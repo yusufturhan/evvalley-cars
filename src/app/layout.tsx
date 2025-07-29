@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Evvalley Cars - Araba İlan Sitesi",
-  description: "Türkiye'nin en güvenilir araba ilan sitesi. Yeni ve ikinci el araçlar için güvenli alım-satım platformu.",
+  title: "Evvalley Motors - America's Trusted Car Marketplace",
+  description: "Find your perfect car with America's most trusted car marketplace. Buy and sell vehicles with confidence.",
 };
 
 export default function RootLayout({

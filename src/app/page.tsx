@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Search, Car, MapPin, Filter } from "lucide-react";
+import Logo from "@/components/Logo";
 
 export default function Home() {
   return (
@@ -8,20 +9,17 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Car className="h-8 w-8 text-blue-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Evvalley Cars</span>
-            </div>
+            <Logo />
             <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-blue-600">Ana Sayfa</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600">Araçlar</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600">İlan Ver</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600">İletişim</a>
+              <a href="#" className="text-gray-700 hover:text-blue-600">Home</a>
+              <a href="#" className="text-gray-700 hover:text-blue-600">Vehicles</a>
+              <a href="#" className="text-gray-700 hover:text-blue-600">Sell Your Car</a>
+              <a href="#" className="text-gray-700 hover:text-blue-600">Contact</a>
             </nav>
             <div className="flex items-center space-x-4">
-              <button className="text-gray-700 hover:text-blue-600">Giriş Yap</button>
+              <button className="text-gray-700 hover:text-blue-600">Sign In</button>
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Kayıt Ol
+                Sign Up
               </button>
             </div>
           </div>
@@ -33,10 +31,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Hayalinizdeki Arabayı Bulun
+              Find Your Perfect Car
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Türkiye'nin en güvenilir araba ilan sitesi
+              America's most trusted car marketplace
             </p>
             
             {/* Search Bar */}
@@ -48,7 +46,7 @@ export default function Home() {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type="text"
-                        placeholder="Marka, model veya özellik ara..."
+                        placeholder="Search make, model, or features..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                       />
                     </div>
@@ -58,14 +56,14 @@ export default function Home() {
                       <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type="text"
-                        placeholder="Şehir seçin..."
+                        placeholder="Select location..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                       />
                     </div>
                   </div>
                   <button className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 flex items-center justify-center">
                     <Filter className="mr-2 h-5 w-5" />
-                    Filtrele
+                    Search
                   </button>
                 </div>
               </div>
@@ -78,7 +76,7 @@ export default function Home() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Öne Çıkan Araçlar
+            Featured Vehicles
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -89,11 +87,11 @@ export default function Home() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">BMW 320i</h3>
-                <p className="text-gray-600 mb-4">2020 • 45.000 km • Benzin</p>
+                <p className="text-gray-600 mb-4">2020 • 28,000 miles • Gasoline</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-blue-600">₺850.000</span>
+                  <span className="text-2xl font-bold text-blue-600">$32,500</span>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    İncele
+                    View Details
                   </button>
                 </div>
               </div>
@@ -106,11 +104,11 @@ export default function Home() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Mercedes C200</h3>
-                <p className="text-gray-600 mb-4">2021 • 32.000 km • Benzin</p>
+                <p className="text-gray-600 mb-4">2021 • 20,000 miles • Gasoline</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-blue-600">₺1.250.000</span>
+                  <span className="text-2xl font-bold text-blue-600">$45,800</span>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    İncele
+                    View Details
                   </button>
                 </div>
               </div>
@@ -123,11 +121,11 @@ export default function Home() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Audi A4</h3>
-                <p className="text-gray-600 mb-4">2019 • 58.000 km • Dizel</p>
+                <p className="text-gray-600 mb-4">2019 • 36,000 miles • Diesel</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-blue-600">₺750.000</span>
+                  <span className="text-2xl font-bold text-blue-600">$28,900</span>
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                    İncele
+                    View Details
                   </button>
                 </div>
               </div>
@@ -141,16 +139,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold mb-2">10,000+</div>
-              <div className="text-blue-100">Aktif İlan</div>
+              <div className="text-4xl font-bold mb-2">50,000+</div>
+              <div className="text-blue-100">Active Listings</div>
             </div>
             <div>
-              <div className="text-4xl font-bold mb-2">50,000+</div>
-              <div className="text-blue-100">Mutlu Müşteri</div>
+              <div className="text-4xl font-bold mb-2">200,000+</div>
+              <div className="text-blue-100">Happy Customers</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">5+</div>
-              <div className="text-blue-100">Yıllık Deneyim</div>
+              <div className="text-blue-100">Years of Experience</div>
             </div>
           </div>
         </div>
@@ -161,40 +159,40 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Evvalley Cars</h3>
+              <h3 className="text-lg font-semibold mb-4">Evvalley Motors</h3>
               <p className="text-gray-400">
-                Türkiye'nin en güvenilir araba ilan sitesi
+                America's most trusted car marketplace
               </p>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Hızlı Linkler</h4>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Ana Sayfa</a></li>
-                <li><a href="#" className="hover:text-white">Araçlar</a></li>
-                <li><a href="#" className="hover:text-white">İlan Ver</a></li>
-                <li><a href="#" className="hover:text-white">İletişim</a></li>
+                <li><a href="#" className="hover:text-white">Home</a></li>
+                <li><a href="#" className="hover:text-white">Vehicles</a></li>
+                <li><a href="#" className="hover:text-white">Sell Your Car</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Destek</h4>
+              <h4 className="text-lg font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Yardım</a></li>
-                <li><a href="#" className="hover:text-white">SSS</a></li>
-                <li><a href="#" className="hover:text-white">Güvenlik</a></li>
-                <li><a href="#" className="hover:text-white">Gizlilik</a></li>
+                <li><a href="#" className="hover:text-white">Help Center</a></li>
+                <li><a href="#" className="hover:text-white">FAQ</a></li>
+                <li><a href="#" className="hover:text-white">Safety</a></li>
+                <li><a href="#" className="hover:text-white">Privacy</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">İletişim</h4>
+              <h4 className="text-lg font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>info@evvalleycars.com</li>
-                <li>+90 212 555 0123</li>
-                <li>İstanbul, Türkiye</li>
+                <li>info@evvalleymotors.com</li>
+                <li>+1 (555) 123-4567</li>
+                <li>New York, NY</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Evvalley Cars. Tüm hakları saklıdır.</p>
+            <p>&copy; 2024 Evvalley Motors. All rights reserved.</p>
           </div>
         </div>
       </footer>
