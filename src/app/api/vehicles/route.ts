@@ -120,9 +120,9 @@ export async function POST(request: Request) {
     const title_status = formData.get('title_status') as string;
 
     // Validate required fields
-    if (!title || !description || !price || !year || !brand || !model || !category) {
+    if (!title || !price || !year || !brand || !model || !category) {
       return NextResponse.json({ 
-        error: 'Missing required fields: title, description, price, year, brand, model, category' 
+        error: 'Missing required fields: title, price, year, brand, model, category' 
       }, { status: 400 });
     }
 

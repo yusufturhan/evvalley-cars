@@ -91,6 +91,11 @@ export default function SellPage() {
       newErrors.title = 'Title must be less than 100 characters';
     }
 
+    // Description validation (optional now)
+    if (formData.description && formData.description.length > 2000) {
+      newErrors.description = 'Description must be less than 2000 characters';
+    }
+
     // Brand validation
     if (!formData.brand.trim()) {
       newErrors.brand = 'Brand is required';
@@ -350,13 +355,12 @@ export default function SellPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Vehicle Condition *
+                  Vehicle Condition
                 </label>
                 <select
                   name="vehicle_condition"
                   value={formData.vehicle_condition}
                   onChange={handleInputChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                 >
                   <option value="" className="text-gray-900">Select condition</option>
@@ -565,10 +569,11 @@ export default function SellPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
                   >
                     <option value="" className="text-gray-900">Select transmission here</option>
-                    <option value="automatic" className="text-gray-900">Automatic</option>
-                    <option value="manual" className="text-gray-900">Manual</option>
-                    <option value="cvt" className="text-gray-900">CVT</option>
-                    <option value="single-speed" className="text-gray-900">Single Speed</option>
+                    <option value="automatic" className="text-gray-900">Automatic Transmission</option>
+                    <option value="e-cvt" className="text-gray-900">e-CVT</option>
+                    <option value="single-speed" className="text-gray-900">Single-Speed</option>
+                    <option value="2-speed" className="text-gray-900">2-Speed Transmission</option>
+                    <option value="dct" className="text-gray-900">DCT (Dual-Clutch)</option>
                   </select>
                 </div>
               </div>
@@ -737,16 +742,15 @@ export default function SellPage() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
+                Description
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                required
                 rows={4}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="Describe your vehicle's condition, features, and any additional information..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                placeholder="Describe your vehicle's condition, features, and any additional information..."
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
