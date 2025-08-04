@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Car } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 interface LogoProps {
   className?: string;
@@ -15,11 +15,13 @@ export default function Logo({ className = '', size = 'md' }: LogoProps) {
 
   return (
     <div className={`flex items-center ${className}`}>
-      {/* Replace this with your actual logo */}
-      <div className={`${sizeClasses[size]} bg-blue-600 rounded-lg flex items-center justify-center`}>
-        <Car className="h-5 w-5 text-white" />
-      </div>
-      <span className="ml-2 text-xl font-bold text-gray-900">Evvalley Motors</span>
+      <Image
+        src="/logo.svg"
+        alt="Evvalley"
+        width={size === 'sm' ? 80 : size === 'lg' ? 160 : 120}
+        height={size === 'sm' ? 27 : size === 'lg' ? 53 : 40}
+        className="rounded-lg"
+      />
     </div>
   );
 }
@@ -34,18 +36,13 @@ export function LogoWithImage({ className = '', size = 'md' }: LogoProps) {
 
   return (
     <div className={`flex items-center ${className}`}>
-      {/* Uncomment and replace with your actual logo */}
-      {/* <Image
-        src="/logo.png"
-        alt="Evvalley Motors"
-        width={32}
-        height={32}
-        className={sizeClasses[size]}
-      /> */}
-      <div className={`${sizeClasses[size]} bg-blue-600 rounded-lg flex items-center justify-center`}>
-        <Car className="h-5 w-5 text-white" />
-      </div>
-      <span className="ml-2 text-xl font-bold text-gray-900">Evvalley Motors</span>
+      <Image
+        src="/logo.svg"
+        alt="Evvalley"
+        width={size === 'sm' ? 80 : size === 'lg' ? 160 : 120}
+        height={size === 'sm' ? 27 : size === 'lg' ? 53 : 40}
+        className="rounded-lg"
+      />
     </div>
   );
 } 
