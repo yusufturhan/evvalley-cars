@@ -137,7 +137,7 @@ export async function POST(request: Request) {
       price: parseFloat(price),
       year: parseInt(year),
       mileage: mileage ? parseInt(mileage) : null,
-      fuel_type: fuel_type || 'electric',
+      fuel_type: fuel_type || null,
       brand,
       model,
       category,
@@ -146,9 +146,20 @@ export async function POST(request: Request) {
       battery_capacity: battery_capacity || null,
       location: location || null,
       seller_id: seller_id || defaultSellerId,
-      vehicle_condition: vehicle_condition || 'good',
-      title_status: title_status || 'clean',
+      vehicle_condition: vehicle_condition || null,
+      title_status: title_status || null,
       highlighted_features: highlighted_features || null,
+      // Extended fields - only if provided
+      interior_color: formData.get('interior_color') as string || null,
+      exterior_color: formData.get('exterior_color') as string || null,
+      body_seating: formData.get('body_seating') as string || null,
+      combined_fuel_economy: formData.get('combined_fuel_economy') as string || null,
+      transmission: formData.get('transmission') as string || null,
+      horsepower: formData.get('horsepower') ? parseInt(formData.get('horsepower') as string) : null,
+      electric_mile_range: formData.get('electric_mile_range') ? parseInt(formData.get('electric_mile_range') as string) : null,
+      battery_warranty: formData.get('battery_warranty') as string || null,
+      drivetrain: formData.get('drivetrain') as string || null,
+      vin: formData.get('vin') as string || null,
       images: [], // Will be populated after upload
       is_active: true
     };

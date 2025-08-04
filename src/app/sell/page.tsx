@@ -26,7 +26,7 @@ export default function SellPage() {
     max_speed: "",
     battery_capacity: "",
     location: "",
-    fuel_type: "electric",
+    fuel_type: "",
     seller_type: "private",
     // New fields
     vehicle_condition: "",
@@ -503,8 +503,26 @@ export default function SellPage() {
               </div>
             </div>
 
-            {/* Mileage and Range */}
+            {/* Fuel Type and Mileage */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fuel Type
+                </label>
+                <select
+                  name="fuel_type"
+                  value={formData.fuel_type}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                >
+                  <option value="" className="text-gray-900">Select fuel type</option>
+                  <option value="electric" className="text-gray-900">Electric</option>
+                  <option value="hybrid" className="text-gray-900">Hybrid</option>
+                  <option value="plug-in-hybrid" className="text-gray-900">Plug-in Hybrid</option>
+                  <option value="hydrogen" className="text-gray-900">Hydrogen</option>
+                </select>
+              </div>
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Mileage (miles)
@@ -520,22 +538,23 @@ export default function SellPage() {
                 />
                 {errors.mileage && <p className="text-red-500 text-xs mt-1">{errors.mileage}</p>}
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Range (miles)
-                </label>
-                <input
-                  type="number"
-                  name="range_miles"
-                  value={formData.range_miles}
-                  onChange={handleInputChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="350"
-                />
-                {errors.range_miles && <p className="text-red-500 text-xs mt-1">{errors.range_miles}</p>}
-              </div>
+            </div>
+
+            {/* Range */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Range (miles)
+              </label>
+              <input
+                type="number"
+                name="range_miles"
+                value={formData.range_miles}
+                onChange={handleInputChange}
+                min="0"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                placeholder="350"
+              />
+              {errors.range_miles && <p className="text-red-500 text-xs mt-1">{errors.range_miles}</p>}
             </div>
 
             {/* Vehicle Details - Extended */}
