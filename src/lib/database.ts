@@ -55,6 +55,9 @@ export interface Vehicle {
   sold?: boolean;
   sold_at?: string;
   sold_to_email?: string;
+  // New fields
+  vehicle_condition?: string;
+  title_status?: string;
 }
 
 export interface Message {

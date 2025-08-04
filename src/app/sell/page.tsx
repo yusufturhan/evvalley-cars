@@ -27,12 +27,11 @@ export default function SellPage() {
     battery_capacity: "",
     location: "",
     fuel_type: "electric",
-    seller_type: "private", // New field
-    // New fields from SS
-    full_name: "",
-    phone_number: "",
-    email: "",
-    post_title: "",
+    seller_type: "private",
+    // New fields
+    vehicle_condition: "",
+    title_status: "",
+    // Extended fields
     interior_color: "",
     exterior_color: "",
     body_seating: "",
@@ -327,24 +326,71 @@ export default function SellPage() {
               </div>
             </div>
 
-            {/* Seller Type */}
+            {/* Seller Type and Vehicle Condition */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Seller Type *
+                </label>
+                <select
+                  name="seller_type"
+                  value={formData.seller_type}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+                >
+                  <option value="private" className="text-gray-900">Private Seller</option>
+                  <option value="dealer" className="text-gray-900">Dealer</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.seller_type === 'private' && 'You are selling your own vehicle'}
+                  {formData.seller_type === 'dealer' && 'You are selling as a professional dealer'}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Vehicle Condition *
+                </label>
+                <select
+                  name="vehicle_condition"
+                  value={formData.vehicle_condition}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+                >
+                  <option value="" className="text-gray-900">Select condition</option>
+                  <option value="excellent" className="text-gray-900">Excellent</option>
+                  <option value="good" className="text-gray-900">Good</option>
+                  <option value="fair" className="text-gray-900">Fair</option>
+                  <option value="poor" className="text-gray-900">Poor</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Describe the overall condition of your vehicle
+                </p>
+              </div>
+            </div>
+
+            {/* Title Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Seller Type *
+                Title Status *
               </label>
               <select
-                name="seller_type"
-                value={formData.seller_type}
+                name="title_status"
+                value={formData.title_status}
                 onChange={handleInputChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
               >
-                <option value="private" className="text-gray-900">Private Seller</option>
-                <option value="dealer" className="text-gray-900">Dealer</option>
+                <option value="" className="text-gray-900">Select title status</option>
+                <option value="clean" className="text-gray-900">Clean Title</option>
+                <option value="salvage" className="text-gray-900">Salvage Title</option>
+                <option value="rebuilt" className="text-gray-900">Rebuilt Title</option>
+                <option value="flood" className="text-gray-900">Flood Title</option>
               </select>
               <p className="text-xs text-gray-500 mt-1">
-                {formData.seller_type === 'private' && 'You are selling your own vehicle'}
-                {formData.seller_type === 'dealer' && 'You are selling as a professional dealer'}
+                Clean title means no major accidents. Salvage means the vehicle was declared a total loss by insurance.
               </p>
             </div>
 

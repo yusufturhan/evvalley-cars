@@ -116,6 +116,8 @@ export async function POST(request: Request) {
     const battery_capacity = formData.get('battery_capacity') as string;
     const location = formData.get('location') as string;
     const seller_id = formData.get('seller_id') as string;
+    const vehicle_condition = formData.get('vehicle_condition') as string;
+    const title_status = formData.get('title_status') as string;
 
     // Validate required fields
     if (!title || !description || !price || !year || !brand || !model || !category) {
@@ -143,6 +145,8 @@ export async function POST(request: Request) {
       battery_capacity: battery_capacity || null,
       location: location || null,
       seller_id: seller_id || defaultSellerId,
+      vehicle_condition: vehicle_condition || 'good',
+      title_status: title_status || 'clean',
       images: [], // Will be populated after upload
       is_active: true
     };

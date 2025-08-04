@@ -438,6 +438,14 @@ export default function VehicleDetailPage() {
                   <p className="font-semibold text-gray-900 capitalize">{vehicle.fuel_type}</p>
                 </div>
                 <div>
+                  <span className="text-gray-800 font-medium">Condition:</span>
+                  <p className="font-semibold text-gray-900 capitalize">{vehicle.vehicle_condition || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Title Status:</span>
+                  <p className="font-semibold text-gray-900 capitalize">{vehicle.title_status || 'N/A'}</p>
+                </div>
+                <div>
                   <span className="text-gray-800 font-medium">Battery:</span>
                   <p className="font-semibold text-gray-900">{vehicle.battery_capacity || 'N/A'}</p>
                 </div>
