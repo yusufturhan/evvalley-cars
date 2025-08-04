@@ -322,12 +322,12 @@ export default function VehicleDetailPage() {
               </div>
             )}
 
-            {/* Messaging Component - Moved here from bottom */}
-            {showMessaging && isSignedIn && vehicle && !vehicle.sold && (
+            {/* Messaging Component - Always show for testing */}
+            {vehicle && (
               <div className="mt-6">
                 <SimpleChat
                   vehicleId={vehicle.id}
-                  currentUserEmail={user?.emailAddresses[0]?.emailAddress || 'anonymous@evvalley.com'}
+                  currentUserEmail={user?.emailAddresses[0]?.emailAddress || 'test@evvalley.com'}
                   sellerEmail={vehicle.seller_email || 'evvalley12@gmail.com'} // Use actual seller email
                   isCurrentUserSeller={user?.emailAddresses[0]?.emailAddress === (vehicle.seller_email || 'evvalley12@gmail.com')}
                 />

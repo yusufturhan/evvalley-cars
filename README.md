@@ -134,9 +134,9 @@ Bu proje MIT lisansı altında lisanslanmıştır.
 
 ## 📞 İletişim
 
-- **Email**: info@evvalleycars.com
-- **Telefon**: +90 212 555 0123
-- **Adres**: İstanbul, Türkiye
+- **Email**: evvalley@evvalley.com
+- **Telefon**: 650 507 63 86
+- **Adres**: East Palo Alto, CA
 
 ## 🙏 Teşekkürler
 
