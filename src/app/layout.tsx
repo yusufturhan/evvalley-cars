@@ -22,6 +22,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.svg', sizes: '32x32', type: 'image/svg+xml' },
+    ],
+    apple: '/favicon.svg',
+  },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
     description: "America's #1 Electric Vehicle & E-Mobility Marketplace. Find, buy, and sell EVs, hybrids, scooters, and e-bikes.",

@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1C1F4A"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M8 6L4 16H12L6 26L20 16H12L18 6Z" fill="white" stroke="white" stroke-width="1"/>
+  
+  <!-- EV text -->
+  <text x="16" y="22" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white" text-anchor="middle">EV</text>
+</svg> 
