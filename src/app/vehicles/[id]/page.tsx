@@ -385,7 +385,7 @@ export default function VehicleDetailPage() {
               <div className="bg-white rounded-lg p-4 border">
                 <div className="flex items-center mb-2">
                   <Calendar className="h-5 w-5 text-gray-600 mr-2" />
-                  <span className="text-sm text-gray-800 font-medium">Year</span>
+                  <span className="text-sm text-gray-900 font-bold">Year</span>
                 </div>
                 <p className="text-lg font-bold text-gray-900">{vehicle.year}</p>
               </div>
@@ -393,7 +393,7 @@ export default function VehicleDetailPage() {
               <div className="bg-white rounded-lg p-4 border">
                 <div className="flex items-center mb-2">
                   <Gauge className="h-5 w-5 text-gray-600 mr-2" />
-                  <span className="text-sm text-gray-800 font-medium">Mileage</span>
+                  <span className="text-sm text-gray-900 font-bold">Mileage</span>
                 </div>
                 <p className="text-lg font-bold text-gray-900">
                   {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}
@@ -404,7 +404,7 @@ export default function VehicleDetailPage() {
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="flex items-center mb-2">
                     <Battery className="h-5 w-5 text-gray-600 mr-2" />
-                    <span className="text-sm text-gray-800 font-medium">Range</span>
+                    <span className="text-sm text-gray-900 font-bold">Range</span>
                   </div>
                   <p className="text-lg font-bold text-gray-900">{vehicle.range_miles} miles</p>
                 </div>
@@ -414,7 +414,7 @@ export default function VehicleDetailPage() {
                 <div className="bg-white rounded-lg p-4 border">
                   <div className="flex items-center mb-2">
                     <Zap className="h-5 w-5 text-gray-600 mr-2" />
-                    <span className="text-sm text-gray-800 font-medium">Max Speed</span>
+                    <span className="text-sm text-gray-900 font-bold">Max Speed</span>
                   </div>
                   <p className="text-lg font-bold text-gray-900">{vehicle.max_speed} mph</p>
                 </div>
@@ -437,81 +437,57 @@ export default function VehicleDetailPage() {
                   <span className="text-gray-800 font-medium">Fuel Type:</span>
                   <p className="font-semibold text-gray-900 capitalize">{vehicle.fuel_type}</p>
                 </div>
-                {vehicle.battery_capacity && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Battery:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.battery_capacity}</p>
+                <div>
+                  <span className="text-gray-800 font-medium">Battery:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.battery_capacity || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Interior Color:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.interior_color || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Exterior Color:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.exterior_color || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Body/Seating:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.body_seating || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Transmission:</span>
+                  <p className="font-semibold text-gray-900 capitalize">{vehicle.transmission || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Fuel Economy:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.combined_fuel_economy || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Horsepower:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.horsepower ? `${vehicle.horsepower} hp` : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Electric Range:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.electric_mile_range ? `${vehicle.electric_mile_range} miles` : 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Battery Warranty:</span>
+                  <p className="font-semibold text-gray-900">{vehicle.battery_warranty || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">Drivetrain:</span>
+                  <p className="font-semibold text-gray-900 capitalize">{vehicle.drivetrain || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-gray-800 font-medium">VIN:</span>
+                  <p className="font-semibold text-gray-900 font-mono text-xs">{vehicle.vin || 'N/A'}</p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-800 font-medium">Location:</span>
+                  <div className="flex items-center mt-1">
+                    <MapPin className="h-4 w-4 text-gray-600 mr-1" />
+                    <p className="font-semibold text-gray-900">{vehicle.location}</p>
                   </div>
-                )}
-                {vehicle.interior_color && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Interior Color:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.interior_color}</p>
-                  </div>
-                )}
-                {vehicle.exterior_color && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Exterior Color:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.exterior_color}</p>
-                  </div>
-                )}
-                {vehicle.body_seating && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Body/Seating:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.body_seating}</p>
-                  </div>
-                )}
-                {vehicle.transmission && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Transmission:</span>
-                    <p className="font-semibold text-gray-900 capitalize">{vehicle.transmission}</p>
-                  </div>
-                )}
-                {vehicle.combined_fuel_economy && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Fuel Economy:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.combined_fuel_economy}</p>
-                  </div>
-                )}
-                {vehicle.horsepower && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Horsepower:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.horsepower} hp</p>
-                  </div>
-                )}
-                {vehicle.electric_mile_range && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Electric Range:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.electric_mile_range} miles</p>
-                  </div>
-                )}
-                {vehicle.battery_warranty && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Battery Warranty:</span>
-                    <p className="font-semibold text-gray-900">{vehicle.battery_warranty}</p>
-                  </div>
-                )}
-                {vehicle.drivetrain && (
-                  <div>
-                    <span className="text-gray-800 font-medium">Drivetrain:</span>
-                    <p className="font-semibold text-gray-900 capitalize">{vehicle.drivetrain}</p>
-                  </div>
-                )}
-                {vehicle.vin && (
-                  <div>
-                    <span className="text-gray-800 font-medium">VIN:</span>
-                    <p className="font-semibold text-gray-900 font-mono text-xs">{vehicle.vin}</p>
-                  </div>
-                )}
-                {vehicle.location && (
-                  <div className="col-span-2">
-                    <span className="text-gray-800 font-medium">Location:</span>
-                    <div className="flex items-center mt-1">
-                      <MapPin className="h-4 w-4 text-gray-600 mr-1" />
-                      <p className="font-semibold text-gray-900">{vehicle.location}</p>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
