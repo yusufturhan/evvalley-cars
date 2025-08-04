@@ -142,135 +142,151 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Mobile Navigation Menu - Always Visible */}
-            <div style={{ 
-              backgroundColor: '#EBF8FF', 
-              borderTop: '1px solid #90CDF4', 
-              padding: '12px 0',
-              marginTop: '8px'
-            }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                <Link 
-                  href="/" 
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A5568',
-                    backgroundColor: 'white',
-                    border: '1px solid #90CDF4',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-block'
-                  }}
-                >
-                  🏠 Home
-                </Link>
-                <Link 
-                  href="/vehicles" 
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A5568',
-                    backgroundColor: 'white',
-                    border: '1px solid #90CDF4',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-block'
-                  }}
-                >
-                  🚗 EVs & E-Mobility
-                </Link>
-                <Link 
-                  href="/community" 
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A5568',
-                    backgroundColor: 'white',
-                    border: '1px solid #90CDF4',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-block'
-                  }}
-                >
-                  👥 Community
-                </Link>
-                <Link 
-                  href="/about" 
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    color: '#4A5568',
-                    backgroundColor: 'white',
-                    border: '1px solid #90CDF4',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-block'
-                  }}
-                >
-                  ℹ️ About Us
-                </Link>
-                <Link 
-                  href="/sell" 
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1C1F4A',
-                    backgroundColor: '#BEE3F8',
-                    border: '2px solid #3AB0FF',
-                    borderRadius: '8px',
-                    textDecoration: 'none',
-                    display: 'inline-block'
-                  }}
-                >
-                  💰 Sell Your EV
-                </Link>
+            {/* Mobile Navigation Menu - Dropdown */}
+            {isMobileMenuOpen && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  right: '0',
+                  backgroundColor: 'white',
+                  borderTop: '1px solid #E2E8F0',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  zIndex: '9999',
+                  padding: '16px'
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <Link 
+                    href="/" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#4A5568',
+                      backgroundColor: '#F7FAFC',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'block',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    href="/vehicles" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#4A5568',
+                      backgroundColor: '#F7FAFC',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'block',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    EVs & E-Mobility
+                  </Link>
+                  <Link 
+                    href="/community" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#4A5568',
+                      backgroundColor: '#F7FAFC',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'block',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    Community
+                  </Link>
+                  <Link 
+                    href="/about" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      fontWeight: '500',
+                      color: '#4A5568',
+                      backgroundColor: '#F7FAFC',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'block',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    About Us
+                  </Link>
+                  <Link 
+                    href="/sell" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      padding: '12px 16px',
+                      fontSize: '16px',
+                      fontWeight: '600',
+                      color: '#1C1F4A',
+                      backgroundColor: '#EBF8FF',
+                      borderRadius: '8px',
+                      textDecoration: 'none',
+                      display: 'block',
+                      border: '2px solid #3AB0FF'
+                    }}
+                  >
+                    Sell Your EV
+                  </Link>
 
-                {isSignedIn && (
-                  <Link 
-                    href="/favorites" 
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#4A5568',
-                      backgroundColor: 'white',
-                      border: '1px solid #90CDF4',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Heart style={{ width: '12px', height: '12px', marginRight: '4px' }} />
-                    Favorites
-                  </Link>
-                )}
-                {isSignedIn && (
-                  <Link 
-                    href="/profile" 
-                    style={{
-                      padding: '8px 16px',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#4A5568',
-                      backgroundColor: 'white',
-                      border: '1px solid #90CDF4',
-                      borderRadius: '8px',
-                      textDecoration: 'none',
-                      display: 'inline-block'
-                    }}
-                  >
-                    👤 My Profile
-                  </Link>
-                )}
+                  {isSignedIn && (
+                    <Link 
+                      href="/favorites" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      style={{
+                        padding: '12px 16px',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#4A5568',
+                        backgroundColor: '#F7FAFC',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        border: '1px solid #E2E8F0'
+                      }}
+                    >
+                      <Heart style={{ width: '16px', height: '16px', marginRight: '8px' }} />
+                      Favorites
+                    </Link>
+                  )}
+                  {isSignedIn && (
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      style={{
+                        padding: '12px 16px',
+                        fontSize: '16px',
+                        fontWeight: '500',
+                        color: '#4A5568',
+                        backgroundColor: '#F7FAFC',
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        display: 'block',
+                        border: '1px solid #E2E8F0'
+                      }}
+                    >
+                      My Profile
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </header>
