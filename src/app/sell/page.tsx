@@ -414,15 +414,17 @@ export default function SellPage() {
                 >
                   <option value="" className="text-gray-900">Select brand</option>
                   <option value="Tesla" className="text-gray-900">Tesla</option>
-                  <option value="Toyota" className="text-gray-900">Toyota</option>
+                  <option value="Rivian" className="text-gray-900">Rivian</option>
+                  <option value="Lucid" className="text-gray-900">Lucid</option>
                   <option value="Ford" className="text-gray-900">Ford</option>
                   <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
-                  <option value="BMW" className="text-gray-900">BMW</option>
-                  <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                  <option value="Toyota" className="text-gray-900">Toyota</option>
                   <option value="Honda" className="text-gray-900">Honda</option>
                   <option value="Nissan" className="text-gray-900">Nissan</option>
-                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                  <option value="BMW" className="text-gray-900">BMW</option>
+                  <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
                   <option value="Audi" className="text-gray-900">Audi</option>
+                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
                   <option value="Hyundai" className="text-gray-900">Hyundai</option>
                   <option value="Kia" className="text-gray-900">Kia</option>
                   <option value="Lexus" className="text-gray-900">Lexus</option>
@@ -433,11 +435,13 @@ export default function SellPage() {
                   <option value="Mazda" className="text-gray-900">Mazda</option>
                   <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
                   <option value="Subaru" className="text-gray-900">Subaru</option>
-                  <option value="Suzuki" className="text-gray-900">Suzuki</option>
-                  <option value="Tata" className="text-gray-900">Tata</option>
-                  <option value="Tesla" className="text-gray-900">Tesla</option>
-                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
-                  <option value="Volvo" className="text-gray-900">Volvo</option>
+                  <option value="Polestar" className="text-gray-900">Polestar</option>
+                  <option value="Fisker" className="text-gray-900">Fisker</option>
+                  <option value="VinFast" className="text-gray-900">VinFast</option>
+                  <option value="Bollinger" className="text-gray-900">Bollinger</option>
+                  <option value="Canoo" className="text-gray-900">Canoo</option>
+                  <option value="Lordstown" className="text-gray-900">Lordstown</option>
+                  <option value="Nikola" className="text-gray-900">Nikola</option>
                   <option value="Other" className="text-gray-900">Other</option>
                 </select>
                 {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
