@@ -58,6 +58,7 @@ export interface Vehicle {
   // New fields
   vehicle_condition?: string;
   title_status?: string;
+  highlighted_features?: string;
 }
 
 export interface Message {

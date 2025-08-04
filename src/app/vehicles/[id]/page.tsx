@@ -421,6 +421,14 @@ export default function VehicleDetailPage() {
               )}
             </div>
 
+            {/* Highlighted Features */}
+            {vehicle.highlighted_features && (
+              <div className="bg-white rounded-lg p-6 border mb-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Highlighted Features</h3>
+                <p className="text-gray-700 whitespace-pre-line">{vehicle.highlighted_features}</p>
+              </div>
+            )}
+
             {/* Additional Details */}
             <div className="bg-white rounded-lg p-6 border">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Vehicle Details</h3>

@@ -29,6 +29,7 @@ ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS sold_to_email VARCHAR(255);
 -- Add new columns to vehicles table
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS vehicle_condition VARCHAR(20);
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS title_status VARCHAR(20);
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS highlighted_features TEXT;
 
 -- Update existing vehicles with default values
 UPDATE vehicles SET vehicle_condition = 'good' WHERE vehicle_condition IS NULL;

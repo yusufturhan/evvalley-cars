@@ -31,6 +31,7 @@ export default function SellPage() {
     // New fields
     vehicle_condition: "",
     title_status: "",
+    highlighted_features: "",
     // Extended fields
     interior_color: "",
     exterior_color: "",
@@ -404,15 +405,41 @@ export default function SellPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Brand *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="brand"
                   value={formData.brand}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., Tesla"
-                />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+                >
+                  <option value="" className="text-gray-900">Select brand</option>
+                  <option value="Tesla" className="text-gray-900">Tesla</option>
+                  <option value="Toyota" className="text-gray-900">Toyota</option>
+                  <option value="Ford" className="text-gray-900">Ford</option>
+                  <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
+                  <option value="BMW" className="text-gray-900">BMW</option>
+                  <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                  <option value="Honda" className="text-gray-900">Honda</option>
+                  <option value="Nissan" className="text-gray-900">Nissan</option>
+                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                  <option value="Audi" className="text-gray-900">Audi</option>
+                  <option value="Hyundai" className="text-gray-900">Hyundai</option>
+                  <option value="Kia" className="text-gray-900">Kia</option>
+                  <option value="Lexus" className="text-gray-900">Lexus</option>
+                  <option value="Porsche" className="text-gray-900">Porsche</option>
+                  <option value="Volvo" className="text-gray-900">Volvo</option>
+                  <option value="Jaguar" className="text-gray-900">Jaguar</option>
+                  <option value="Land Rover" className="text-gray-900">Land Rover</option>
+                  <option value="Mazda" className="text-gray-900">Mazda</option>
+                  <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
+                  <option value="Subaru" className="text-gray-900">Subaru</option>
+                  <option value="Suzuki" className="text-gray-900">Suzuki</option>
+                  <option value="Tata" className="text-gray-900">Tata</option>
+                  <option value="Tesla" className="text-gray-900">Tesla</option>
+                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                  <option value="Volvo" className="text-gray-900">Volvo</option>
+                  <option value="Other" className="text-gray-900">Other</option>
+                </select>
                 {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
               </div>
               
@@ -737,6 +764,24 @@ export default function SellPage() {
               </label>
               <ImageUpload onImagesChange={handleImagesChange} maxImages={12} />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+            </div>
+
+            {/* Highlighted Features */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Highlighted Features
+              </label>
+              <textarea
+                name="highlighted_features"
+                value={formData.highlighted_features}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                placeholder="List the key features of your vehicle (e.g., Autopilot, Premium Sound, Leather Seats, Navigation, etc.)"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Highlight the most important features that make your vehicle special
+              </p>
             </div>
 
             {/* Description */}

@@ -118,6 +118,7 @@ export async function POST(request: Request) {
     const seller_id = formData.get('seller_id') as string;
     const vehicle_condition = formData.get('vehicle_condition') as string;
     const title_status = formData.get('title_status') as string;
+    const highlighted_features = formData.get('highlighted_features') as string;
 
     // Validate required fields
     if (!title || !price || !year || !brand || !model || !category) {
@@ -147,6 +148,7 @@ export async function POST(request: Request) {
       seller_id: seller_id || defaultSellerId,
       vehicle_condition: vehicle_condition || 'good',
       title_status: title_status || 'clean',
+      highlighted_features: highlighted_features || null,
       images: [], // Will be populated after upload
       is_active: true
     };
