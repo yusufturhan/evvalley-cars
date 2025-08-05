@@ -11,6 +11,10 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS seller_type VARCHAR(20) DEFAULT 'priv
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS range_miles INTEGER;
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS max_speed INTEGER;
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS battery_capacity INTEGER;
+ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS seller_email VARCHAR(255);
+
+-- Update existing vehicles with seller emails
+UPDATE vehicles SET seller_email = 'yusufturhan129@gmail.com' WHERE seller_email IS NULL;
 
 -- Add new vehicle detail columns
 ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS interior_color VARCHAR(50);

@@ -130,6 +130,9 @@ export async function POST(request: Request) {
     // Use a default UUID if seller_id is not provided or invalid
     const defaultSellerId = '1b69d5c5-283a-4d53-979f-4f6eb7a5ea0a';
 
+    // Get seller email from form data or use default
+    const seller_email = formData.get('seller_email') as string || 'evvalley12@gmail.com';
+
     // Create vehicle data
     const vehicleData = {
       title,
@@ -146,6 +149,7 @@ export async function POST(request: Request) {
       battery_capacity: battery_capacity || null,
       location: location || null,
       seller_id: seller_id || defaultSellerId,
+      seller_email: seller_email,
       vehicle_condition: vehicle_condition || null,
       title_status: title_status || null,
       highlighted_features: highlighted_features || null,

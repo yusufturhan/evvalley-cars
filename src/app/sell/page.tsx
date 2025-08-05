@@ -28,6 +28,7 @@ export default function SellPage() {
     location: "",
     fuel_type: "",
     seller_type: "private",
+    seller_email: user?.emailAddresses[0]?.emailAddress || "",
     // New fields
     vehicle_condition: "",
     title_status: "",
@@ -220,6 +221,7 @@ export default function SellPage() {
       submitFormData.append('battery_capacity', formData.battery_capacity || '');
       submitFormData.append('location', formData.location.trim() || '');
       submitFormData.append('seller_id', userSupabaseId);
+      submitFormData.append('seller_email', formData.seller_email);
 
       // Add images to FormData
       images.forEach((image, index) => {
