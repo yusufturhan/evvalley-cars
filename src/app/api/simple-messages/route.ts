@@ -34,7 +34,7 @@ async function sendEmailNotification(
   messageContent: string
 ) {
   try {
-    const emailResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/email`, {
+    const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/api/email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -80,7 +80,7 @@ From: ${senderName}
 Vehicle: ${vehicleTitle}
 Message: ${messageContent}
 
-View message: ${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/vehicles/f355824c-030d-4b8c-ad60-dfc5c19ce479
+View message: ${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/f355824c-030d-4b8c-ad60-dfc5c19ce479
 
 ---
 Evvalley - US EV & E-Mobility Marketplace
@@ -192,7 +192,9 @@ export async function POST(request: NextRequest) {
     console.log('✅ Message sent successfully!');
 
     // Send email notification to receiver
+    console.log('📧 Attempting to send email to:', receiverEmail);
     await sendEmailNotification(receiverEmail, senderName, vehicleTitle, content.trim());
+    console.log('📧 Email notification completed');
 
     return NextResponse.json({ message });
 
