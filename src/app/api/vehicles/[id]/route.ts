@@ -126,7 +126,7 @@ export async function PUT(
                 .single();
 
               if (!userError && user) {
-                const emailResponse = await fetch(`http://localhost:3001/api/email`, {
+                const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/api/email`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -150,7 +150,7 @@ export async function PUT(
                           </div>
                           
                           <div style="text-align: center; margin: 30px 0;">
-                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/vehicles/${vehicle.id}" 
+                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/${vehicle.id}" 
                                style="background: #3AB0FF; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
                               View Vehicle
                             </a>
@@ -160,7 +160,7 @@ export async function PUT(
                           
                           <div style="text-align: center; color: #6b7280; font-size: 14px;">
                             <p style="margin: 0;">This email was sent by Evvalley.</p>
-                            <p style="margin: 5px 0;">Manage your favorite vehicles by visiting your <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/favorites" style="color: #3AB0FF;">favorites page</a>.</p>
+                            <p style="margin: 5px 0;">Manage your favorite vehicles by visiting your <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/favorites" style="color: #3AB0FF;">favorites page</a>.</p>
                           </div>
                         </div>
                       </div>
@@ -175,7 +175,7 @@ The price of a vehicle in your favorites has been updated:
 ${vehicle.title}
 New Price: $${vehicle.price.toLocaleString()}
 
-View Vehicle: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/vehicles/${vehicle.id}
+View Vehicle: ${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/${vehicle.id}
 
 You're receiving this email because you have this vehicle in your favorites.
                     `
