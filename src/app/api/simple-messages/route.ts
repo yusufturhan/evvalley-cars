@@ -41,50 +41,93 @@ async function sendEmailNotification(
         to: receiverEmail,
         subject: `New message from ${senderName} about ${vehicleTitle} - Evvalley`,
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-            <div style="background-color: #059669; color: white; padding: 20px; text-align: center;">
-              <h1 style="margin: 0; font-size: 24px;">Evvalley</h1>
-              <p style="margin: 5px 0 0 0; font-size: 14px;">US EV & E-Mobility Marketplace</p>
-            </div>
-            
-            <div style="padding: 30px; background-color: #ffffff;">
-              <h2 style="color: #059669; margin-bottom: 20px;">New Message Received</h2>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Message - Evvalley</title>
+          </head>
+          <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <!-- Header -->
+              <div style="background: linear-gradient(135deg, #1C1F4A 0%, #3AB0FF 100%); padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                <div style="display: inline-block; background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 50%; margin-bottom: 20px;">
+                  <span style="font-size: 32px;">💬</span>
+                </div>
+                <h1 style="margin: 0; font-size: 28px; color: white; font-weight: 600;">Evvalley</h1>
+                <p style="margin: 15px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px;">You have a new message!</p>
+              </div>
               
-              <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                <p style="margin: 0 0 10px 0;"><strong>From:</strong> ${senderName}</p>
-                <p style="margin: 0 0 10px 0;"><strong>Vehicle:</strong> ${vehicleTitle}</p>
-                <p style="margin: 0 0 15px 0;"><strong>Message:</strong></p>
-                <div style="background-color: #ffffff; padding: 15px; border-left: 4px solid #059669; border-radius: 4px;">
-                  <p style="margin: 0; line-height: 1.6;">${messageContent}</p>
+              <!-- Content -->
+              <div style="padding: 40px 30px;">
+                <h2 style="color: #1f2937; margin: 0 0 25px 0; font-size: 22px; font-weight: 600;">New Message Received</h2>
+                
+                <!-- Message Details -->
+                <div style="background: #f8fafc; padding: 25px; border-radius: 12px; margin: 25px 0;">
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #3AB0FF;">
+                      <p style="margin: 0; font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">From</p>
+                      <p style="margin: 5px 0 0 0; font-weight: bold; color: #374151; font-size: 16px;">${senderName}</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #3AB0FF;">
+                      <p style="margin: 0; font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Vehicle</p>
+                      <p style="margin: 5px 0 0 0; font-weight: bold; color: #374151; font-size: 16px;">${vehicleTitle}</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Message Content -->
+                  <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #6b7280; font-weight: 600;">Message:</p>
+                    <div style="background: #f9fafb; padding: 15px; border-radius: 6px;">
+                      <p style="margin: 0; line-height: 1.6; color: #374151; font-size: 14px;">${messageContent}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- CTA Button -->
+                <div style="text-align: center; margin: 35px 0;">
+                  <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/${vehicleId}" 
+                     style="background: linear-gradient(135deg, #3AB0FF, #2A8FE6); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; display: inline-block; font-size: 16px; box-shadow: 0 4px 6px rgba(58, 176, 255, 0.3);">
+                    💬 Reply to Message
+                  </a>
+                </div>
+                
+                <!-- Footer -->
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 35px 0;">
+                
+                <div style="text-align: center; color: #6b7280; font-size: 14px; line-height: 1.6;">
+                  <p style="margin: 0 0 10px 0;">This email was sent by Evvalley - Your trusted EV marketplace.</p>
+                  <p style="margin: 0 0 15px 0;">Manage your messages and browse more vehicles on our 
+                    <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles" style="color: #3AB0FF; text-decoration: none; font-weight: 500;">website</a>.
+                  </p>
+                  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
+                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                      © 2024 Evvalley. All rights reserved.
+                    </p>
+                  </div>
                 </div>
               </div>
-              
-              <div style="text-align: center; margin-top: 30px;">
-                <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/vehicles/f355824c-030d-4b8c-ad60-dfc5c19ce479" 
-                   style="background-color: #059669; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
-                  View Message
-                </a>
-              </div>
-              
-              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;">
-                <p style="margin: 0;">This email was sent from Evvalley - US EV & E-Mobility Marketplace</p>
-                <p style="margin: 5px 0 0 0;">Contact: evvalley@evvalley.com</p>
-              </div>
             </div>
-          </div>
+          </body>
+          </html>
         `,
         text: `
-Evvalley - New Message
+💬 New Message - Evvalley
 
-From: ${senderName}
-Vehicle: ${vehicleTitle}
-Message: ${messageContent}
+Hello there,
 
-View message: ${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/f355824c-030d-4b8c-ad60-dfc5c19ce479
+You have received a new message from ${senderName} about the vehicle: ${vehicleTitle}
+
+Message:
+${messageContent}
+
+Reply to this message: ${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/vehicles/${vehicleId}
 
 ---
-Evvalley - US EV & E-Mobility Marketplace
-Contact: evvalley@evvalley.com
+Evvalley - Your trusted EV marketplace
+Manage your messages and browse more vehicles on our website.
+© 2024 Evvalley. All rights reserved.
         `
       })
     });
