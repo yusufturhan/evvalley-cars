@@ -25,7 +25,7 @@ export function calculateMembershipDuration(createdAt: string): string {
 
 export function isVerifiedUser(email: string): boolean {
   // Email doğrulandı kabul ediyoruz (Clerk ile giriş yapanlar)
-  return email && email.includes('@');
+  return Boolean(email && email.includes('@'));
 }
 
 export function getVerificationBadge(): string {

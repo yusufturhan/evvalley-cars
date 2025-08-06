@@ -31,7 +31,8 @@ async function sendEmailNotification(
   receiverEmail: string,
   senderName: string,
   vehicleTitle: string,
-  messageContent: string
+  messageContent: string,
+  vehicleId: string
 ) {
   try {
     const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.com'}/api/email`, {
@@ -236,7 +237,7 @@ export async function POST(request: NextRequest) {
 
     // Send email notification to receiver
     console.log('📧 Attempting to send email to:', receiverEmail);
-    await sendEmailNotification(receiverEmail, senderName, vehicleTitle, content.trim());
+    await sendEmailNotification(receiverEmail, senderName, vehicleTitle, content.trim(), vehicleId);
     console.log('📧 Email notification completed');
 
     return NextResponse.json({ message });
