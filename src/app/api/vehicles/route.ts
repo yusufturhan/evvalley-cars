@@ -100,7 +100,15 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
+    console.log('=== FORM DATA DEBUG ===');
     console.log('Received form data');
+    
+    // Debug: FormData içeriğini logla
+    console.log('FormData keys:', Array.from(formData.keys()));
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+    console.log('=== END FORM DATA DEBUG ===');
 
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
@@ -127,11 +135,77 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Use a default UUID if seller_id is not provided or invalid
-    const defaultSellerId = '1b69d5c5-283a-4d53-979f-4f6eb7a5ea0a';
+    // Validate VIN if provided
+    const vin = formData.get('vin') as string;
+    if (vin && vin.trim()) {
+      // Check VIN length (should be 17 characters)
+      if (vin.trim().length !== 17) {
+        return NextResponse.json({ 
+          error: 'VIN must be exactly 17 characters long' 
+        }, { status: 400 });
+      }
 
-    // Get seller email from form data or use default
-    const seller_email = formData.get('seller_email') as string || 'evvalley12@gmail.com';
+      // Check if VIN already exists
+      const { data: existingVehicle, error: vinCheckError } = await supabase
+        .from('vehicles')
+        .select('id, title')
+        .eq('vin', vin.trim())
+        .single();
+
+      if (vinCheckError && vinCheckError.code !== 'PGRST116') { // PGRST116 = no rows found
+        console.error('VIN check error:', vinCheckError);
+        return NextResponse.json({ 
+          error: 'Failed to check VIN uniqueness' 
+        }, { status: 500 });
+      }
+
+      if (existingVehicle) {
+        return NextResponse.json({ 
+          error: `Vehicle with VIN ${vin.trim()} already exists: ${existingVehicle.title}` 
+        }, { status: 400 });
+      }
+    }
+
+    // Get seller email from form data - this should be the actual user's email
+    const seller_email = formData.get('seller_email') as string;
+    
+    if (!seller_email) {
+      console.error('❌ Seller email is missing from form data');
+      return NextResponse.json({ 
+        error: 'Seller email is required' 
+      }, { status: 400 });
+    }
+    
+    console.log('📧 Seller email from form:', seller_email);
+
+    // Get or create user in Supabase based on email
+    let actualSellerId = seller_id;
+    
+    if (!actualSellerId || actualSellerId === '1b69d5c5-283a-4d53-979f-4f6eb7a5ea0a') {
+      // Try to find user by email
+      const { data: existingUser, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', seller_email)
+        .single();
+
+      if (userError && userError.code !== 'PGRST116') {
+        console.error('❌ Error finding user by email:', userError);
+        return NextResponse.json({ 
+          error: 'Failed to find user account' 
+        }, { status: 500 });
+      }
+
+      if (existingUser) {
+        actualSellerId = existingUser.id;
+        console.log('✅ Found existing user by email:', actualSellerId);
+      } else {
+        console.error('❌ User not found by email:', seller_email);
+        return NextResponse.json({ 
+          error: 'User account not found. Please sign in again.' 
+        }, { status: 400 });
+      }
+    }
 
     // Create vehicle data
     const vehicleData = {
@@ -148,11 +222,11 @@ export async function POST(request: Request) {
       max_speed: max_speed ? parseInt(max_speed) : null,
       battery_capacity: battery_capacity || null,
       location: location || null,
-      seller_id: seller_id || defaultSellerId,
+      seller_id: actualSellerId,
       seller_email: seller_email,
-      vehicle_condition: vehicle_condition || null,
-      title_status: title_status || null,
-      highlighted_features: highlighted_features || null,
+      vehicle_condition: formData.get('vehicle_condition') as string || null,
+      title_status: formData.get('title_status') as string || null,
+      highlighted_features: formData.get('highlighted_features') as string || null,
       // Extended fields - only if provided
       interior_color: formData.get('interior_color') as string || null,
       exterior_color: formData.get('exterior_color') as string || null,
@@ -168,7 +242,9 @@ export async function POST(request: Request) {
       is_active: true
     };
 
-    console.log('Inserting vehicle data:', vehicleData);
+    console.log('=== VEHICLE DATA DEBUG ===');
+    console.log('Inserting vehicle data:', JSON.stringify(vehicleData, null, 2));
+    console.log('=== END VEHICLE DATA DEBUG ===');
 
     // Use service role client to bypass RLS
     const supabaseAdmin = createServerSupabaseClient();

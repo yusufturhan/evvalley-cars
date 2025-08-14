@@ -13,6 +13,7 @@ export default function SellPage() {
   const [loading, setLoading] = useState(false);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>('ev-car');
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -33,6 +34,20 @@ export default function SellPage() {
     vehicle_condition: "",
     title_status: "",
     highlighted_features: "",
+    condition: "",
+    // Scooter/Bike specific fields
+    weight: "",
+    max_load: "",
+    wheel_size: "",
+    motor_power: "",
+    charging_time: "",
+    warranty: "",
+    frame_size: "",
+    motor_type: "",
+    bike_type: "",
+    gear_system: "",
+    // Color field for scooters and bikes
+    color: "",
     // Extended fields
     interior_color: "",
     exterior_color: "",
@@ -164,12 +179,8 @@ export default function SellPage() {
       }
     }
 
-    // Description validation
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (formData.description.length < 20) {
-      newErrors.description = 'Description must be at least 20 characters';
-    } else if (formData.description.length > 2000) {
+    // Description validation (optional)
+    if (formData.description.trim() && formData.description.length > 2000) {
       newErrors.description = 'Description must be less than 2000 characters';
     }
 
@@ -222,6 +233,21 @@ export default function SellPage() {
       submitFormData.append('location', formData.location.trim() || '');
       submitFormData.append('seller_id', userSupabaseId);
       submitFormData.append('seller_email', formData.seller_email);
+
+      // Add new vehicle detail fields to FormData
+      submitFormData.append('vehicle_condition', formData.vehicle_condition || '');
+      submitFormData.append('title_status', formData.title_status || '');
+      submitFormData.append('highlighted_features', formData.highlighted_features || '');
+      submitFormData.append('interior_color', formData.interior_color || '');
+      submitFormData.append('exterior_color', formData.exterior_color || '');
+      submitFormData.append('body_seating', formData.body_seating || '');
+      submitFormData.append('combined_fuel_economy', formData.combined_fuel_economy || '');
+      submitFormData.append('transmission', formData.transmission || '');
+      submitFormData.append('horsepower', formData.horsepower || '');
+      submitFormData.append('electric_mile_range', formData.electric_mile_range || '');
+      submitFormData.append('battery_warranty', formData.battery_warranty || '');
+      submitFormData.append('drivetrain', formData.drivetrain || '');
+      submitFormData.append('vin', formData.vin || '');
 
       // Add images to FormData
       images.forEach((image, index) => {
@@ -310,7 +336,11 @@ export default function SellPage() {
                   onChange={handleInputChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., Tesla Model 3"
+                  placeholder={
+                    selectedCategory === 'ev-scooter' ? "e.g., Segway Ninebot Max" :
+                    selectedCategory === 'e-bike' ? "e.g., Trek Verve+ 2" :
+                    "e.g., Tesla Model 3"
+                  }
                 />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
               </div>
@@ -321,8 +351,11 @@ export default function SellPage() {
                 </label>
                 <select
                   name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value);
+                    setFormData(prev => ({ ...prev, category: e.target.value }));
+                  }}
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                 >
@@ -356,50 +389,54 @@ export default function SellPage() {
                 </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Vehicle Condition
-                </label>
-                <select
-                  name="vehicle_condition"
-                  value={formData.vehicle_condition}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
-                >
-                  <option value="" className="text-gray-900">Select condition</option>
-                  <option value="excellent" className="text-gray-900">Excellent</option>
-                  <option value="good" className="text-gray-900">Good</option>
-                  <option value="fair" className="text-gray-900">Fair</option>
-                  <option value="poor" className="text-gray-900">Poor</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Describe the overall condition of your vehicle
-                </p>
-              </div>
+              {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Vehicle Condition
+                  </label>
+                  <select
+                    name="vehicle_condition"
+                    value={formData.vehicle_condition}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+                  >
+                    <option value="" className="text-gray-900">Select condition</option>
+                    <option value="excellent" className="text-gray-900">Excellent</option>
+                    <option value="good" className="text-gray-900">Good</option>
+                    <option value="fair" className="text-gray-900">Fair</option>
+                    <option value="poor" className="text-gray-900">Poor</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Describe the overall condition of your vehicle
+                  </p>
+                </div>
+              )}
             </div>
 
-            {/* Title Status */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title Status *
-              </label>
-              <select
-                name="title_status"
-                value={formData.title_status}
-                onChange={handleInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
-              >
-                <option value="" className="text-gray-900">Select title status</option>
-                <option value="clean" className="text-gray-900">Clean Title</option>
-                <option value="salvage" className="text-gray-900">Salvage Title</option>
-                <option value="rebuilt" className="text-gray-900">Rebuilt Title</option>
-                <option value="flood" className="text-gray-900">Flood Title</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Clean title means no major accidents. Salvage means the vehicle was declared a total loss by insurance.
-              </p>
-            </div>
+            {/* Title Status - Only for Cars */}
+            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title Status *
+                </label>
+                <select
+                  name="title_status"
+                  value={formData.title_status}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
+                >
+                  <option value="" className="text-gray-900">Select title status</option>
+                  <option value="clean" className="text-gray-900">Clean Title</option>
+                  <option value="salvage" className="text-gray-900">Salvage Title</option>
+                  <option value="rebuilt" className="text-gray-900">Rebuilt Title</option>
+                  <option value="flood" className="text-gray-900">Flood Title</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Clean title means no major accidents. Salvage means the vehicle was declared a total loss by insurance.
+                </p>
+              </div>
+            )}
 
             {/* Brand and Model */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -415,55 +452,119 @@ export default function SellPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900"
                 >
                   <option value="" className="text-gray-900">Select brand</option>
-                  <option value="Tesla" className="text-gray-900">Tesla</option>
-                  <option value="Rivian" className="text-gray-900">Rivian</option>
-                  <option value="Lucid" className="text-gray-900">Lucid</option>
-                  <option value="Ford" className="text-gray-900">Ford</option>
-                  <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
-                  <option value="Toyota" className="text-gray-900">Toyota</option>
-                  <option value="Honda" className="text-gray-900">Honda</option>
-                  <option value="Nissan" className="text-gray-900">Nissan</option>
-                  <option value="BMW" className="text-gray-900">BMW</option>
-                  <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
-                  <option value="Audi" className="text-gray-900">Audi</option>
-                  <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
-                  <option value="Hyundai" className="text-gray-900">Hyundai</option>
-                  <option value="Kia" className="text-gray-900">Kia</option>
-                  <option value="Lexus" className="text-gray-900">Lexus</option>
-                  <option value="Porsche" className="text-gray-900">Porsche</option>
-                  <option value="Volvo" className="text-gray-900">Volvo</option>
-                  <option value="Jaguar" className="text-gray-900">Jaguar</option>
-                  <option value="Land Rover" className="text-gray-900">Land Rover</option>
-                  <option value="Mazda" className="text-gray-900">Mazda</option>
-                  <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
-                  <option value="Subaru" className="text-gray-900">Subaru</option>
-                  <option value="Polestar" className="text-gray-900">Polestar</option>
-                  <option value="Fisker" className="text-gray-900">Fisker</option>
-                  <option value="VinFast" className="text-gray-900">VinFast</option>
-                  <option value="Bollinger" className="text-gray-900">Bollinger</option>
-                  <option value="Canoo" className="text-gray-900">Canoo</option>
-                  <option value="Lordstown" className="text-gray-900">Lordstown</option>
-                  <option value="Nikola" className="text-gray-900">Nikola</option>
-                  <option value="Other" className="text-gray-900">Other</option>
+                  
+                  {/* Car Brands */}
+                  {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+                    <>
+                      <option value="Tesla" className="text-gray-900">Tesla</option>
+                      <option value="Rivian" className="text-gray-900">Rivian</option>
+                      <option value="Lucid" className="text-gray-900">Lucid</option>
+                      <option value="Ford" className="text-gray-900">Ford</option>
+                      <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
+                      <option value="Toyota" className="text-gray-900">Toyota</option>
+                      <option value="Honda" className="text-gray-900">Honda</option>
+                      <option value="Nissan" className="text-gray-900">Nissan</option>
+                      <option value="BMW" className="text-gray-900">BMW</option>
+                      <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                      <option value="Audi" className="text-gray-900">Audi</option>
+                      <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                      <option value="Hyundai" className="text-gray-900">Hyundai</option>
+                      <option value="Kia" className="text-gray-900">Kia</option>
+                      <option value="Lexus" className="text-gray-900">Lexus</option>
+                      <option value="Porsche" className="text-gray-900">Porsche</option>
+                      <option value="Volvo" className="text-gray-900">Volvo</option>
+                      <option value="Jaguar" className="text-gray-900">Jaguar</option>
+                      <option value="Land Rover" className="text-gray-900">Land Rover</option>
+                      <option value="Mazda" className="text-gray-900">Mazda</option>
+                      <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
+                      <option value="Subaru" className="text-gray-900">Subaru</option>
+                      <option value="Polestar" className="text-gray-900">Polestar</option>
+                      <option value="Fisker" className="text-gray-900">Fisker</option>
+                      <option value="VinFast" className="text-gray-900">VinFast</option>
+                      <option value="Bollinger" className="text-gray-900">Bollinger</option>
+                      <option value="Canoo" className="text-gray-900">Canoo</option>
+                      <option value="Lordstown" className="text-gray-900">Lordstown</option>
+                      <option value="Nikola" className="text-gray-900">Nikola</option>
+                    </>
+                  )}
+                  
+                  {/* Scooter Brands */}
+                  {selectedCategory === 'ev-scooter' && (
+                    <>
+                      <option value="Segway" className="text-gray-900">Segway</option>
+                      <option value="Xiaomi" className="text-gray-900">Xiaomi</option>
+                      <option value="Ninebot" className="text-gray-900">Ninebot</option>
+                      <option value="Razor" className="text-gray-900">Razor</option>
+                      <option value="GoTrax" className="text-gray-900">GoTrax</option>
+                      <option value="Hiboy" className="text-gray-900">Hiboy</option>
+                      <option value="Glion" className="text-gray-900">Glion</option>
+                      <option value="Unagi" className="text-gray-900">Unagi</option>
+                      <option value="Bird" className="text-gray-900">Bird</option>
+                      <option value="Lime" className="text-gray-900">Lime</option>
+                      <option value="Spin" className="text-gray-900">Spin</option>
+                      <option value="Vespa" className="text-gray-900">Vespa</option>
+                      <option value="Yamaha" className="text-gray-900">Yamaha</option>
+                      <option value="Honda" className="text-gray-900">Honda</option>
+                      <option value="Suzuki" className="text-gray-900">Suzuki</option>
+                      <option value="Kymco" className="text-gray-900">Kymco</option>
+                      <option value="SYM" className="text-gray-900">SYM</option>
+                      <option value="Other" className="text-gray-900">Other</option>
+                    </>
+                  )}
+                  
+                  {/* E-Bike Brands */}
+                  {selectedCategory === 'e-bike' && (
+                    <>
+                      <option value="Trek" className="text-gray-900">Trek</option>
+                      <option value="Specialized" className="text-gray-900">Specialized</option>
+                      <option value="Giant" className="text-gray-900">Giant</option>
+                      <option value="Cannondale" className="text-gray-900">Cannondale</option>
+                      <option value="Santa Cruz" className="text-gray-900">Santa Cruz</option>
+                      <option value="Yeti" className="text-gray-900">Yeti</option>
+                      <option value="Ibis" className="text-gray-900">Ibis</option>
+                      <option value="Pivot" className="text-gray-900">Pivot</option>
+                      <option value="Salsa" className="text-gray-900">Salsa</option>
+                      <option value="Surly" className="text-gray-900">Surly</option>
+                      <option value="All-City" className="text-gray-900">All-City</option>
+                      <option value="Kona" className="text-gray-900">Kona</option>
+                      <option value="Marin" className="text-gray-900">Marin</option>
+                      <option value="Diamondback" className="text-gray-900">Diamondback</option>
+                      <option value="Raleigh" className="text-gray-900">Raleigh</option>
+                      <option value="Schwinn" className="text-gray-900">Schwinn</option>
+                      <option value="Huffy" className="text-gray-900">Huffy</option>
+                      <option value="Kent" className="text-gray-900">Kent</option>
+                      <option value="Mongoose" className="text-gray-900">Mongoose</option>
+                      <option value="Haro" className="text-gray-900">Haro</option>
+                      <option value="GT" className="text-gray-900">GT</option>
+                      <option value="Redline" className="text-gray-900">Redline</option>
+                      <option value="SE" className="text-gray-900">SE</option>
+                      <option value="Volume" className="text-gray-900">Volume</option>
+                      <option value="Other" className="text-gray-900">Other</option>
+                    </>
+                  )}
                 </select>
                 {errors.brand && <p className="text-red-500 text-xs mt-1">{errors.brand}</p>}
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Model *
-                </label>
-                <input
-                  type="text"
-                  name="model"
-                  value={formData.model}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., Model 3"
-                />
-                {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model}</p>}
-              </div>
+                                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Model *
+                    </label>
+                    <input
+                      type="text"
+                      name="model"
+                      value={formData.model}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder={
+                        selectedCategory === 'ev-scooter' ? "e.g., Ninebot Max" :
+                        selectedCategory === 'e-bike' ? "e.g., Verve+ 2" :
+                        "e.g., Model 3"
+                      }
+                    />
+                    {errors.model && <p className="text-red-500 text-xs mt-1">{errors.model}</p>}
+                  </div>
             </div>
 
             {/* Year and Price */}
@@ -505,264 +606,677 @@ export default function SellPage() {
               </div>
             </div>
 
-            {/* Fuel Type and Mileage */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Fuel Type
-                </label>
-                <select
-                  name="fuel_type"
-                  value={formData.fuel_type}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
-                >
-                  <option value="" className="text-gray-900">Select fuel type</option>
-                  <option value="electric" className="text-gray-900">Electric</option>
-                  <option value="hybrid" className="text-gray-900">Hybrid</option>
-                  <option value="plug-in-hybrid" className="text-gray-900">Plug-in Hybrid</option>
-                  <option value="hydrogen" className="text-gray-900">Hydrogen</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mileage (miles)
-                </label>
-                <input
-                  type="number"
-                  name="mileage"
-                  value={formData.mileage}
-                  onChange={handleInputChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="15000"
-                />
-                {errors.mileage && <p className="text-red-500 text-xs mt-1">{errors.mileage}</p>}
-              </div>
-            </div>
-
-            {/* Range */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Range (miles)
-              </label>
-              <input
-                type="number"
-                name="range_miles"
-                value={formData.range_miles}
-                onChange={handleInputChange}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                placeholder="350"
-              />
-              {errors.range_miles && <p className="text-red-500 text-xs mt-1">{errors.range_miles}</p>}
-            </div>
-
-            {/* Vehicle Details - Extended */}
-            <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Details</h3>
-              
-              {/* Colors and Body */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Fuel Type and Mileage - Only for Cars */}
+            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Interior Color
-                  </label>
-                  <input
-                    type="text"
-                    name="interior_color"
-                    value={formData.interior_color}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter color here"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Exterior Color
-                  </label>
-                  <input
-                    type="text"
-                    name="exterior_color"
-                    value={formData.exterior_color}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter color here"
-                  />
-                </div>
-              </div>
-
-              {/* Body and Transmission */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Body/Seating
-                  </label>
-                  <input
-                    type="text"
-                    name="body_seating"
-                    value={formData.body_seating}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter body/seating here"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Transmission
+                    Fuel Type
                   </label>
                   <select
-                    name="transmission"
-                    value={formData.transmission}
+                    name="fuel_type"
+                    value={formData.fuel_type}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
                   >
-                    <option value="" className="text-gray-900">Select transmission here</option>
-                    <option value="automatic" className="text-gray-900">Automatic Transmission</option>
-                    <option value="e-cvt" className="text-gray-900">e-CVT</option>
-                    <option value="single-speed" className="text-gray-900">Single-Speed</option>
-                    <option value="2-speed" className="text-gray-900">2-Speed Transmission</option>
-                    <option value="dct" className="text-gray-900">DCT (Dual-Clutch)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Fuel Economy and Horsepower */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Combined Fuel Economy
-                  </label>
-                  <input
-                    type="text"
-                    name="combined_fuel_economy"
-                    value={formData.combined_fuel_economy}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter combined fuel economy here"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Horsepower
-                  </label>
-                  <input
-                    type="number"
-                    name="horsepower"
-                    value={formData.horsepower}
-                    onChange={handleInputChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter horsepower here"
-                  />
-                </div>
-              </div>
-
-              {/* Electric Range and Battery Warranty */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Electric Mile Range
-                  </label>
-                  <input
-                    type="number"
-                    name="electric_mile_range"
-                    value={formData.electric_mile_range}
-                    onChange={handleInputChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter electric mile range here"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Battery Warranty
-                  </label>
-                  <input
-                    type="text"
-                    name="battery_warranty"
-                    value={formData.battery_warranty}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter battery warranty here"
-                  />
-                </div>
-              </div>
-
-              {/* Drivetrain and VIN */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Drivetrain
-                  </label>
-                  <select
-                    name="drivetrain"
-                    value={formData.drivetrain}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
-                  >
-                    <option value="" className="text-gray-900">Select drivetrain here</option>
-                    <option value="awd" className="text-gray-900">All-Wheel Drive (AWD)</option>
-                    <option value="fwd" className="text-gray-900">Front-Wheel Drive (FWD)</option>
-                    <option value="rwd" className="text-gray-900">Rear-Wheel Drive (RWD)</option>
-                    <option value="4wd" className="text-gray-900">Four-Wheel Drive (4WD)</option>
+                    <option value="" className="text-gray-900">Select fuel type</option>
+                    <option value="electric" className="text-gray-900">Electric</option>
+                    <option value="hybrid" className="text-gray-900">Hybrid</option>
+                    <option value="plug-in-hybrid" className="text-gray-900">Plug-in Hybrid</option>
+                    <option value="hydrogen" className="text-gray-900">Hydrogen</option>
                   </select>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    VIN
+                    Mileage (miles)
                   </label>
                   <input
-                    type="text"
-                    name="vin"
-                    value={formData.vin}
+                    type="number"
+                    name="mileage"
+                    value={formData.mileage}
                     onChange={handleInputChange}
+                    min="0"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="Enter VIN here"
-                    maxLength={17}
+                    placeholder="15000"
                   />
+                  {errors.mileage && <p className="text-red-500 text-xs mt-1">{errors.mileage}</p>}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* EV Specific Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Range - Only for Cars */}
+            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Max Speed (mph)
+                  Range (miles)
                 </label>
                 <input
                   type="number"
-                  name="max_speed"
-                  value={formData.max_speed}
+                  name="range_miles"
+                  value={formData.range_miles}
                   onChange={handleInputChange}
                   min="0"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="155"
+                  placeholder="350"
                 />
-                {errors.max_speed && <p className="text-red-500 text-xs mt-1">{errors.max_speed}</p>}
+                {errors.range_miles && <p className="text-red-500 text-xs mt-1">{errors.range_miles}</p>}
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Battery Capacity
-                </label>
-                <input
-                  type="text"
-                  name="battery_capacity"
-                  value={formData.battery_capacity}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="75 kWh"
-                />
+            )}
+
+
+
+            {/* Vehicle Details - Only for Cars */}
+            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Details</h3>
+                
+                {/* Colors and Body */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Interior Color
+                    </label>
+                    <input
+                      type="text"
+                      name="interior_color"
+                      value={formData.interior_color}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter color here"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Exterior Color
+                    </label>
+                    <input
+                      type="text"
+                      name="exterior_color"
+                      value={formData.exterior_color}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter color here"
+                    />
+                  </div>
+                </div>
+
+                {/* Body and Transmission */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Body/Seating
+                    </label>
+                    <input
+                      type="text"
+                      name="body_seating"
+                      value={formData.body_seating}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter body/seating here"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Transmission
+                    </label>
+                    <select
+                      name="transmission"
+                      value={formData.transmission}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select transmission here</option>
+                      <option value="automatic" className="text-gray-900">Automatic Transmission</option>
+                      <option value="e-cvt" className="text-gray-900">e-CVT</option>
+                      <option value="single-speed" className="text-gray-900">Single-Speed</option>
+                      <option value="2-speed" className="text-gray-900">2-Speed Transmission</option>
+                      <option value="dct" className="text-gray-900">DCT (Dual-Clutch)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Fuel Economy and Horsepower */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Combined Fuel Economy
+                    </label>
+                    <input
+                      type="text"
+                      name="combined_fuel_economy"
+                      value={formData.combined_fuel_economy}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter combined fuel economy here"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Horsepower
+                    </label>
+                    <input
+                      type="number"
+                      name="horsepower"
+                      value={formData.horsepower}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter horsepower here"
+                    />
+                  </div>
+                </div>
+
+                {/* Electric Range and Battery Warranty */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Electric Mile Range
+                    </label>
+                    <input
+                      type="number"
+                      name="electric_mile_range"
+                      value={formData.electric_mile_range}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter electric mile range here"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Battery Warranty
+                    </label>
+                    <input
+                      type="text"
+                      name="battery_warranty"
+                      value={formData.battery_warranty}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter battery warranty here"
+                    />
+                  </div>
+                </div>
+
+                {/* Drivetrain and VIN */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Drivetrain
+                    </label>
+                    <select
+                      name="drivetrain"
+                      value={formData.drivetrain}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select drivetrain here</option>
+                      <option value="awd" className="text-gray-900">All-Wheel Drive (AWD)</option>
+                      <option value="fwd" className="text-gray-900">Front-Wheel Drive (FWD)</option>
+                      <option value="rwd" className="text-gray-900">Rear-Wheel Drive (RWD)</option>
+                      <option value="4wd" className="text-gray-900">Four-Wheel Drive (4WD)</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      VIN
+                    </label>
+                    <input
+                      type="text"
+                      name="vin"
+                      value={formData.vin}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="Enter VIN here"
+                      maxLength={17}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {/* EV Specific Fields - Only for Cars */}
+            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Max Speed (mph)
+                  </label>
+                  <input
+                    type="number"
+                    name="max_speed"
+                    value={formData.max_speed}
+                    onChange={handleInputChange}
+                    min="0"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="155"
+                  />
+                  {errors.max_speed && <p className="text-red-500 text-xs mt-1">{errors.max_speed}</p>}
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Battery Capacity
+                  </label>
+                  <input
+                    type="text"
+                    name="battery_capacity"
+                    value={formData.battery_capacity}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                    placeholder="75 kWh"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Scooter Specific Fields */}
+            {selectedCategory === 'ev-scooter' && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Scooter Details</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Condition
+                    </label>
+                    <select
+                      name="condition"
+                      value={formData.condition}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select condition</option>
+                      <option value="excellent" className="text-gray-900">Excellent</option>
+                      <option value="good" className="text-gray-900">Good</option>
+                      <option value="fair" className="text-gray-900">Fair</option>
+                      <option value="poor" className="text-gray-900">Poor</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Max Speed (mph)
+                    </label>
+                    <input
+                      type="number"
+                      name="max_speed"
+                      value={formData.max_speed}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="25"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Range (miles)
+                    </label>
+                    <input
+                      type="number"
+                      name="range_miles"
+                      value={formData.range_miles}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="25"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Battery Capacity
+                    </label>
+                    <input
+                      type="text"
+                      name="battery_capacity"
+                      value={formData.battery_capacity}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="36V 7.8Ah"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Weight (lbs)
+                    </label>
+                    <input
+                      type="number"
+                      name="weight"
+                      value={formData.weight}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="0.1"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="35"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Max Load (lbs)
+                    </label>
+                    <input
+                      type="number"
+                      name="max_load"
+                      value={formData.max_load}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="265"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Wheel Size
+                    </label>
+                    <input
+                      type="text"
+                      name="wheel_size"
+                      value={formData.wheel_size}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="10 inch"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Motor Power (W)
+                    </label>
+                    <input
+                      type="number"
+                      name="motor_power"
+                      value={formData.motor_power}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="300"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Color
+                    </label>
+                    <input
+                      type="text"
+                      name="color"
+                      value={formData.color}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="e.g., Black, White, Red"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Charging Time
+                    </label>
+                    <input
+                      type="text"
+                      name="charging_time"
+                      value={formData.charging_time}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="4-6 hours"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Warranty
+                    </label>
+                    <input
+                      type="text"
+                      name="warranty"
+                      value={formData.warranty}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="1 year"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* E-Bike Specific Fields */}
+            {selectedCategory === 'e-bike' && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">E-Bike Details</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Condition
+                    </label>
+                    <select
+                      name="condition"
+                      value={formData.condition}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select condition</option>
+                      <option value="excellent" className="text-gray-900">Excellent</option>
+                      <option value="good" className="text-gray-900">Good</option>
+                      <option value="fair" className="text-gray-900">Fair</option>
+                      <option value="poor" className="text-gray-900">Poor</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Bike Type
+                    </label>
+                    <select
+                      name="bike_type"
+                      value={formData.bike_type}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select bike type</option>
+                      <option value="mountain" className="text-gray-900">Mountain Bike</option>
+                      <option value="road" className="text-gray-900">Road Bike</option>
+                      <option value="city" className="text-gray-900">City Bike</option>
+                      <option value="hybrid" className="text-gray-900">Hybrid Bike</option>
+                      <option value="cargo" className="text-gray-900">Cargo Bike</option>
+                      <option value="folding" className="text-gray-900">Folding Bike</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Max Speed (mph)
+                    </label>
+                    <input
+                      type="number"
+                      name="max_speed"
+                      value={formData.max_speed}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="28"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Range (miles)
+                    </label>
+                    <input
+                      type="number"
+                      name="range_miles"
+                      value={formData.range_miles}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="40"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Battery Capacity
+                    </label>
+                    <input
+                      type="text"
+                      name="battery_capacity"
+                      value={formData.battery_capacity}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="36V 10Ah"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Frame Size
+                    </label>
+                    <input
+                      type="text"
+                      name="frame_size"
+                      value={formData.frame_size}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="L (Large)"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Wheel Size
+                    </label>
+                    <input
+                      type="text"
+                      name="wheel_size"
+                      value={formData.wheel_size}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="26 inch"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Motor Type
+                    </label>
+                    <select
+                      name="motor_type"
+                      value={formData.motor_type}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900"
+                    >
+                      <option value="" className="text-gray-900">Select motor type</option>
+                      <option value="hub" className="text-gray-900">Hub Motor</option>
+                      <option value="mid-drive" className="text-gray-900">Mid-Drive Motor</option>
+                      <option value="rear-hub" className="text-gray-900">Rear Hub Motor</option>
+                      <option value="front-hub" className="text-gray-900">Front Hub Motor</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Motor Power (W)
+                    </label>
+                    <input
+                      type="number"
+                      name="motor_power"
+                      value={formData.motor_power}
+                      onChange={handleInputChange}
+                      min="0"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="350"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Gear System
+                    </label>
+                    <input
+                      type="text"
+                      name="gear_system"
+                      value={formData.gear_system}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="7-speed Shimano"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Color
+                    </label>
+                    <input
+                      type="text"
+                      name="color"
+                      value={formData.color}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="e.g., Black, Blue, Green"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Charging Time
+                    </label>
+                    <input
+                      type="text"
+                      name="charging_time"
+                      value={formData.charging_time}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="4-6 hours"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Warranty
+                    </label>
+                    <input
+                      type="text"
+                      name="warranty"
+                      value={formData.warranty}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                      placeholder="3 years"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Location */}
             <div>

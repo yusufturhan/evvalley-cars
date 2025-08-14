@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import ClerkProvider from "@/components/ClerkProvider";
-import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Evvalley - US EV & E-Mobility Marketplace",
-  description: "America's #1 Electric Vehicle & E-Mobility Marketplace. Find, buy, and sell EVs, hybrids, scooters, and e-bikes.",
-  keywords: "electric vehicles, EVs, hybrid cars, e-scooters, e-bikes, EV marketplace, green transportation",
+  title: "Evvalley - US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles",
+  description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Find your next EV or list your vehicle for sale. Trusted marketplace for electric mobility with expert guidance.",
+  keywords: "electric vehicles, EVs, e-scooters, e-bikes, marketplace, buy, sell, US, electric mobility, green transportation, electric car marketplace, EV dealer, electric vehicle sales",
   authors: [{ name: "Evvalley" }],
   creator: "Evvalley",
   publisher: "Evvalley",
@@ -18,38 +16,41 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://evvalley.com'),
+  metadataBase: new URL('https://www.evvalley.com'),
   alternates: {
-    canonical: '/',
+    canonical: 'https://www.evvalley.com',
   },
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.svg', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=2', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=2', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=2', sizes: '16x16', type: 'image/svg+xml' },
     ],
-    apple: '/favicon.svg',
+    shortcut: '/favicon.svg?v=2',
+    apple: '/favicon.svg?v=2',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
-    description: "America's #1 Electric Vehicle & E-Mobility Marketplace. Find, buy, and sell EVs, hybrids, scooters, and e-bikes.",
-    url: 'https://evvalley.com',
-    siteName: 'Evvalley',
+    description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility.",
+    url: "https://www.evvalley.com",
+    siteName: "Evvalley",
     images: [
       {
-        url: '/og-image.jpg',
+        url: "https://www.evvalley.com/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: 'Evvalley - US EV & E-Mobility Marketplace',
+        alt: "Evvalley - US EV & E-Mobility Marketplace",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
+    locale: "en_US",
+    type: "website",
   },
   twitter: {
-    card: 'summary_large_image',
+    card: "summary_large_image",
     title: "Evvalley - US EV & E-Mobility Marketplace",
-    description: "America's #1 Electric Vehicle & E-Mobility Marketplace",
-    images: ['/og-image.jpg'],
+    description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US.",
+    images: ["https://www.evvalley.com/og-image.jpg"],
+    creator: "@evvalley",
   },
   robots: {
     index: true,
@@ -57,13 +58,16 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
-    google: 'your-google-verification-code',
+    google: process.env.GOOGLE_VERIFICATION_CODE || "your-google-verification-code",
+  },
+  other: {
+    "google-site-verification": process.env.GOOGLE_VERIFICATION_CODE || "",
   },
 };
 
@@ -73,46 +77,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          {/* Google Analytics */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XXXXXXXXXX');
-            `}
-          </Script>
-          
-          {/* Structured Data */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "WebSite",
-                "name": "Evvalley",
-                "description": "America's #1 Electric Vehicle & E-Mobility Marketplace",
-                "url": "https://evvalley.com",
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": "https://evvalley.com/vehicles?search={search_term_string}",
-                  "query-input": "required name=search_term_string"
-                }
-              })
-            }}
-          />
-        </head>
-        <body className={inter.className}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+        <link rel="shortcut icon" href="/favicon.svg?v=2" />
+      </head>
+      <body className={inter.className}>
+        {children}
+      </body>
+    </html>
   );
 }

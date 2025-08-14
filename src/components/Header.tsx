@@ -43,6 +43,12 @@ export default function Header() {
               <Link href="/about" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
                 About Us
               </Link>
+              <Link href="/blog" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
+                Blog
+              </Link>
+              <Link href="/escrow" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
+                Escrow
+              </Link>
               <Link href="/sell" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
                 Sell Your EV
               </Link>
@@ -197,6 +203,22 @@ export default function Header() {
                   }}
                 >
                   About Us
+                </Link>
+                <Link 
+                  href="/escrow" 
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#4A5568',
+                    backgroundColor: 'white',
+                    border: '1px solid #90CDF4',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    display: 'inline-block'
+                  }}
+                >
+                  Escrow
                 </Link>
                 <Link 
                   href="/sell" 

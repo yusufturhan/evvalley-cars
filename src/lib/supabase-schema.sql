@@ -220,3 +220,206 @@ CREATE POLICY "Anyone can update typing status" ON typing_status FOR UPDATE USIN
 
 DROP POLICY IF EXISTS "Anyone can read typing status" ON typing_status;
 CREATE POLICY "Anyone can read typing status" ON typing_status FOR SELECT USING (true); 
+
+-- EV Scooters Table
+CREATE TABLE IF NOT EXISTS ev_scooters (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  year INTEGER NOT NULL CHECK (year >= 1900 AND year <= 2030),
+  brand TEXT NOT NULL,
+  model TEXT NOT NULL,
+  category TEXT DEFAULT 'ev-scooter',
+  seller_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  seller_email TEXT NOT NULL,
+  location TEXT NOT NULL,
+  images TEXT[],
+  sold BOOLEAN DEFAULT FALSE,
+  sold_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- Scooter specific fields
+  range_miles INTEGER,
+  max_speed INTEGER,
+  battery_capacity TEXT,
+  weight DECIMAL(5,2),
+  max_load INTEGER,
+  wheel_size TEXT,
+  motor_power TEXT,
+  charging_time TEXT,
+  warranty TEXT,
+  condition TEXT,
+  color TEXT,
+  highlighted_features TEXT,
+  
+  -- Validation
+  CONSTRAINT valid_price CHECK (price > 0),
+  CONSTRAINT valid_year CHECK (year >= 1900 AND year <= 2030),
+  CONSTRAINT valid_range CHECK (range_miles >= 0),
+  CONSTRAINT valid_max_speed CHECK (max_speed >= 0),
+  CONSTRAINT valid_weight CHECK (weight > 0),
+  CONSTRAINT valid_max_load CHECK (max_load > 0)
+);
+
+-- E-Bikes Table
+CREATE TABLE IF NOT EXISTS e_bikes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  year INTEGER NOT NULL CHECK (year >= 1900 AND year <= 2030),
+  brand TEXT NOT NULL,
+  model TEXT NOT NULL,
+  category TEXT DEFAULT 'e-bike',
+  seller_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  seller_email TEXT NOT NULL,
+  location TEXT NOT NULL,
+  images TEXT[],
+  sold BOOLEAN DEFAULT FALSE,
+  sold_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  -- E-Bike specific fields
+  range_miles INTEGER,
+  max_speed INTEGER,
+  battery_capacity TEXT,
+  frame_size TEXT,
+  wheel_size TEXT,
+  motor_type TEXT,
+  motor_power TEXT,
+  charging_time TEXT,
+  warranty TEXT,
+  condition TEXT,
+  color TEXT,
+  highlighted_features TEXT,
+  bike_type TEXT, -- mountain, road, city, etc.
+  gear_system TEXT,
+  
+  -- Validation
+  CONSTRAINT valid_price CHECK (price > 0),
+  CONSTRAINT valid_year CHECK (year >= 1900 AND year <= 2030),
+  CONSTRAINT valid_range CHECK (range_miles >= 0),
+  CONSTRAINT valid_max_speed CHECK (max_speed >= 0)
+);
+
+-- RLS Policies for EV Scooters
+ALTER TABLE ev_scooters ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read access to ev_scooters" ON ev_scooters
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated users to insert ev_scooters" ON ev_scooters
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Allow users to update their own ev_scooters" ON ev_scooters
+  FOR UPDATE USING (auth.uid() = seller_id);
+
+CREATE POLICY "Allow users to delete their own ev_scooters" ON ev_scooters
+  FOR DELETE USING (auth.uid() = seller_id);
+
+-- RLS Policies for E-Bikes
+ALTER TABLE e_bikes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Allow public read access to e_bikes" ON e_bikes
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated users to insert e_bikes" ON e_bikes
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+CREATE POLICY "Allow users to update their own e_bikes" ON e_bikes
+  FOR UPDATE USING (auth.uid() = seller_id);
+
+CREATE POLICY "Allow users to delete their own e_bikes" ON e_bikes
+  FOR DELETE USING (auth.uid() = seller_id);
+
+-- Indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_ev_scooters_brand ON ev_scooters(brand);
+CREATE INDEX IF NOT EXISTS idx_ev_scooters_year ON ev_scooters(year);
+CREATE INDEX IF NOT EXISTS idx_ev_scooters_price ON ev_scooters(price);
+CREATE INDEX IF NOT EXISTS idx_ev_scooters_seller_id ON ev_scooters(seller_id);
+CREATE INDEX IF NOT EXISTS idx_ev_scooters_sold ON ev_scooters(sold);
+
+CREATE INDEX IF NOT EXISTS idx_e_bikes_brand ON e_bikes(brand);
+CREATE INDEX IF NOT EXISTS idx_e_bikes_year ON e_bikes(year);
+CREATE INDEX IF NOT EXISTS idx_e_bikes_price ON e_bikes(price);
+CREATE INDEX IF NOT EXISTS idx_e_bikes_seller_id ON e_bikes(seller_id);
+CREATE INDEX IF NOT EXISTS idx_e_bikes_sold ON e_bikes(sold); 
+
+-- Newsletter subscribers table
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) UNIQUE NOT NULL,
+  subscribed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  status VARCHAR(50) DEFAULT 'active',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create index for email lookups
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email ON newsletter_subscribers(email);
+
+-- Create index for status filtering
+CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_status ON newsletter_subscribers(status);
+
+-- Enable RLS (Row Level Security)
+ALTER TABLE newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for inserting new subscribers (public access)
+CREATE POLICY "Allow public to insert newsletter subscribers" ON newsletter_subscribers
+  FOR INSERT WITH CHECK (true);
+
+-- Create policy for reading subscribers (admin only)
+CREATE POLICY "Allow admin to read newsletter subscribers" ON newsletter_subscribers
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Create policy for updating subscribers (admin only)
+CREATE POLICY "Allow admin to update newsletter subscribers" ON newsletter_subscribers
+  FOR UPDATE USING (auth.role() = 'authenticated');
+
+-- Create policy for deleting subscribers (admin only)
+CREATE POLICY "Allow admin to delete newsletter subscribers" ON newsletter_subscribers
+  FOR DELETE USING (auth.role() = 'authenticated'); 
+
+-- Email logs table for tracking campaign sends
+CREATE TABLE IF NOT EXISTS email_logs (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  campaign_id TEXT NOT NULL,
+  email_id TEXT,
+  sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  status TEXT NOT NULL DEFAULT 'sent', -- sent, failed, bounced, opened, clicked
+  error_message TEXT,
+  opened_at TIMESTAMP WITH TIME ZONE,
+  clicked_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS policies for email_logs
+ALTER TABLE email_logs ENABLE ROW LEVEL SECURITY;
+
+-- Allow admins to view all email logs
+CREATE POLICY "Admins can view all email logs" ON email_logs
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM users 
+      WHERE users.id = auth.uid() 
+      AND users.role = 'admin'
+    )
+  );
+
+-- Allow system to insert email logs
+CREATE POLICY "System can insert email logs" ON email_logs
+  FOR INSERT WITH CHECK (true);
+
+-- Allow system to update email logs
+CREATE POLICY "System can update email logs" ON email_logs
+  FOR UPDATE USING (true);
+
+-- Index for better performance
+CREATE INDEX IF NOT EXISTS idx_email_logs_campaign_id ON email_logs(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_email_logs_user_id ON email_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_email_logs_sent_at ON email_logs(sent_at);
+CREATE INDEX IF NOT EXISTS idx_email_logs_status ON email_logs(status); 

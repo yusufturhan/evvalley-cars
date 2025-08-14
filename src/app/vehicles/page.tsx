@@ -6,8 +6,11 @@ import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function VehiclesPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,38 +24,165 @@ export default function VehiclesPage() {
   });
   const [showSoldVehicles, setShowSoldVehicles] = useState(false);
 
-  // URL'den parametreleri oku ve filtreleri ayarla
+  // Sync filters state with URL params for UI
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const categoryFromUrl = urlParams.get('category');
-      
-      if (categoryFromUrl) {
-        setFilters(prev => ({
-          ...prev,
-          category: categoryFromUrl
-        }));
-      }
-    }
-  }, []);
+    const categoryFromUrl = searchParams.get('category') || 'all';
+    const brandFromUrl = searchParams.get('brand') || 'all';
+    const yearFromUrl = searchParams.get('year') || 'all';
+    const minPriceFromUrl = searchParams.get('minPrice') || '';
+    const maxPriceFromUrl = searchParams.get('maxPrice') || '';
+    const searchFromUrl = searchParams.get('search') || '';
+    const locationFromUrl = searchParams.get('location') || '';
+    
+    setFilters({
+      category: categoryFromUrl,
+      brand: brandFromUrl,
+      year: yearFromUrl,
+      minPrice: minPriceFromUrl,
+      maxPrice: maxPriceFromUrl
+    });
+    
+    setSearchQuery(searchFromUrl);
+    setLocationQuery(locationFromUrl);
+  }, [searchParams]);
 
+  // Fetch vehicles when URL params change
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
-        const params = new URLSearchParams();
-        if (filters.category !== 'all') params.append('category', filters.category);
-        if (filters.brand !== 'all') params.append('brand', filters.brand);
-        if (filters.year !== 'all') params.append('year', filters.year);
-        if (filters.minPrice) params.append('minPrice', filters.minPrice);
-        if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-        if (showSoldVehicles) params.append('includeSold', 'true');
+        let allVehicles: any[] = [];
 
-        const response = await fetch(`/api/vehicles?${params.toString()}`);
-        const data = await response.json();
+        // Get current filters from URL params
+        const currentCategory = searchParams.get('category') || 'all';
+        const currentBrand = searchParams.get('brand') || 'all';
+        const currentYear = searchParams.get('year') || 'all';
+        const currentMinPrice = searchParams.get('minPrice') || '';
+        const currentMaxPrice = searchParams.get('maxPrice') || '';
+        const currentSearch = searchParams.get('search') || '';
+        const currentLocation = searchParams.get('location') || '';
+
+        console.log('🔍 Current URL params:', {
+          category: currentCategory,
+          brand: currentBrand,
+          year: currentYear,
+          minPrice: currentMinPrice,
+          maxPrice: currentMaxPrice,
+          search: currentSearch,
+          location: currentLocation
+        });
+
+        // Fetch from different endpoints based on category
+        if (currentCategory === 'all' || currentCategory === 'ev-car' || currentCategory === 'hybrid-car') {
+          const params = new URLSearchParams();
+          if (currentCategory !== 'all') params.append('category', currentCategory);
+          if (currentBrand !== 'all') params.append('brand', currentBrand);
+          if (currentYear !== 'all') params.append('year', currentYear);
+          if (currentMinPrice) params.append('minPrice', currentMinPrice);
+          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+          if (showSoldVehicles) params.append('includeSold', 'true');
+
+          console.log('🔍 Fetching vehicles with params:', params.toString());
+          const response = await fetch(`/api/vehicles?${params.toString()}`);
+          const data = await response.json();
+          console.log('📦 API response:', data);
+          if (data.vehicles) {
+            console.log('✅ Adding vehicles:', data.vehicles.length);
+            allVehicles.push(...data.vehicles);
+          }
+        }
+
+        // Fetch E-Scooters
+        if (currentCategory === 'all' || currentCategory === 'ev-scooter') {
+          const params = new URLSearchParams();
+          if (currentBrand !== 'all') params.append('brand', currentBrand);
+          if (currentYear !== 'all') params.append('year', currentYear);
+          if (currentMinPrice) params.append('minPrice', currentMinPrice);
+          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+
+          const response = await fetch(`/api/ev-scooters?${params.toString()}`);
+          const data = await response.json();
+          if (data.scooters) {
+            allVehicles.push(...data.scooters);
+          }
+        }
+
+        // Fetch E-Bikes
+        if (currentCategory === 'all' || currentCategory === 'e-bike') {
+          const params = new URLSearchParams();
+          if (currentBrand !== 'all') params.append('brand', currentBrand);
+          if (currentYear !== 'all') params.append('year', currentYear);
+          if (currentMinPrice) params.append('minPrice', currentMinPrice);
+          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+
+          const response = await fetch(`/api/e-bikes?${params.toString()}`);
+          const data = await response.json();
+          if (data.bikes) {
+            allVehicles.push(...data.bikes);
+          }
+        }
+
+        // Apply additional client-side filtering
+        let filteredVehicles = allVehicles;
+        
+        console.log('🔍 Before filtering - Total vehicles:', allVehicles.length);
+        console.log('🔍 Search query:', currentSearch);
+        console.log('🔍 Location query:', currentLocation);
+        
+        // Filter by search query - more flexible matching
+        if (currentSearch.trim()) {
+          const searchQuery = currentSearch.toLowerCase().trim();
+          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
+            const title = vehicle.title?.toLowerCase() || '';
+            const brand = vehicle.brand?.toLowerCase() || '';
+            const model = vehicle.model?.toLowerCase() || '';
+            const category = vehicle.category?.toLowerCase() || '';
+            
+            // Check if any part of the search query matches any vehicle field
+            const searchWords = searchQuery.split(' ').filter(word => word.length > 0);
+            
+            // If search query has multiple words, check if any word matches
+            if (searchWords.length > 1) {
+              return searchWords.some(word => 
+                title.includes(word) || 
+                brand.includes(word) || 
+                model.includes(word) || 
+                category.includes(word)
+              );
+            }
+            
+            // Single word search - check if it's contained in any field
+            return title.includes(searchQuery) || 
+                   brand.includes(searchQuery) || 
+                   model.includes(searchQuery) || 
+                   category.includes(searchQuery);
+          });
+        }
+
+        // Filter by location - more flexible matching
+        if (currentLocation.trim()) {
+          const locationQuery = currentLocation.toLowerCase().trim();
+          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
+            const vehicleLocation = vehicle.location?.toLowerCase() || '';
+            
+            // Check if any part of the search query matches the vehicle location
+            const searchWords = locationQuery.split(' ').filter(word => word.length > 0);
+            
+            // If search query has multiple words, check if any word matches
+            if (searchWords.length > 1) {
+              return searchWords.some(word => vehicleLocation.includes(word));
+            }
+            
+            // Single word search - check if it's contained in the location
+            return vehicleLocation.includes(locationQuery);
+          });
+        }
+
+        console.log('🔍 After search filtering - Vehicles:', filteredVehicles.length);
+        console.log('🔍 After location filtering - Vehicles:', filteredVehicles.length);
         
         // Ensure all data is properly serialized for Next.js 15 compatibility
-        const serializedVehicles = data.vehicles?.map((vehicle: any) => {
+        const serializedVehicles = filteredVehicles.map((vehicle: any) => {
           const plainVehicle = { ...vehicle };
           // Convert dates to strings
           if (plainVehicle.created_at) {
@@ -66,8 +196,9 @@ export default function VehiclesPage() {
           }
           // Ensure all properties are serializable
           return JSON.parse(JSON.stringify(plainVehicle));
-        }) || [];
+        });
         
+        console.log('🎯 Final vehicles to display:', serializedVehicles.length);
         setVehicles(serializedVehicles);
       } catch (error) {
         console.error('Error fetching vehicles:', error);
@@ -77,7 +208,7 @@ export default function VehiclesPage() {
     };
 
     fetchVehicles();
-  }, [filters, showSoldVehicles]);
+  }, [searchParams, showSoldVehicles, searchQuery, locationQuery]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -110,53 +241,8 @@ export default function VehiclesPage() {
   };
 
   const handleSearch = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      
-      // Add search query
-      if (searchQuery.trim()) {
-        params.append('search', searchQuery.trim());
-      }
-      
-      // Add location query
-      if (locationQuery.trim()) {
-        params.append('location', locationQuery.trim());
-      }
-      
-      // Add filters
-      if (filters.category !== 'all') params.append('category', filters.category);
-      if (filters.brand !== 'all') params.append('brand', filters.brand);
-      if (filters.year !== 'all') params.append('year', filters.year);
-      if (filters.minPrice) params.append('minPrice', filters.minPrice);
-      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
-
-      const response = await fetch(`/api/vehicles?${params.toString()}`);
-      const data = await response.json();
-      
-      // Ensure all data is properly serialized for Next.js 15 compatibility
-      const serializedVehicles = data.vehicles?.map((vehicle: any) => {
-        const plainVehicle = { ...vehicle };
-        // Convert dates to strings
-        if (plainVehicle.created_at) {
-          plainVehicle.created_at = plainVehicle.created_at.toString();
-        }
-        if (plainVehicle.updated_at) {
-          plainVehicle.updated_at = plainVehicle.updated_at.toString();
-        }
-        if (plainVehicle.sold_at) {
-          plainVehicle.sold_at = plainVehicle.sold_at.toString();
-        }
-        // Ensure all properties are serializable
-        return JSON.parse(JSON.stringify(plainVehicle));
-      }) || [];
-      
-      setVehicles(serializedVehicles);
-    } catch (error) {
-      console.error('Error searching vehicles:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Trigger the main fetchVehicles function which now handles all categories
+    // fetchVehicles function is already defined above
   };
 
   return (
@@ -224,8 +310,7 @@ export default function VehiclesPage() {
           <div className="flex flex-wrap gap-3 justify-center">
             <button 
               onClick={() => {
-                setFilters({...filters, category: 'all'});
-                setTimeout(() => handleSearch(), 100);
+                router.push('/vehicles');
               }}
               className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 filters.category === 'all' 
@@ -239,8 +324,7 @@ export default function VehiclesPage() {
             
             <button 
               onClick={() => {
-                setFilters({...filters, category: 'ev-car'});
-                setTimeout(() => handleSearch(), 100);
+                router.push('/vehicles?category=ev-car');
               }}
               className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 filters.category === 'ev-car' 
@@ -254,8 +338,7 @@ export default function VehiclesPage() {
             
             <button 
               onClick={() => {
-                setFilters({...filters, category: 'hybrid-car'});
-                setTimeout(() => handleSearch(), 100);
+                router.push('/vehicles?category=hybrid-car');
               }}
               className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 filters.category === 'hybrid-car' 
@@ -269,8 +352,7 @@ export default function VehiclesPage() {
             
             <button 
               onClick={() => {
-                setFilters({...filters, category: 'ev-scooter'});
-                setTimeout(() => handleSearch(), 100);
+                router.push('/vehicles?category=ev-scooter');
               }}
               className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 filters.category === 'ev-scooter' 
@@ -284,8 +366,7 @@ export default function VehiclesPage() {
             
             <button 
               onClick={() => {
-                setFilters({...filters, category: 'e-bike'});
-                setTimeout(() => handleSearch(), 100);
+                router.push('/vehicles?category=e-bike');
               }}
               className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                 filters.category === 'e-bike' 
@@ -318,17 +399,53 @@ export default function VehiclesPage() {
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.brand}
                     onChange={(e) => {
-                      setFilters({...filters, brand: e.target.value});
-                      setTimeout(() => handleSearch(), 100);
+                      const newBrand = e.target.value;
+                      const currentCategory = searchParams.get('category') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (currentCategory !== 'all') params.append('category', currentCategory);
+                      if (newBrand !== 'all') params.append('brand', newBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
                     }}
                   >
                     <option value="all" className="text-gray-900">All Brands</option>
                     <option value="Tesla" className="text-gray-900">Tesla</option>
-                    <option value="BMW" className="text-gray-900">BMW</option>
-                    <option value="Audi" className="text-gray-900">Audi</option>
+                    <option value="Rivian" className="text-gray-900">Rivian</option>
+                    <option value="Lucid" className="text-gray-900">Lucid</option>
+                    <option value="Ford" className="text-gray-900">Ford</option>
+                    <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
                     <option value="Toyota" className="text-gray-900">Toyota</option>
-                    <option value="Xiaomi" className="text-gray-900">Xiaomi</option>
-                    <option value="Segway" className="text-gray-900">Segway</option>
+                    <option value="Honda" className="text-gray-900">Honda</option>
+                    <option value="Nissan" className="text-gray-900">Nissan</option>
+                    <option value="BMW" className="text-gray-900">BMW</option>
+                    <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                    <option value="Audi" className="text-gray-900">Audi</option>
+                    <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                    <option value="Hyundai" className="text-gray-900">Hyundai</option>
+                    <option value="Kia" className="text-gray-900">Kia</option>
+                    <option value="Lexus" className="text-gray-900">Lexus</option>
+                    <option value="Porsche" className="text-gray-900">Porsche</option>
+                    <option value="Volvo" className="text-gray-900">Volvo</option>
+                    <option value="Jaguar" className="text-gray-900">Jaguar</option>
+                    <option value="Land Rover" className="text-gray-900">Land Rover</option>
+                    <option value="Mazda" className="text-gray-900">Mazda</option>
+                    <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
+                    <option value="Subaru" className="text-gray-900">Subaru</option>
+                    <option value="Polestar" className="text-gray-900">Polestar</option>
+                    <option value="Fisker" className="text-gray-900">Fisker</option>
+                    <option value="VinFast" className="text-gray-900">VinFast</option>
+                    <option value="Bollinger" className="text-gray-900">Bollinger</option>
+                    <option value="Canoo" className="text-gray-900">Canoo</option>
+                    <option value="Lordstown" className="text-gray-900">Lordstown</option>
+                    <option value="Nikola" className="text-gray-900">Nikola</option>
+                    <option value="Other" className="text-gray-900">Other</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,15 +463,49 @@ export default function VehiclesPage() {
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.year}
                     onChange={(e) => {
-                      setFilters({...filters, year: e.target.value});
-                      setTimeout(() => handleSearch(), 100);
+                      const newYear = e.target.value;
+                      const currentCategory = searchParams.get('category') || 'all';
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (currentCategory !== 'all') params.append('category', currentCategory);
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (newYear !== 'all') params.append('year', newYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
                     }}
                   >
                     <option value="all" className="text-gray-900">All Years</option>
+                    <option value="2025" className="text-gray-900">2025</option>
                     <option value="2024" className="text-gray-900">2024</option>
                     <option value="2023" className="text-gray-900">2023</option>
                     <option value="2022" className="text-gray-900">2022</option>
                     <option value="2021" className="text-gray-900">2021</option>
+                    <option value="2020" className="text-gray-900">2020</option>
+                    <option value="2019" className="text-gray-900">2019</option>
+                    <option value="2018" className="text-gray-900">2018</option>
+                    <option value="2017" className="text-gray-900">2017</option>
+                    <option value="2016" className="text-gray-900">2016</option>
+                    <option value="2015" className="text-gray-900">2015</option>
+                    <option value="2014" className="text-gray-900">2014</option>
+                    <option value="2013" className="text-gray-900">2013</option>
+                    <option value="2012" className="text-gray-900">2012</option>
+                    <option value="2011" className="text-gray-900">2011</option>
+                    <option value="2010" className="text-gray-900">2010</option>
+                    <option value="2009" className="text-gray-900">2009</option>
+                    <option value="2008" className="text-gray-900">2008</option>
+                    <option value="2007" className="text-gray-900">2007</option>
+                    <option value="2006" className="text-gray-900">2006</option>
+                    <option value="2005" className="text-gray-900">2005</option>
+                    <option value="2004" className="text-gray-900">2004</option>
+                    <option value="2003" className="text-gray-900">2003</option>
+                    <option value="2002" className="text-gray-900">2002</option>
+                    <option value="2001" className="text-gray-900">2001</option>
+                    <option value="2000" className="text-gray-900">2000</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,8 +525,22 @@ export default function VehiclesPage() {
                     placeholder="0"
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.minPrice}
-                    onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
-                    onBlur={() => handleSearch()}
+                    onChange={(e) => {
+                      const newMinPrice = e.target.value;
+                      const currentCategory = searchParams.get('category') || 'all';
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (currentCategory !== 'all') params.append('category', currentCategory);
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (newMinPrice) params.append('minPrice', newMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
+                    }}
                   />
                 </div>
               </div>
@@ -390,8 +555,22 @@ export default function VehiclesPage() {
                     placeholder="100,000"
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.maxPrice}
-                    onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                    onBlur={() => handleSearch()}
+                    onChange={(e) => {
+                      const newMaxPrice = e.target.value;
+                      const currentCategory = searchParams.get('category') || 'all';
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (currentCategory !== 'all') params.append('category', currentCategory);
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (newMaxPrice) params.append('maxPrice', newMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
+                    }}
                   />
                 </div>
               </div>
@@ -401,14 +580,7 @@ export default function VehiclesPage() {
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => {
-                  setFilters({
-                    category: 'all',
-                    brand: 'all',
-                    year: 'all',
-                    minPrice: '',
-                    maxPrice: ''
-                  });
-                  setTimeout(() => handleSearch(), 100);
+                  router.push('/vehicles');
                 }}
                 className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
               >

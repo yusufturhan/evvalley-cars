@@ -66,7 +66,8 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
     battery_warranty: "",
     drivetrain: "",
     vin: "",
-    seller_type: "private"
+    seller_type: "private",
+    highlighted_features: ""
   });
   const [images, setImages] = useState<File[]>([]);
 
@@ -145,7 +146,8 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 battery_warranty: vehicleInfo.battery_warranty || "",
                 drivetrain: vehicleInfo.drivetrain || "",
                 vin: vehicleInfo.vin || "",
-                seller_type: vehicleInfo.seller_type || "private"
+                seller_type: vehicleInfo.seller_type || "private",
+                highlighted_features: vehicleInfo.highlighted_features || ""
               });
             } else {
               alert("Vehicle not found");
@@ -275,6 +277,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
       submitFormData.append('battery_warranty', formData.battery_warranty || '');
       submitFormData.append('drivetrain', formData.drivetrain || '');
       submitFormData.append('vin', formData.vin || '');
+      submitFormData.append('highlighted_features', formData.highlighted_features || '');
 
       // Add new images if provided
       images.forEach((image, index) => {
@@ -750,6 +753,20 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                   placeholder="e.g., 1HGBH41JXMN109186"
                 />
               </div>
+
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Highlighted Features
+                </label>
+                <textarea
+                  name="highlighted_features"
+                  value={formData.highlighted_features}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                  placeholder="e.g., Autopilot, Premium Interior, Performance Package, etc."
+                />
+              </div>
             </div>
 
             {/* Current Images */}
@@ -794,7 +811,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 onChange={handleInputChange}
                 required
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
                 placeholder="Describe your vehicle's condition, features, and any additional information..."
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}

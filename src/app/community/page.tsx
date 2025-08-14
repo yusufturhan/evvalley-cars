@@ -23,8 +23,15 @@ export default function CommunityPage() {
 
   const handleJoinCommunity = () => {
     // Discord redirect logic
-    window.open('https://discord.gg/aRRNjgrm', '_blank');
-    setIsJoined(true);
+    try {
+      // Use direct Discord invite link
+      window.open('https://discord.com/invite/aRRNjgrm', '_blank');
+      setIsJoined(true);
+    } catch (error) {
+      console.error('Discord link error:', error);
+      // Fallback to short link
+      window.open('https://discord.gg/aRRNjgrm', '_blank');
+    }
   };
 
   return (

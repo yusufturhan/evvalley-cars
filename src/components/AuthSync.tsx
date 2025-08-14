@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 
 export default function AuthSync() {
   const { user, isLoaded } = useUser();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isLoaded && user) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && isLoaded && user) {
       // Sync user data with Supabase
       const syncUser = async () => {
         try {
@@ -36,7 +41,7 @@ export default function AuthSync() {
 
       syncUser();
     }
-  }, [user, isLoaded]);
+  }, [mounted, user, isLoaded]);
 
   return null; // This component doesn't render anything
 } 

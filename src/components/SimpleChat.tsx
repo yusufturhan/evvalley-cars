@@ -313,7 +313,7 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
     if (!receiverEmail) return;
     
     try {
-      console.log('�� Sending message:', newMessage);
+      console.log('📤 Sending message:', newMessage);
       console.log('👤 From:', currentUserEmail, 'To:', receiverEmail);
       
       // Stop typing indicator
@@ -344,6 +344,43 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
     }
   };
 
+  // Mark messages as read when they are viewed
+  const markMessagesAsRead = async () => {
+    if (!filteredMessages.length) return;
+    
+    const unreadMessages = filteredMessages.filter(msg => 
+      msg.receiver_email === currentUserEmail && !msg.is_read
+    );
+    
+    if (unreadMessages.length === 0) return;
+    
+    try {
+      console.log('📖 Marking messages as read:', unreadMessages.length, 'messages');
+      
+      const response = await fetch('/api/simple-messages/mark-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messageIds: unreadMessages.map(msg => msg.id)
+        })
+      });
+      
+      if (response.ok) {
+        console.log('✅ Messages marked as read successfully');
+        // Update local state to reflect read status
+        setMessages(prev => prev.map(msg => 
+          unreadMessages.some(unread => unread.id === msg.id) 
+            ? { ...msg, is_read: true }
+            : msg
+        ));
+      } else {
+        console.error('❌ Failed to mark messages as read:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error marking messages as read:', error);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendMessage();
@@ -354,6 +391,21 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
     console.log('🎯 SimpleChat mounted with:', { vehicleId, currentUserEmail, sellerEmail, isCurrentUserSeller });
     fetchMessages();
   }, [vehicleId]);
+
+  // Temporarily disable auto mark as read to fix the error
+  // useEffect(() => {
+  //   if (filteredMessages.length > 0 && currentUserEmail) {
+  //     const unreadMessages = filteredMessages.filter(msg => 
+  //       msg.receiver_email === currentUserEmail && !msg.is_read
+  //     );
+  //     
+  //     if (unreadMessages.length > 0) {
+  //       setTimeout(() => {
+  //         markMessagesAsRead();
+  //       }, 100);
+  //     }
+  //   }
+  // }, [filteredMessages, currentUserEmail]);
 
   // Cleanup typing timeout on unmount
   useEffect(() => {
@@ -440,10 +492,23 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
                     }`}
                   >
                     <p className="text-sm font-medium">{msg.content}</p>
-                    <div className={`text-xs mt-1 ${
+                    <div className={`text-xs mt-1 flex items-center justify-between ${
                       isOwnMessage ? 'text-green-100' : 'text-gray-600'
                     }`}>
-                      {msg.sender_name} • {new Date(msg.created_at).toLocaleTimeString()}
+                      <span>{msg.sender_name} • {new Date(msg.created_at).toLocaleTimeString()}</span>
+                      {isOwnMessage && (
+                        <span className="ml-2">
+                          {msg.is_read ? (
+                            <span className="text-blue-300" title="Read">
+                              ✓✓
+                            </span>
+                          ) : (
+                            <span className="text-gray-400" title="Delivered">
+                              ✓
+                            </span>
+                          )}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

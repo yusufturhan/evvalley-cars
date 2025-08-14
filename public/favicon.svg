@@ -2,12 +2,9 @@
   <!-- Background -->
   <rect width="32" height="32" fill="#1C1F4A"/>
   
-  <!-- Lightning bolt -->
-  <path d="M6 4L2 12H8L4 20L14 12H8L12 4Z" fill="white" stroke="white" stroke-width="0.5"/>
+  <!-- Lightning bolt - larger and more prominent -->
+  <path d="M8 6L4 16H12L6 26L18 16H12L16 6Z" fill="white" stroke="white" stroke-width="0.5"/>
   
-  <!-- EVVALLEY text -->
-  <text x="16" y="18" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="white" text-anchor="middle">EVVALLEY</text>
-  
-  <!-- Make electricity tagline -->
-  <text x="16" y="24" font-family="Arial, sans-serif" font-size="2" fill="white" text-anchor="middle">Make electricity</text>
+  <!-- EV text - larger and more readable -->
+  <text x="16" y="28" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="white" text-anchor="middle">EV</text>
 </svg> 

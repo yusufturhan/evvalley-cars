@@ -9,11 +9,82 @@ export async function GET(
     const { id } = await params;
     const supabase = createServerSupabaseClient();
     
-    const { data: vehicle, error } = await supabase
+    // First try vehicles table
+    let { data: vehicle, error } = await supabase
       .from('vehicles')
-      .select('*')
+      .select(`
+        *,
+        vehicle_condition,
+        title_status,
+        highlighted_features,
+        interior_color,
+        exterior_color,
+        body_seating,
+        combined_fuel_economy,
+        transmission,
+        horsepower,
+        electric_mile_range,
+        battery_warranty,
+        battery_capacity,
+        drivetrain,
+        vin
+      `)
       .eq('id', id)
       .single();
+
+    // If not found in vehicles, try ev_scooters
+    if (error || !vehicle) {
+      const { data: scooter, error: scooterError } = await supabase
+        .from('ev_scooters')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (scooter && !scooterError) {
+        // Convert scooter to vehicle format for compatibility
+        vehicle = {
+          ...scooter,
+          category: 'ev-scooter',
+          // Add any missing fields that the frontend expects
+          fuel_type: 'Electric',
+          drivetrain: 'Electric',
+          body_seating: 'Scooter',
+          combined_fuel_economy: 'Electric',
+          horsepower: scooter.motor_power ? parseInt(scooter.motor_power) : null,
+          electric_mile_range: scooter.max_speed ? parseInt(scooter.max_speed) : null,
+          battery_warranty: scooter.warranty || null,
+          vin: null, // Scooters don't have VIN
+        };
+        error = null;
+      }
+    }
+
+    // If still not found, try e_bikes
+    if (error || !vehicle) {
+      const { data: bike, error: bikeError } = await supabase
+        .from('e_bikes')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (bike && !bikeError) {
+        // Convert bike to vehicle format for compatibility
+        vehicle = {
+          ...bike,
+          category: 'e-bike',
+          // Add any missing fields that the frontend expects
+          fuel_type: 'Electric',
+          drivetrain: 'Electric',
+          body_seating: 'Bike',
+          combined_fuel_economy: 'Electric',
+          horsepower: bike.motor_power ? parseInt(bike.motor_power) : null,
+          electric_mile_range: bike.max_speed ? parseInt(bike.max_speed) : null,
+          battery_warranty: bike.warranty || null,
+          vin: null, // Bikes don't have VIN
+        };
+        error = null;
+      }
+    }
 
     if (error || !vehicle) {
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
