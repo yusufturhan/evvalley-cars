@@ -26,6 +26,9 @@ export default function BlogPage() {
         <p><strong>Server Side:</strong> Yes</p>
         <p><strong>All Post Titles:</strong> {filteredPosts.map(p => p.title).join(' | ')}</p>
         <p><strong>Build Time:</strong> {new Date().toISOString()}</p>
+        <p><strong>Render Count:</strong> {filteredPosts.length} posts should render</p>
+        <p><strong>First 3 IDs:</strong> {filteredPosts.slice(0, 3).map(p => p.id).join(', ')}</p>
+        <p><strong>Last 3 IDs:</strong> {filteredPosts.slice(-3).map(p => p.id).join(', ')}</p>
       </div>
 
       {/* Blog Posts */}
@@ -34,12 +37,13 @@ export default function BlogPage() {
           Blog Posts ({filteredPosts.length})
         </h2>
         
-        {filteredPosts.map((post) => (
+        {filteredPosts.map((post, index) => (
           <div key={post.id} style={{ 
             border: '1px solid #d1d5db', 
             padding: '16px', 
             borderRadius: '4px', 
-            marginBottom: '16px' 
+            marginBottom: '16px',
+            backgroundColor: index % 2 === 0 ? '#f9fafb' : '#ffffff'
           }}>
             <div style={{ marginBottom: '8px' }}>
               <span style={{ 
