@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import AuthSync from "@/components/AuthSync";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -153,7 +155,10 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        {children}
+        <ClerkProvider>
+          <AuthSync />
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
