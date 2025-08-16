@@ -24,6 +24,7 @@ const generateStructuredData = (vehicle: any) => {
       "@type": "Offer",
       "price": vehicle.price,
       "priceCurrency": "USD",
+      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
       "availability": vehicle.sold_at ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
       "shippingDetails": {
         "@type": "OfferShippingDetails",
