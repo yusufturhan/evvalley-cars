@@ -76,11 +76,80 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Generate structured data for the homepage
+  const homepageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Evvalley",
+    "description": "US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles",
+    "url": "https://www.evvalley.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.evvalley.com/vehicles?search={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Evvalley",
+      "url": "https://www.evvalley.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.evvalley.com/logo.svg"
+      }
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": "USD"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 3,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 7,
+            "unitCode": "DAY"
+          }
+        }
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": "US",
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": 30,
+        "returnMethod": "https://schema.org/ReturnByMail",
+        "returnFees": "https://schema.org/FreeReturn"
+      }
+    }
+  };
+
   return (
     <html lang="en">
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
         <link rel="shortcut icon" href="/favicon.svg?v=2" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(homepageStructuredData)
+          }}
+        />
       </head>
       <body className={inter.className}>
         {children}
