@@ -24,6 +24,8 @@ export default function BlogPage() {
         <p><strong>Selected Category:</strong> All Categories</p>
         <p><strong>Post IDs:</strong> {filteredPosts.map(p => p.id).join(', ')}</p>
         <p><strong>Server Side:</strong> Yes</p>
+        <p><strong>All Post Titles:</strong> {filteredPosts.map(p => p.title).join(' | ')}</p>
+        <p><strong>Build Time:</strong> {new Date().toISOString()}</p>
       </div>
 
       {/* Blog Posts */}
