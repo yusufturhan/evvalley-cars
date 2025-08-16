@@ -106,6 +106,21 @@ export default function Home() {
     }
   };
 
+  const getCategoryLabel = (category: string) => {
+    switch (category) {
+      case 'ev-car':
+        return 'EV CAR';
+      case 'hybrid-car':
+        return 'HYBRID';
+      case 'ev-scooter':
+        return 'E-SCOOTER';
+      case 'ev-bike':
+        return 'E-BIKE';
+      default:
+        return category.toUpperCase();
+    }
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -305,9 +320,8 @@ export default function Home() {
                   <div className="p-6">
                     <div className="flex items-center mb-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
-                        {vehicle.category.replace('-', ' ').toUpperCase()}
+                        {getCategoryLabel(vehicle.category)}
                       </span>
-                      <span className="ml-2 text-gray-500 text-xs">ID: {vehicle.id}</span>
                     </div>
                     
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.title}</h3>
