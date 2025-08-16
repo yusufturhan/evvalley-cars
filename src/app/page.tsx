@@ -223,41 +223,46 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <button
+            <Link
+              href="/vehicles"
               onClick={() => handleCategoryClick('all')}
               className="bg-blue-600 text-white p-6 rounded-xl hover:bg-blue-700 transition-colors text-center"
             >
               <Zap className="w-8 h-8 mx-auto mb-3" />
               <span className="font-medium">All Electric Vehicles</span>
-            </button>
-            <button
+            </Link>
+            <Link
+              href="/vehicles?category=ev-car"
               onClick={() => handleCategoryClick('ev-car')}
               className="bg-white text-gray-900 p-6 rounded-xl hover:bg-gray-50 transition-colors text-center border border-gray-200"
             >
               <Car className="w-8 h-8 mx-auto mb-3" />
               <span className="font-medium">Electric Cars</span>
-            </button>
-            <button
+            </Link>
+            <Link
+              href="/vehicles?category=hybrid-car"
               onClick={() => handleCategoryClick('hybrid-car')}
               className="bg-white text-gray-900 p-6 rounded-xl hover:bg-gray-50 transition-colors text-center border border-gray-200"
             >
               <Battery className="w-8 h-8 mx-auto mb-3" />
               <span className="font-medium">Hybrid Cars</span>
-            </button>
-            <button
+            </Link>
+            <Link
+              href="/vehicles?category=ev-scooter"
               onClick={() => handleCategoryClick('ev-scooter')}
               className="bg-white text-gray-900 p-6 rounded-xl hover:bg-gray-50 transition-colors text-center border border-gray-200"
             >
               <Bike className="w-8 h-8 mx-auto mb-3" />
               <span className="font-medium">Electric Scooters</span>
-            </button>
-            <button
+            </Link>
+            <Link
+              href="/vehicles?category=ev-bike"
               onClick={() => handleCategoryClick('ev-bike')}
               className="bg-white text-gray-900 p-6 rounded-xl hover:bg-gray-50 transition-colors text-center border border-gray-200"
             >
               <Bike className="w-8 h-8 mx-auto mb-3" />
               <span className="font-medium">Electric Bikes</span>
-            </button>
+            </Link>
           </div>
         </div>
       </section>
