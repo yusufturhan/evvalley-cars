@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight, ArrowRight, CheckCircle } from "lucide-react";
+import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import OptimizedImage from "@/components/OptimizedImage";
@@ -23,7 +23,7 @@ export default function Home() {
     const fetchFeaturedVehicles = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/vehicles?limit=6');
+        const response = await fetch('/api/vehicles?limit=12');
         const data = await response.json();
         
         // Ensure all data is properly serialized for Next.js 15 compatibility
@@ -116,7 +116,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F5F9FF]">
       <AuthSync />
       
       {/* Google Analytics */}
@@ -136,230 +136,154 @@ export default function Home() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 via-blue-500 to-green-500 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <section className="bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Find Your Perfect
-              <span className="block text-green-300">Electric Vehicle</span>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Find Your Perfect Electric Vehicle
             </h1>
-            <p className="text-xl md:text-2xl mb-4 font-medium">
+            <p className="text-xl text-white/90">
               US Electric Vehicle & E-Mobility Marketplace
-            </p>
-            <p className="text-lg mb-8 max-w-3xl mx-auto opacity-90">
-              Buy and sell electric cars, hybrid vehicles, e-scooters, and e-bikes. 
-              Trusted marketplace for Tesla, Chevrolet, Ford, Hyundai, and more. 
-              Expert guidance for your electric vehicle journey.
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-4xl mx-auto mb-8">
-              <div className="flex flex-col md:flex-row gap-4 bg-white rounded-xl p-2 shadow-lg">
-                <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-4 py-3">
-                  <Search className="w-5 h-5 text-gray-400 mr-3" />
-                  <input
-                    type="text"
-                    placeholder="Search Tesla, Chevy Bolt, Ford Mach-E..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500"
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  />
+            <div className="max-w-4xl mx-auto mt-8">
+              <div className="bg-white rounded-lg p-4 shadow-lg">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search Tesla, Chevy Bolt, Ford Mach-E..."
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={locationQuery}
+                        onChange={(e) => setLocationQuery(e.target.value)}
+                        placeholder="Enter city, state, or zip code..."
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleSearch}
+                    className="bg-[#1C1F4A] text-white px-8 py-3 rounded-lg hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
+                  >
+                    <Filter className="mr-2 h-5 w-5" />
+                    Search EVs
+                  </button>
                 </div>
-                <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-4 py-3">
-                  <MapPin className="w-5 h-5 text-gray-400 mr-3" />
-                  <input
-                    type="text"
-                    placeholder="Enter city, state, or zip code..."
-                    value={locationQuery}
-                    onChange={(e) => setLocationQuery(e.target.value)}
-                    className="flex-1 bg-transparent border-none outline-none text-gray-900 placeholder-gray-500"
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                </div>
-                <button
-                  onClick={handleSearch}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
-                >
-                  <Filter className="w-5 h-5 mr-2" />
-                  Search EVs
-                </button>
               </div>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="flex flex-wrap justify-center gap-8 text-sm">
-              <div className="flex items-center">
-                <Shield className="w-5 h-5 mr-2" />
-                <span>Secure Transactions</span>
-              </div>
-              <div className="flex items-center">
-                <Star className="w-5 h-5 mr-2" />
-                <span>4.8/5 Rating</span>
-              </div>
-              <div className="flex items-center">
-                <Users className="w-5 h-5 mr-2" />
-                <span>10,000+ Users</span>
-              </div>
-              <div className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2" />
-                <span>Growing Community</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Evvalley?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Your trusted partner in the electric vehicle revolution
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Secure & Trusted</h3>
-              <p className="text-gray-600">
-                Buy and sell with confidence. Our secure platform ensures safe transactions 
-                and verified listings for all electric vehicles.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Expert Guidance</h3>
-              <p className="text-gray-600">
-                Get expert advice on electric vehicles, charging, maintenance, and tax incentives. 
-                Make informed decisions about your EV purchase.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Growing Community</h3>
-              <p className="text-gray-600">
-                Join thousands of electric vehicle enthusiasts. Share experiences, tips, 
-                and connect with other EV owners in our community.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-20">
+      <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Browse Electric Vehicle Categories
             </h2>
-            <p className="text-xl text-gray-600">
-              Find the perfect electric vehicle for your needs - from electric cars to e-scooters
+            <p className="text-gray-600">
+              Find the perfect electric vehicle for your needs
             </p>
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Link
-              href="/vehicles"
-              onClick={() => handleCategoryClick('all')}
-              className="group bg-white p-8 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-            >
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-                <Zap className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">All Electric Vehicles</h3>
-              <p className="text-sm text-gray-600">Complete marketplace</p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/vehicles" onClick={() => handleCategoryClick('all')}>
+              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md">
+                <Zap className="w-4 h-4 text-white" />
+                <span className="text-sm font-medium text-white">All Electric Vehicles</span>
+              </button>
             </Link>
-            <Link
-              href="/vehicles?category=ev-car"
-              onClick={() => handleCategoryClick('ev-car')}
-              className="group bg-white p-8 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-            >
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
-                <Car className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Electric Cars</h3>
-              <p className="text-sm text-gray-600">Tesla, Chevy, Ford & more</p>
+            
+            <Link href="/vehicles?category=ev-car" onClick={() => handleCategoryClick('ev-car')}>
+              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
+                <Car className="w-4 h-4 text-gray-700" />
+                <span className="text-sm font-medium text-gray-900">Electric Cars</span>
+              </button>
             </Link>
-            <Link
-              href="/vehicles?category=hybrid-car"
-              onClick={() => handleCategoryClick('hybrid-car')}
-              className="group bg-white p-8 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-            >
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
-                <Battery className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Hybrid Cars</h3>
-              <p className="text-sm text-gray-600">Toyota, Honda, Ford hybrids</p>
+            
+            <Link href="/vehicles?category=hybrid-car" onClick={() => handleCategoryClick('hybrid-car')}>
+              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
+                <Car className="w-4 h-4 text-gray-700" />
+                <span className="text-sm font-medium text-gray-900">Hybrid Cars</span>
+              </button>
             </Link>
-            <Link
-              href="/vehicles?category=ev-scooter"
-              onClick={() => handleCategoryClick('ev-scooter')}
-              className="group bg-white p-8 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all text-center"
-            >
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
-                <Bike className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">E-Scooters</h3>
-              <p className="text-sm text-gray-600">Urban transportation</p>
+            
+            <Link href="/vehicles?category=ev-scooter" onClick={() => handleCategoryClick('ev-scooter')}>
+              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
+                <Bike className="w-4 h-4 text-gray-700" />
+                <span className="text-sm font-medium text-gray-900">Electric Scooters</span>
+              </button>
+            </Link>
+            
+            <Link href="/vehicles?category=ev-bike" onClick={() => handleCategoryClick('ev-bike')}>
+              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
+                <Bike className="w-4 h-4 text-gray-700" />
+                <span className="text-sm font-medium text-gray-900">Electric Bikes</span>
+              </button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Featured Vehicles Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-12">
+          <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 Featured Electric Vehicles
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-gray-600">
                 Discover top-rated electric cars, hybrid vehicles, and e-mobility solutions
               </p>
             </div>
-            <Link
-              href="/vehicles"
-              className="text-blue-600 hover:text-blue-700 font-medium flex items-center"
-              onClick={() => trackClick('view_all_vehicles', 'homepage')}
-            >
-              View All Electric Vehicles
-              <ChevronRight className="w-4 h-4 ml-1" />
+            <Link href="/vehicles" className="text-[#3AB0FF] hover:text-[#2A2F6B] font-semibold transition-colors">
+              View All Electric Vehicles →
             </Link>
           </div>
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 h-80 animate-pulse"></div>
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex justify-between">
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                      <div className="h-8 bg-gray-200 rounded w-24"></div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredVehicles.slice(0, 6).map((vehicle) => (
-                <div
-                  key={vehicle.id}
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-                >
+              {featuredVehicles.map((vehicle) => (
+                <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
-                    <div className="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
                       {vehicle.images && vehicle.images.length > 0 ? (
                         <img
                           src={vehicle.images[0]}
-                          alt={vehicle.title}
+                          alt={`${vehicle.brand} ${vehicle.model} electric vehicle for sale`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -369,72 +293,46 @@ export default function Home() {
                           }}
                         />
                       ) : null}
-                      <div className={`text-white text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                      <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
                         <div className="text-4xl mb-2">🚗</div>
-                        <div className="text-sm font-medium">{vehicle.brand || vehicle.category.replace('-', ' ')}</div>
+                        <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
                     </div>
-                    <FavoriteButton vehicleId={vehicle.id} className="absolute top-2 right-2" />
-                    <span className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
-                      {vehicle.category.replace('-', ' ').toUpperCase()}
-                    </span>
+                    <div className="absolute top-2 right-2">
+                      <FavoriteButton vehicleId={vehicle.id} size="sm" />
+                    </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                      <Link href={`/vehicles/${vehicle.id}`} className="hover:text-blue-600">
-                        {vehicle.title}
-                      </Link>
-                    </h3>
-                    <p className="text-2xl font-bold text-blue-600 mb-3">
-                      {formatPrice(vehicle.price)}
-                    </p>
-                    <div className="flex items-center text-sm text-gray-500 mb-4">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      <span>{vehicle.location || 'Location not specified'}</span>
+                    <div className="flex items-center mb-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
+                        {vehicle.category.replace('-', ' ').toUpperCase()}
+                      </span>
+                      <span className="ml-2 text-gray-500 text-xs">ID: {vehicle.id}</span>
                     </div>
-                    <Link
-                      href={`/vehicles/${vehicle.id}`}
-                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors"
-                      onClick={() => trackClick('view_details_button', vehicle.title)}
-                    >
-                      View Details
-                    </Link>
+                    
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.title}</h3>
+                    <p className="text-gray-600 mb-4">
+                      {vehicle.year} • {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}
+                      {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold text-[#3AB0FF]">
+                        {formatPrice(vehicle.price)}
+                      </span>
+                      <Link href={`/vehicles/${vehicle.id}`}>
+                        <button 
+                          className="bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors"
+                          onClick={() => trackClick('view_details_button', vehicle.title)}
+                        >
+                          View Details
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Join the Electric Revolution?
-          </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Start your journey towards sustainable transportation today. 
-            Find your perfect electric vehicle or sell your current one.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/vehicles"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center justify-center"
-              onClick={() => trackClick('cta_browse_vehicles', 'homepage')}
-            >
-              Browse Vehicles
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-            <Link
-              href="/sell"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center"
-              onClick={() => trackClick('cta_sell_vehicle', 'homepage')}
-            >
-              Sell Your EV
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-          </div>
         </div>
       </section>
 
