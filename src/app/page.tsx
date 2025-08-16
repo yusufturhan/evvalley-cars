@@ -319,10 +319,17 @@ export default function Home() {
                     <p className="text-2xl font-bold text-blue-600 mb-2">
                       {formatPrice(vehicle.price)}
                     </p>
-                    <div className="flex items-center text-sm text-gray-500">
+                    <div className="flex items-center text-sm text-gray-500 mb-3">
                       <MapPin className="w-4 h-4 mr-1" />
                       <span>{vehicle.location || 'Location not specified'}</span>
                     </div>
+                    <Link
+                      href={`/vehicles/${vehicle.id}`}
+                      className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors"
+                      onClick={() => trackClick('view_details_button', vehicle.title)}
+                    >
+                      View Details
+                    </Link>
                   </div>
                 </div>
               ))}
