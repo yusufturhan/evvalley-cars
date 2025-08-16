@@ -5,81 +5,139 @@ export default function BlogPage() {
   const filteredPosts = getBlogPostsByCategory('All Categories');
 
   return (
-    <div style={{ padding: '20px', backgroundColor: 'white', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '20px' }}>
-        Evvalley Blog
-      </h1>
-      
-      {/* Debug Info */}
-      <div style={{ 
-        marginBottom: '20px', 
-        padding: '16px', 
-        backgroundColor: '#fef3c7', 
-        border: '1px solid #f59e0b', 
-        borderRadius: '4px' 
-      }}>
-        <h3 style={{ fontWeight: 'bold', marginBottom: '8px' }}>DEBUG INFO:</h3>
-        <p><strong>Total Blog Posts:</strong> {blogPosts.length}</p>
-        <p><strong>Filtered Posts:</strong> {filteredPosts.length}</p>
-        <p><strong>Selected Category:</strong> All Categories</p>
-        <p><strong>Post IDs:</strong> {filteredPosts.map(p => p.id).join(', ')}</p>
-        <p><strong>Server Side:</strong> Yes</p>
-        <p><strong>All Post Titles:</strong> {filteredPosts.map(p => p.title).join(' | ')}</p>
-        <p><strong>Build Time:</strong> {new Date().toISOString()}</p>
-        <p><strong>Render Count:</strong> {filteredPosts.length} posts should render</p>
-        <p><strong>First 3 IDs:</strong> {filteredPosts.slice(0, 3).map(p => p.id).join(', ')}</p>
-        <p><strong>Last 3 IDs:</strong> {filteredPosts.slice(-3).map(p => p.id).join(', ')}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Evvalley Blog
+          </h1>
+          <p className="text-lg text-gray-600">
+            Latest insights, guides, and tips for electric vehicle enthusiasts
+          </p>
+        </div>
       </div>
 
-      {/* Blog Posts */}
-      <div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>
-          Blog Posts ({filteredPosts.length})
-        </h2>
-        
-        {filteredPosts.map((post, index) => (
-          <div key={post.id} style={{ 
-            border: '1px solid #d1d5db', 
-            padding: '16px', 
-            borderRadius: '4px', 
-            marginBottom: '16px',
-            backgroundColor: index % 2 === 0 ? '#f9fafb' : '#ffffff'
-          }}>
-            <div style={{ marginBottom: '8px' }}>
-              <span style={{ 
-                backgroundColor: '#dbeafe', 
-                color: '#1e40af', 
-                padding: '4px 8px', 
-                borderRadius: '4px', 
-                fontSize: '0.875rem' 
-              }}>
-                {post.category}
-              </span>
-              <span style={{ marginLeft: '8px', color: '#6b7280', fontSize: '0.875rem' }}>
-                ID: {post.id}
-              </span>
-            </div>
-            
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '8px' }}>
-              <Link href={`/blog/${post.slug}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
-                {post.title}
-              </Link>
-            </h3>
-            
-            <p style={{ color: '#4b5563', marginBottom: '8px' }}>{post.excerpt}</p>
-            
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-              By {post.author} • {post.readTime} min read • {new Date(post.publishedAt).toLocaleDateString()}
+      {/* Debug Info - Hidden in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <h3 className="font-bold text-yellow-800 mb-2">DEBUG INFO:</h3>
+            <div className="text-sm text-yellow-700 space-y-1">
+              <p><strong>Total Blog Posts:</strong> {blogPosts.length}</p>
+              <p><strong>Filtered Posts:</strong> {filteredPosts.length}</p>
+              <p><strong>Render Count:</strong> {filteredPosts.length} posts should render</p>
             </div>
           </div>
-        ))}
-      </div>
-
-      {filteredPosts.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '32px' }}>
-          <p style={{ color: '#6b7280' }}>No posts found for this category.</p>
         </div>
       )}
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Category Filter */}
+        <div className="mb-8">
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  category === 'All Categories'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Blog Posts Grid */}
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {filteredPosts.map((post, index) => (
+            <article key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              {/* Featured Image Placeholder */}
+              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="text-white text-center">
+                  <div className="text-4xl mb-2">🚗</div>
+                  <div className="text-sm font-medium">{post.category}</div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* Category Tag */}
+                <div className="mb-3">
+                  <span className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {post.category}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                  <Link href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+                    {post.title}
+                  </Link>
+                </h2>
+
+                {/* Excerpt */}
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {post.excerpt}
+                </p>
+
+                {/* Tags */}
+                <div className="mb-4">
+                  <div className="flex flex-wrap gap-1">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Meta */}
+                <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center space-x-2">
+                    <span>{post.author}</span>
+                    <span>•</span>
+                    <span>{post.readTime} min read</span>
+                  </div>
+                  <time dateTime={post.publishedAt}>
+                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </time>
+                </div>
+
+                {/* Read More Button */}
+                <div className="mt-4">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
+                  >
+                    Read More
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredPosts.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+            <p className="text-gray-600">No blog posts match your current filter.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

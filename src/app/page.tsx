@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { trackEvent, trackSearch, trackCategoryView, trackClick, trackScrollDepth } from "@/lib/analytics";
+import { trackEvent, trackSearch, trackCategoryView, trackClick, trackScrollDepth, trackSocialMediaClick } from "@/lib/analytics";
 
 export default function Home() {
   const router = useRouter();
