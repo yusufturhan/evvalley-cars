@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight } from "lucide-react";
+import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import OptimizedImage from "@/components/OptimizedImage";
@@ -18,6 +18,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   useEffect(() => {
     const fetchFeaturedVehicles = async () => {
@@ -72,6 +74,24 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest('.category-dropdown')) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    if (showCategoryDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showCategoryDropdown]);
+
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchQuery.trim()) {
@@ -79,6 +99,9 @@ export default function Home() {
     }
     if (locationQuery.trim()) {
       params.append('location', locationQuery.trim());
+    }
+    if (selectedCategory !== 'all') {
+      params.append('category', selectedCategory);
     }
     
     const queryString = params.toString();
@@ -118,6 +141,23 @@ export default function Home() {
         return 'E-BIKE';
       default:
         return category.toUpperCase();
+    }
+  };
+
+  const getCategoryDisplayName = (category: string) => {
+    switch (category) {
+      case 'all':
+        return 'All Categories';
+      case 'ev-car':
+        return 'Electric Cars';
+      case 'hybrid-car':
+        return 'Hybrid Cars';
+      case 'ev-scooter':
+        return 'E-Scooters';
+      case 'ev-bike':
+        return 'E-Bikes';
+      default:
+        return 'All Categories';
     }
   };
 
@@ -165,6 +205,49 @@ export default function Home() {
             <div className="max-w-4xl mx-auto mt-8">
               <div className="bg-white rounded-lg p-4 shadow-lg">
                 <div className="flex flex-col md:flex-row gap-4">
+                  {/* Category Dropdown */}
+                  <div className="relative category-dropdown">
+                    <button
+                      onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                      className="w-full md:w-48 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 flex items-center justify-between hover:border-[#3AB0FF] transition-colors"
+                    >
+                      <span className="flex items-center">
+                        <Zap className="w-4 h-4 mr-2 text-gray-500" />
+                        {getCategoryDisplayName(selectedCategory)}
+                      </span>
+                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {showCategoryDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+                        {[
+                          { value: 'all', label: 'All Categories', icon: Zap },
+                          { value: 'ev-car', label: 'Electric Cars', icon: Car },
+                          { value: 'hybrid-car', label: 'Hybrid Cars', icon: Car },
+                          { value: 'ev-scooter', label: 'E-Scooters', icon: Bike },
+                          { value: 'ev-bike', label: 'E-Bikes', icon: Bike }
+                        ].map((category) => {
+                          const IconComponent = category.icon;
+                          return (
+                            <button
+                              key={category.value}
+                              onClick={() => {
+                                setSelectedCategory(category.value);
+                                setShowCategoryDropdown(false);
+                              }}
+                              className={`w-full px-4 py-3 text-left flex items-center hover:bg-gray-50 transition-colors ${
+                                selectedCategory === category.value ? 'bg-blue-50 text-blue-600' : 'text-gray-900'
+                              }`}
+                            >
+                              <IconComponent className="w-4 h-4 mr-2" />
+                              {category.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex-1">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
