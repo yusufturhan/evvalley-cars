@@ -298,13 +298,25 @@ export default function Home() {
                   className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
                 >
                   <div className="relative">
-                    <OptimizedImage
-                      src={vehicle.images?.[0] || '/placeholder-car.jpg'}
-                      alt={vehicle.title}
-                      width={300}
-                      height={200}
-                      className="w-full h-48 object-cover"
-                    />
+                    <div className="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      {vehicle.images && vehicle.images.length > 0 ? (
+                        <img
+                          src={vehicle.images[0]}
+                          alt={vehicle.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`text-white text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                        <div className="text-4xl mb-2">🚗</div>
+                        <div className="text-sm font-medium">{vehicle.brand || vehicle.category.replace('-', ' ')}</div>
+                      </div>
+                    </div>
                     <FavoriteButton vehicleId={vehicle.id} className="absolute top-2 right-2" />
                     <span className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
                       {vehicle.category.replace('-', ' ').toUpperCase()}
