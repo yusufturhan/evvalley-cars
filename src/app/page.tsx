@@ -466,14 +466,14 @@ export default function Home() {
               <div className="flex space-x-4">
                 <a
                   href="#"
-                  onClick={() => trackSocialMediaClick('facebook')}
+                  onClick={() => trackSocialMediaClick('facebook', 'link')}
                   className="text-gray-400 hover:text-white"
                 >
                   <Facebook className="w-6 h-6" />
                 </a>
                 <a
                   href="#"
-                  onClick={() => trackSocialMediaClick('instagram')}
+                  onClick={() => trackSocialMediaClick('instagram', 'link')}
                   className="text-gray-400 hover:text-white"
                 >
                   <Instagram className="w-6 h-6" />
