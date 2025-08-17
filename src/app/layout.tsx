@@ -24,12 +24,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.svg?v=3', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.svg?v=3', sizes: '32x32', type: 'image/svg+xml' },
-      { url: '/favicon.svg?v=3', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=4', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.svg?v=4', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=4', sizes: '16x16', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon.svg?v=3',
-    apple: '/favicon.svg?v=3',
+    shortcut: '/favicon.svg?v=4',
+    apple: '/favicon.svg?v=4',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
