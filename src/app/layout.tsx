@@ -24,12 +24,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.svg?v=4', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.svg?v=4', sizes: '32x32', type: 'image/svg+xml' },
-      { url: '/favicon.svg?v=4', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=5', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.svg?v=5', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=5', sizes: '16x16', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon.svg?v=4',
-    apple: '/favicon.svg?v=4',
+    shortcut: '/favicon.svg?v=5',
+    apple: [
+      { url: '/apple-touch-icon.svg?v=5', sizes: '180x180', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=5', sizes: '32x32', type: 'image/svg+xml' },
+    ],
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
@@ -78,85 +81,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Generate structured data for the homepage
-  const homepageStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Evvalley",
-    "description": "US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles",
-    "url": "https://www.evvalley.com",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": {
-        "@type": "EntryPoint",
-        "urlTemplate": "https://www.evvalley.com/vehicles?search={search_term_string}"
-      },
-      "query-input": "required name=search_term_string"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Evvalley",
-      "url": "https://www.evvalley.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://www.evvalley.com/logo.svg"
-      }
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD",
-      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
-      "availability": "https://schema.org/InStock",
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "0",
-          "currency": "USD"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 3,
-            "unitCode": "DAY"
-          },
-          "transitTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 7,
-            "unitCode": "DAY"
-          }
-        }
-      },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "US",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 30,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn"
-      }
-    }
-  };
-
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
-        <link rel="shortcut icon" href="/favicon.svg?v=2" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(homepageStructuredData)
-          }}
-        />
+        {/* Safari-specific favicon tags */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.svg?v=5" />
+        <link rel="apple-touch-icon" sizes="32x32" href="/favicon.svg?v=5" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=5" />
+        <link rel="shortcut icon" href="/favicon.svg?v=5" />
+        <meta name="theme-color" content="#1C1F4A" />
+        <meta name="msapplication-TileColor" content="#1C1F4A" />
       </head>
       <body className={inter.className}>
         <ClerkProvider>
-          <AuthSync />
           {children}
         </ClerkProvider>
       </body>

@@ -1,0 +1,10 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="90" cy="90" r="90" fill="#1C1F4A"/>
+  
+  <!-- Lightning bolt - larger for Apple Touch Icon -->
+  <path d="M35 25L20 70H45L30 115L70 70H50L60 25Z" fill="#3AB0FF" stroke="#3AB0FF" stroke-width="2"/>
+  
+  <!-- EVVALLEY text - larger and more readable -->
+  <text x="90" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">EVVALLEY</text>
+</svg>
