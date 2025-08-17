@@ -1,0 +1,11 @@
+<!-- This is a placeholder for ICO file. I'll create a simple SVG that can be converted to ICO -->
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#1C1F4A"/>
+  
+  <!-- Lightning bolt - scaled down from logo -->
+  <path d="M6 4L2 12H8L4 20L12 12H8L10 4Z" fill="#3AB0FF" stroke="#3AB0FF" stroke-width="0.5"/>
+  
+  <!-- EVVALLEY text - scaled down and positioned -->
+  <text x="16" y="26" font-family="Arial, sans-serif" font-size="4" font-weight="bold" fill="white" text-anchor="middle">EVVALLEY</text>
+</svg>

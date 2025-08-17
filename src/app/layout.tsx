@@ -24,18 +24,19 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.svg?v=6', type: 'image/svg+xml' },
-      { url: '/favicon-32x32.svg?v=6', sizes: '32x32', type: 'image/svg+xml' },
-      { url: '/favicon.svg?v=6', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=7', type: 'image/svg+xml' },
+      { url: '/favicon.ico?v=7', type: 'image/x-icon' },
+      { url: '/favicon-32x32.svg?v=7', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=7', sizes: '16x16', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon.svg?v=6',
+    shortcut: '/favicon.ico?v=7',
     apple: [
-      { url: '/apple-touch-icon.svg?v=6', sizes: '180x180', type: 'image/svg+xml' },
-      { url: '/apple-touch-icon.svg?v=6', sizes: '152x152', type: 'image/svg+xml' },
-      { url: '/apple-touch-icon.svg?v=6', sizes: '144x144', type: 'image/svg+xml' },
-      { url: '/apple-touch-icon.svg?v=6', sizes: '120x120', type: 'image/svg+xml' },
-      { url: '/apple-touch-icon.svg?v=6', sizes: '114x114', type: 'image/svg+xml' },
-      { url: '/favicon.svg?v=6', sizes: '32x32', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.svg?v=7', sizes: '180x180', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.svg?v=7', sizes: '152x152', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.svg?v=7', sizes: '144x144', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.svg?v=7', sizes: '120x120', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.svg?v=7', sizes: '114x114', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=7', sizes: '32x32', type: 'image/svg+xml' },
     ],
   },
   openGraph: {
@@ -89,23 +90,24 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Safari-specific favicon tags - Multiple formats for maximum compatibility */}
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon.svg?v=6" />
-        <link rel="apple-touch-icon" sizes="32x32" href="/favicon.svg?v=6" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=6" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon.svg?v=7" />
+        <link rel="apple-touch-icon" sizes="32x32" href="/favicon.svg?v=7" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=7" />
         
         {/* Standard favicon tags */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=6" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg?v=6" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg?v=6" />
-        <link rel="shortcut icon" href="/favicon.svg?v=6" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico?v=7" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg?v=7" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg?v=7" />
+        <link rel="shortcut icon" href="/favicon.ico?v=7" />
         
         {/* Theme colors */}
         <meta name="theme-color" content="#1C1F4A" />
