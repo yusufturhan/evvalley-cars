@@ -19,6 +19,7 @@ Allow: /about/
 Allow: /contact/
 Allow: /privacy/
 Allow: /terms/
+Allow: /safety/
 
 # Sitemap
 Sitemap: https://www.evvalley.com/sitemap.xml
@@ -38,6 +39,13 @@ Allow: /vehicles?category=
 Allow: /vehicles?brand=
 Allow: /vehicles?year=
 Allow: /blog?category=
+
+# Prevent Soft 404 issues
+# Block access to non-existent vehicle IDs
+Disallow: /vehicles/999999
+Disallow: /vehicles/000000
+Disallow: /vehicles/test
+Disallow: /vehicles/demo
 
 # Host directive
 Host: https://www.evvalley.com
