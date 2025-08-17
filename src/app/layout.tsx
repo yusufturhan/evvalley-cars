@@ -23,9 +23,12 @@ export const metadata: Metadata = {
     canonical: 'https://www.evvalley.com',
   },
   icons: {
-    icon: '/favicon.svg?v=8',
-    shortcut: '/favicon.svg?v=8',
-    apple: '/apple-touch-icon.svg?v=8',
+    icon: [
+      { url: '/favicon.png?v=9', type: 'image/png' },
+      { url: '/favicon.svg?v=9', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.png?v=9',
+    apple: '/favicon.png?v=9',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
@@ -77,10 +80,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Simple and direct favicon approach */}
-        <link rel="icon" href="/favicon.svg?v=8" />
-        <link rel="shortcut icon" href="/favicon.svg?v=8" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=8" />
+        {/* Safari-specific favicon approach with PNG priority */}
+        <link rel="icon" type="image/png" href="/favicon.png?v=9" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=9" />
+        <link rel="shortcut icon" href="/favicon.png?v=9" />
+        <link rel="apple-touch-icon" href="/favicon.png?v=9" />
+        
+        {/* Safari-specific meta tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Evvalley" />
         
         {/* Force cache refresh */}
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
