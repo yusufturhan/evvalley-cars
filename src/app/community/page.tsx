@@ -307,7 +307,7 @@ export default function CommunityPage() {
             <div>
               <h4 className="text-lg font-semibold mb-4">Contact</h4>
               <ul className="space-y-2 text-gray-400">
-                <li>evvalley@evvalley.com</li>
+                <li>info@evvalley.com</li>
                 <li>San Francisco, CA</li>
                 <li>
                   <Link href="/contact">

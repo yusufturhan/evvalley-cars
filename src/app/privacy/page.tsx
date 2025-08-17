@@ -154,7 +154,7 @@ export default function PrivacyPage() {
               <div className="space-y-2 text-gray-600">
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2" />
-                  <span>evvalley@evvalley.com</span>
+                  <span>info@evvalley.com</span>
                 </div>
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-2" />
