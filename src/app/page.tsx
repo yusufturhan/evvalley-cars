@@ -465,16 +465,20 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Follow Us</h4>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.facebook.com/evvalley"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => trackSocialMediaClick('facebook', 'link')}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
                   <Facebook className="w-6 h-6" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/evvalley"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => trackSocialMediaClick('instagram', 'link')}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
                   <Instagram className="w-6 h-6" />
                 </a>
