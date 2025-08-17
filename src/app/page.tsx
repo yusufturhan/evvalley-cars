@@ -465,7 +465,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Follow Us</h4>
               <div className="flex space-x-4">
                 <a
-                  href="https://www.facebook.com/evvalley"
+                  href="https://www.facebook.com/profile.php?id=61574833470669"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackSocialMediaClick('facebook', 'link')}
@@ -474,7 +474,7 @@ export default function Home() {
                   <Facebook className="w-6 h-6" />
                 </a>
                 <a
-                  href="https://www.instagram.com/evvalley"
+                  href="https://www.instagram.com/evvalleyus/"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackSocialMediaClick('instagram', 'link')}
