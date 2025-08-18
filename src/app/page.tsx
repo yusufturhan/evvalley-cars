@@ -16,6 +16,7 @@ export default function Home() {
   const router = useRouter();
   const [featuredVehicles, setFeaturedVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -25,29 +26,46 @@ export default function Home() {
     const fetchFeaturedVehicles = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
         const response = await fetch('/api/vehicles?limit=12');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
+        if (!data.vehicles) {
+          throw new Error('No vehicles data received');
+        }
+        
         // Ensure all data is properly serialized for Next.js 15 compatibility
-        const serializedVehicles = data.vehicles?.map((vehicle: any) => {
-          const plainVehicle = { ...vehicle };
-          // Convert dates to strings
-          if (plainVehicle.created_at) {
-            plainVehicle.created_at = plainVehicle.created_at.toString();
+        const serializedVehicles = data.vehicles.map((vehicle: any) => {
+          try {
+            const plainVehicle = { ...vehicle };
+            // Convert dates to strings
+            if (plainVehicle.created_at) {
+              plainVehicle.created_at = plainVehicle.created_at.toString();
+            }
+            if (plainVehicle.updated_at) {
+              plainVehicle.updated_at = plainVehicle.updated_at.toString();
+            }
+            if (plainVehicle.sold_at) {
+              plainVehicle.sold_at = plainVehicle.sold_at.toString();
+            }
+            // Ensure all properties are serializable
+            return JSON.parse(JSON.stringify(plainVehicle));
+          } catch (serializeError) {
+            console.error('Error serializing vehicle:', serializeError);
+            return null;
           }
-          if (plainVehicle.updated_at) {
-            plainVehicle.updated_at = plainVehicle.updated_at.toString();
-          }
-          if (plainVehicle.sold_at) {
-            plainVehicle.sold_at = plainVehicle.sold_at.toString();
-          }
-          // Ensure all properties are serializable
-          return JSON.parse(JSON.stringify(plainVehicle));
-        }) || [];
+        }).filter(Boolean); // Remove null entries
         
         setFeaturedVehicles(serializedVehicles);
       } catch (error) {
         console.error('Error fetching vehicles:', error);
+        setError(error instanceof Error ? error.message : 'Failed to fetch vehicles');
       } finally {
         setLoading(false);
       }
@@ -57,16 +75,20 @@ export default function Home() {
 
     // Track scroll depth
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = Math.round((scrollTop / docHeight) * 100);
-      
-      if (scrollPercent >= 25 && scrollPercent < 50) {
-        trackScrollDepth(25);
-      } else if (scrollPercent >= 50 && scrollPercent < 75) {
-        trackScrollDepth(50);
-      } else if (scrollPercent >= 75) {
-        trackScrollDepth(75);
+      try {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+        
+        if (scrollPercent >= 25 && scrollPercent < 50) {
+          trackScrollDepth(25);
+        } else if (scrollPercent >= 50 && scrollPercent < 75) {
+          trackScrollDepth(50);
+        } else if (scrollPercent >= 75) {
+          trackScrollDepth(75);
+        }
+      } catch (scrollError) {
+        console.error('Error tracking scroll:', scrollError);
       }
     };
 
@@ -77,9 +99,13 @@ export default function Home() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (!target.closest('.category-dropdown')) {
-        setShowCategoryDropdown(false);
+      try {
+        const target = event.target as Element;
+        if (!target.closest('.category-dropdown')) {
+          setShowCategoryDropdown(false);
+        }
+      } catch (clickError) {
+        console.error('Error handling click outside:', clickError);
       }
     };
 
@@ -93,26 +119,66 @@ export default function Home() {
   }, [showCategoryDropdown]);
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (searchQuery.trim()) {
-      params.append('search', searchQuery.trim());
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) {
+        params.append('search', searchQuery.trim());
+      }
+      if (locationQuery.trim()) {
+        params.append('location', locationQuery.trim());
+      }
+      if (selectedCategory && selectedCategory !== 'all') {
+        params.append('category', selectedCategory);
+      }
+      
+      const queryString = params.toString();
+      const url = `/vehicles${queryString ? `?${queryString}` : ''}`;
+      
+      trackSearch(searchQuery, featuredVehicles.length);
+      router.push(url);
+    } catch (searchError) {
+      console.error('Error handling search:', searchError);
     }
-    if (locationQuery.trim()) {
-      params.append('location', locationQuery.trim());
-    }
-    if (selectedCategory !== 'all') {
-      params.append('category', selectedCategory);
-    }
-    
-    const queryString = params.toString();
-    trackSearch(searchQuery.trim(), featuredVehicles.length);
-    router.push(`/vehicles${queryString ? `?${queryString}` : ''}`);
   };
 
-  const handleCategoryClick = (category: string) => {
-    trackCategoryView(category);
-    trackClick('category_button', category);
+  const handleCategorySelect = (category: string) => {
+    try {
+      setSelectedCategory(category);
+      setShowCategoryDropdown(false);
+      trackCategoryView(category);
+    } catch (categoryError) {
+      console.error('Error selecting category:', categoryError);
+    }
   };
+
+  const handleVehicleClick = (vehicleId: string) => {
+    try {
+      trackClick('vehicle_card', vehicleId);
+    } catch (clickError) {
+      console.error('Error tracking vehicle click:', clickError);
+    }
+  };
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F5F9FF]">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to Load Vehicles</h2>
+            <p className="text-gray-600 mb-8">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-[#3AB0FF] text-white px-6 py-3 rounded-lg hover:bg-[#2A8FD9] transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -231,10 +297,7 @@ export default function Home() {
                           return (
                             <button
                               key={category.value}
-                              onClick={() => {
-                                setSelectedCategory(category.value);
-                                setShowCategoryDropdown(false);
-                              }}
+                              onClick={() => handleCategorySelect(category.value)}
                               className={`w-full px-4 py-3 text-left flex items-center hover:bg-gray-50 transition-colors ${
                                 selectedCategory === category.value ? 'bg-blue-50 text-blue-600' : 'text-gray-900'
                               }`}
@@ -300,35 +363,35 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/vehicles" onClick={() => handleCategoryClick('all')}>
+            <Link href="/vehicles" onClick={() => handleCategorySelect('all')}>
               <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md">
                 <Zap className="w-4 h-4 text-white" />
                 <span className="text-sm font-medium text-white">All Electric Vehicles</span>
               </button>
             </Link>
             
-            <Link href="/vehicles?category=ev-car" onClick={() => handleCategoryClick('ev-car')}>
+            <Link href="/vehicles?category=ev-car" onClick={() => handleCategorySelect('ev-car')}>
               <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
                 <Car className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-900">Electric Cars</span>
               </button>
             </Link>
             
-            <Link href="/vehicles?category=hybrid-car" onClick={() => handleCategoryClick('hybrid-car')}>
+            <Link href="/vehicles?category=hybrid-car" onClick={() => handleCategorySelect('hybrid-car')}>
               <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
                 <Car className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-900">Hybrid Cars</span>
               </button>
             </Link>
             
-            <Link href="/vehicles?category=ev-scooter" onClick={() => handleCategoryClick('ev-scooter')}>
+            <Link href="/vehicles?category=ev-scooter" onClick={() => handleCategorySelect('ev-scooter')}>
               <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
                 <Bike className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-900">Electric Scooters</span>
               </button>
             </Link>
             
-            <Link href="/vehicles?category=ev-bike" onClick={() => handleCategoryClick('ev-bike')}>
+            <Link href="/vehicles?category=ev-bike" onClick={() => handleCategorySelect('ev-bike')}>
               <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
                 <Bike className="w-4 h-4 text-gray-700" />
                 <span className="text-sm font-medium text-gray-900">Electric Bikes</span>
@@ -416,7 +479,7 @@ export default function Home() {
                       <span className="text-2xl font-bold text-[#3AB0FF]">
                         {formatPrice(vehicle.price)}
                       </span>
-                      <Link href={`/vehicles/${vehicle.id}`}>
+                      <Link href={`/vehicles/${vehicle.id}`} onClick={() => handleVehicleClick(vehicle.id)}>
                         <button 
                           className="bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors"
                           onClick={() => trackClick('view_details_button', vehicle.title)}

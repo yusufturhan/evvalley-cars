@@ -10,7 +10,16 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Enhanced error logging
     console.error('❌ Application error:', error);
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    console.error('❌ Error digest:', error.digest);
+    
+    // Log additional context
+    console.error('❌ User agent:', navigator.userAgent);
+    console.error('❌ Current URL:', window.location.href);
+    console.error('❌ Timestamp:', new Date().toISOString());
   }, [error]);
 
   return (
@@ -23,6 +32,13 @@ export default function Error({
           <p className="text-gray-600 mb-6">
             We're sorry, but something went wrong. Please try again.
           </p>
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
+              <p className="text-sm text-red-800 font-medium mb-2">Debug Info:</p>
+              <p className="text-xs text-red-700 mb-1">Error: {error.message}</p>
+              <p className="text-xs text-red-700">Digest: {error.digest}</p>
+            </div>
+          )}
           <div className="space-y-3">
             <button
               onClick={reset}
