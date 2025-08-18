@@ -221,6 +221,7 @@ export default function SellPage() {
       console.log("🚀 Starting vehicle submission...");
       console.log("📝 Form data:", formData);
       console.log("🖼️ Images count:", images.length, 'uploaded urls:', imageUrls.length);
+      console.log("📸 Uploaded URLs:", imageUrls);
       console.log("👤 User Supabase ID:", userSupabaseId);
       
       // Build JSON payload (send only URLs, no big files)
