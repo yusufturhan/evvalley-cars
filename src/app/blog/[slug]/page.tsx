@@ -70,16 +70,9 @@ interface BlogPostPageProps {
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   
-  // Special handling for old/deleted blog post
+  // Special handling for old/deleted blog post - redirect to 404
   if (slug === 'battery-technology-advancements-and-the-ev-range-problem') {
-    // Return 410 Gone status for permanently deleted content
-    throw new Response('This blog post has been permanently removed.', {
-      status: 410,
-      statusText: 'Gone',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-    });
+    notFound(); // This will return a proper 404 status
   }
   
   const post = getBlogPostBySlug(slug);
