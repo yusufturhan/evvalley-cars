@@ -107,6 +107,20 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     }
   };
 
+  // Format seller name from email
+  const formatSellerName = (email: string) => {
+    const [username, domain] = email.split('@');
+    
+    // If it's a business email (info@, contact@, etc.)
+    if (['info', 'contact', 'sales', 'support', 'hello', 'admin'].includes(username.toLowerCase())) {
+      // Return domain name (e.g., "westauto.com")
+      return domain;
+    }
+    
+    // For personal emails, return username
+    return username;
+  };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'ev-car':
@@ -453,7 +467,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                       </div>
                       <p className="font-bold text-gray-900">
                         {sellerInfo.full_name || 
-                         (sellerInfo.email ? sellerInfo.email.split('@')[0] : 'Unknown Seller')}
+                         (sellerInfo.email ? formatSellerName(sellerInfo.email) : 'Unknown Seller')}
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         {isVerifiedUser(sellerInfo.email) && (
