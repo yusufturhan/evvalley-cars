@@ -18,33 +18,17 @@ CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(c
 -- Enable Row Level Security (RLS)
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
--- Create policy to allow authenticated users to read their own messages (if needed)
--- CREATE POLICY "Users can view their own contact messages" ON contact_messages
---   FOR SELECT USING (auth.uid()::text = email);
-
 -- Create policy to allow public insert (for contact form)
 CREATE POLICY "Allow public insert for contact form" ON contact_messages
   FOR INSERT WITH CHECK (true);
 
--- Create policy to allow admin users to read all messages
-CREATE POLICY "Allow admin to read all contact messages" ON contact_messages
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM users 
-      WHERE users.id = auth.uid() 
-      AND users.role = 'admin'
-    )
-  );
+-- Create policy to allow authenticated users to read all messages (simplified)
+CREATE POLICY "Allow authenticated users to read contact messages" ON contact_messages
+  FOR SELECT USING (auth.role() = 'authenticated');
 
--- Create policy to allow admin users to update messages
-CREATE POLICY "Allow admin to update contact messages" ON contact_messages
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM users 
-      WHERE users.id = auth.uid() 
-      AND users.role = 'admin'
-    )
-  );
+-- Create policy to allow authenticated users to update messages
+CREATE POLICY "Allow authenticated users to update contact messages" ON contact_messages
+  FOR UPDATE USING (auth.role() = 'authenticated');
 
 -- Add trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

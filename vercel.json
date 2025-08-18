@@ -62,5 +62,12 @@
       "source": "/favicon.ico",
       "destination": "/favicon.svg"
     }
+  ],
+  "redirects": [
+    {
+      "source": "https://evvalley.com/:path*",
+      "destination": "https://www.evvalley.com/:path*",
+      "permanent": true
+    }
   ]
 }

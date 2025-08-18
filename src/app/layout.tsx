@@ -19,9 +19,6 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL('https://www.evvalley.com'),
-  alternates: {
-    canonical: 'https://www.evvalley.com',
-  },
   icons: {
     icon: [
       { url: '/favicon.png?v=9', type: 'image/png' },
