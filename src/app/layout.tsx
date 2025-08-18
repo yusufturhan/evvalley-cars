@@ -21,11 +21,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://www.evvalley.com'),
   icons: {
     icon: [
-      { url: '/favicon.png?v=9', type: 'image/png' },
-      { url: '/favicon.svg?v=9', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=10', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon.png?v=9',
-    apple: '/favicon.png?v=9',
+    shortcut: '/favicon.svg?v=10',
+    apple: '/favicon.svg?v=10',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
@@ -77,11 +76,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Safari-specific favicon approach with PNG priority */}
-        <link rel="icon" type="image/png" href="/favicon.png?v=9" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=9" />
-        <link rel="shortcut icon" href="/favicon.png?v=9" />
-        <link rel="apple-touch-icon" href="/favicon.png?v=9" />
+        {/* Safari-specific favicon approach with SVG priority */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=10" />
+        <link rel="shortcut icon" href="/favicon.svg?v=10" />
+        <link rel="apple-touch-icon" href="/favicon.svg?v=10" />
         
         {/* Safari-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
