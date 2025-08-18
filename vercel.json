@@ -65,7 +65,13 @@
   ],
   "redirects": [
     {
-      "source": "https://evvalley.com/:path*",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "evvalley.com"
+        }
+      ],
       "destination": "https://www.evvalley.com/:path*",
       "permanent": true
     }
