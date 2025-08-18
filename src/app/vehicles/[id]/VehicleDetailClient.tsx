@@ -113,8 +113,8 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     
     // If it's a business email (info@, contact@, etc.)
     if (['info', 'contact', 'sales', 'support', 'hello', 'admin'].includes(username.toLowerCase())) {
-      // Return domain name (e.g., "westauto.com")
-      return domain;
+      // Return full business email (e.g., "info@westauto.com")
+      return email;
     }
     
     // For personal emails, return username
