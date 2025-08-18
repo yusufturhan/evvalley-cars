@@ -20,42 +20,21 @@ const generateStructuredData = (vehicle: any) => {
     "description": vehicle.description,
     "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : "",
     "url": `https://www.evvalley.com/vehicles/${vehicle.id}`,
+    "brand": {
+      "@type": "Brand",
+      "name": vehicle.brand
+    },
+    "model": vehicle.model,
+    "category": vehicle.category,
     "offers": {
       "@type": "Offer",
       "price": vehicle.price,
       "priceCurrency": "USD",
-      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year from now
+      "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       "availability": vehicle.sold_at ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "0",
-          "currency": "USD"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 3,
-            "unitCode": "DAY"
-          },
-          "transitTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 7,
-            "unitCode": "DAY"
-          }
-        }
-      },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "US",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 30,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn"
+      "seller": {
+        "@type": "Organization",
+        "name": "Evvalley"
       }
     },
     "aggregateRating": {
