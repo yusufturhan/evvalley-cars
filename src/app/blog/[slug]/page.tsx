@@ -1,33 +1,33 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { getBlogPostBySlug } from '@/lib/blog-content';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, Calendar, Clock, User, Tag } from 'lucide-react';
-import { getBlogPostBySlug, getRelatedBlogPosts } from '@/lib/blog-content';
-
-interface BlogPostPageProps {
-  params: Promise<{ slug: string }>;
-}
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = getBlogPostBySlug(params.slug);
-  
   if (!post) {
     return {
       title: 'Blog Post Not Found - Evvalley',
       description: 'The requested blog post could not be found.',
     };
   }
-
   const postUrl = `https://www.evvalley.com/blog/${post.slug}`;
-
   return {
-    title: `${post.title} - Evvalley Blog`,
-    description: post.metaDescription || post.excerpt,
-    keywords: post.keywords || 'electric vehicles, EVs, e-scooters, e-bikes, marketplace, blog',
+    title: post.title,
+    description: post.metaDescription,
+    keywords: post.keywords,
+    authors: [{ name: post.author }],
+    creator: 'Evvalley',
+    publisher: 'Evvalley',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    metadataBase: new URL('https://www.evvalley.com'),
     alternates: {
       canonical: postUrl,
     },
-    robots: {
+    robots: { // Added for specific blog post indexing
       index: true,
       follow: true,
       googleBot: {
@@ -40,129 +40,137 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     },
     openGraph: {
       title: post.title,
-      description: post.metaDescription || post.excerpt,
+      description: post.excerpt,
       url: postUrl,
+      siteName: 'Evvalley',
+      locale: 'en_US',
       type: 'article',
-      publishedTime: post.publishedAt,
-      modifiedTime: post.updatedAt,
-      authors: ['Evvalley Team'],
-      tags: post.tags || [],
+      images: [
+        {
+          url: post.featuredImage || 'https://www.evvalley.com/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.metaDescription || post.excerpt,
+      description: post.excerpt,
+      images: [post.featuredImage || 'https://www.evvalley.com/og-image.jpg'],
     },
   };
 }
 
+interface BlogPostPageProps {
+  params: Promise<{ slug: string }>;
+}
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
+  
+  // Special handling for old/deleted blog post
+  if (slug === 'battery-technology-advancements-and-the-ev-range-problem') {
+    // Return 410 Gone status for permanently deleted content
+    return new Response('This blog post has been permanently removed.', {
+      status: 410,
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    });
+  }
+  
   const post = getBlogPostBySlug(slug);
 
   if (!post) {
-    notFound();
+    notFound(); // Changed from custom JSX to Next.js notFound()
   }
 
-  const relatedPosts = getRelatedBlogPosts(post, 2);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#1C1F4A] to-[#3AB0FF] text-white">
-        <div className="max-w-4xl mx-auto px-4 py-16">
-          <div className="mb-6">
-            <Link href="/blog">
-              <button className="flex items-center text-white hover:text-gray-200 transition-colors">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Blog
-              </button>
-            </Link>
-          </div>
+    <div className="min-h-screen bg-[#F5F9FF]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Header */}
+        <div className="mb-8">
+          <nav className="text-sm text-gray-600 mb-4">
+            <a href="/" className="hover:text-[#3AB0FF]">Home</a>
+            <span className="mx-2">→</span>
+            <a href="/blog" className="hover:text-[#3AB0FF]">Blog</a>
+            <span className="mx-2">→</span>
+            <span className="text-gray-900">{post.title}</span>
+          </nav>
           
-          {/* Category Badge */}
-          <span className="inline-block px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-4">
-            {post.category}
-          </span>
-          
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {post.title}
           </h1>
           
-          <p className="text-xl opacity-90 mb-6">
-            {post.excerpt}
-          </p>
-          
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-6 text-sm opacity-80">
-            <div className="flex items-center">
-              <User className="h-4 w-4 mr-2" />
-              {post.author}
-            </div>
-            <div className="flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+            <span>By {post.author}</span>
+            <span>•</span>
+            <time dateTime={post.publishedAt}>
               {new Date(post.publishedAt).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
               })}
-            </div>
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-2" />
-              {post.readTime} min read
-            </div>
+            </time>
+            <span>•</span>
+            <span>{post.readTime} min read</span>
+            <span>•</span>
+            <span className="bg-[#3AB0FF] text-white px-2 py-1 rounded-full text-xs">
+              {post.category}
+            </span>
           </div>
+          
+          {post.featuredImage && (
+            <div className="mb-8">
+              <img
+                src={post.featuredImage}
+                alt={post.title}
+                className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+          )}
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <article className="bg-white rounded-lg shadow-lg p-8">
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {post.tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                #{tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Article Content */}
+        {/* Content */}
+        <article className="prose prose-lg max-w-none">
           <div 
-            className="prose prose-lg max-w-none text-gray-800 leading-relaxed text-base"
-            style={{
-              fontSize: '16px',
-              lineHeight: '1.7',
-              color: '#374151'
-            }}
             dangerouslySetInnerHTML={{ __html: post.content }}
+            className="text-gray-800 leading-relaxed"
           />
         </article>
 
-        {/* Related Posts */}
-        {relatedPosts.length > 0 && (
-          <div className="mt-16">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {relatedPosts.map((relatedPost) => (
-                <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`}>
-                  <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                      {relatedPost.title}
-                    </h4>
-                    <p className="text-gray-600 text-sm mb-3">
-                      {relatedPost.excerpt}
-                    </p>
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {relatedPost.readTime} min read
-                    </div>
-                  </div>
-                </Link>
+        {/* Tags */}
+        {post.tags.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags:</h3>
+            <div className="flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                >
+                  {tag}
+                </span>
               ))}
             </div>
           </div>
         )}
+
+        {/* Call to Action */}
+        <div className="mt-12 p-8 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] rounded-lg text-white text-center">
+          <h3 className="text-2xl font-bold mb-4">Ready to Find Your Perfect EV?</h3>
+          <p className="text-lg mb-6">
+            Explore our marketplace for electric vehicles, e-scooters, and e-bikes.
+          </p>
+          <a
+            href="/vehicles"
+            className="inline-block bg-white text-[#1C1F4A] px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          >
+            Browse Electric Vehicles
+          </a>
+        </div>
       </div>
     </div>
   );
