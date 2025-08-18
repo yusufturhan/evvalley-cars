@@ -260,10 +260,14 @@ export default function SellPage() {
         submitFormData.append('images', image);
       });
       
+      console.log("📤 Sending request to /api/vehicles...");
       const response = await fetch("/api/vehicles", {
         method: "POST",
         body: submitFormData,
       });
+      
+      console.log("📥 Response status:", response.status);
+      console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
         alert("Vehicle listed successfully!");
@@ -275,7 +279,14 @@ export default function SellPage() {
       }
     } catch (error) {
       console.error("❌ Network Error:", error);
-      alert("Network error: Failed to list vehicle. Please check your connection and try again.");
+      console.error("❌ Error details:", {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        formData: formData,
+        imagesCount: images.length,
+        userSupabaseId: userSupabaseId
+      });
+      alert("Network error: Failed to list vehicle. Please check your connection and try again. Check console for details.");
     } finally {
       setLoading(false);
     }
