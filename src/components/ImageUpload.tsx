@@ -19,7 +19,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tempIdRef = useRef<string>(crypto.randomUUID());
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
     
@@ -70,7 +70,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     if (onImagesChange) onImagesChange(newImages);
   };
 
-  const handleDrop = (event: React.DragEvent) => {
+  const handleDrop = async (event: React.DragEvent) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
@@ -82,8 +82,29 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
 
     const newImages = [...images, ...imageFiles];
     setImages(newImages);
-    onImagesChange(newImages);
+    if (onImagesChange) onImagesChange(newImages);
 
+    // upload sequentially to avoid big payloads
+    setUploading(true);
+    const urls: string[] = [...uploadedUrls];
+    let completed = 0;
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      try {
+        const { publicUrl } = await uploadTempImage(file, tempIdRef.current, uploadedUrls.length + i);
+        urls.push(publicUrl);
+      } catch (e) {
+        console.error('Image upload failed:', e);
+      } finally {
+        completed += 1;
+        setProgress(Math.round((completed / imageFiles.length) * 100));
+      }
+    }
+    setUploadedUrls(urls);
+    if (onUrlsChange) onUrlsChange(urls);
+    setUploading(false);
+
+    // Create previews
     imageFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
