@@ -210,12 +210,18 @@ export default function SellPage() {
 
     // Validate form
     if (!validateForm()) {
-      alert("Please fix the errors in the form");
+      console.error("❌ Form validation failed:", errors);
+      alert("Please fix the errors in the form. Check the console for details.");
       return;
     }
 
     setLoading(true);
     try {
+      console.log("🚀 Starting vehicle submission...");
+      console.log("📝 Form data:", formData);
+      console.log("🖼️ Images count:", images.length);
+      console.log("👤 User Supabase ID:", userSupabaseId);
+      
       // Create FormData
       const submitFormData = new FormData();
       submitFormData.append('title', formData.title.trim());
@@ -263,12 +269,13 @@ export default function SellPage() {
         alert("Vehicle listed successfully!");
         router.push("/vehicles");
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
+        const errorData = await response.json();
+        console.error("❌ API Error:", errorData);
+        alert(`Error: ${errorData.error || 'Failed to list vehicle'}`);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to list vehicle");
+      console.error("❌ Network Error:", error);
+      alert("Network error: Failed to list vehicle. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
