@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { ArrowLeft, Calendar, Clock, User, Tag } from 'lucide-react';
 import { getBlogPostBySlug, getRelatedBlogPosts } from '@/lib/blog-content';
 
@@ -60,14 +61,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = getBlogPostBySlug(slug);
 
   if (!post) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Blog Post Not Found</h1>
-          <p className="text-gray-600">The requested blog post could not be found.</p>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
   const relatedPosts = getRelatedBlogPosts(post, 2);
