@@ -73,8 +73,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Special handling for old/deleted blog post
   if (slug === 'battery-technology-advancements-and-the-ev-range-problem') {
     // Return 410 Gone status for permanently deleted content
-    return new Response('This blog post has been permanently removed.', {
+    throw new Response('This blog post has been permanently removed.', {
       status: 410,
+      statusText: 'Gone',
       headers: {
         'Content-Type': 'text/plain',
       },
