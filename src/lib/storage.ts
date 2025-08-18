@@ -62,6 +62,39 @@ export const uploadImage = async (file: File, vehicleId: string, index: number) 
   }
 };
 
+// Upload image to a temporary folder before the listing is created
+// Path: vehicle-images/temp/{tempId}/{filename}
+export const uploadTempImage = async (
+  file: File,
+  tempId: string,
+  index: number
+) => {
+  try {
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const safeName = `${Date.now()}_${index}.${fileExt}`;
+    const filePath = `temp/${tempId}/${safeName}`;
+
+    const { error } = await supabase.storage
+      .from('vehicle-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('vehicle-images')
+      .getPublicUrl(filePath);
+
+    return { publicUrl: urlData.publicUrl, path: filePath };
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Delete image from Supabase Storage
 export const deleteImage = async (filePath: string) => {
   try {

@@ -1,17 +1,23 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { uploadTempImage } from "@/lib/storage";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 
 interface ImageUploadProps {
-  onImagesChange: (images: File[]) => void;
+  onImagesChange?: (images: File[]) => void; // legacy
+  onUrlsChange?: (urls: string[]) => void;   // new: uploaded URLs
   maxImages?: number;
 }
 
-export default function ImageUpload({ onImagesChange, maxImages = 5 }: ImageUploadProps) {
+export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 5 }: ImageUploadProps) {
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tempIdRef = useRef<string>(crypto.randomUUID());
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -24,7 +30,27 @@ export default function ImageUpload({ onImagesChange, maxImages = 5 }: ImageUplo
 
     const newImages = [...images, ...imageFiles];
     setImages(newImages);
-    onImagesChange(newImages);
+    if (onImagesChange) onImagesChange(newImages);
+
+    // upload sequentially to avoid big payloads
+    setUploading(true);
+    const urls: string[] = [...uploadedUrls];
+    let completed = 0;
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+      try {
+        const { publicUrl } = await uploadTempImage(file, tempIdRef.current, uploadedUrls.length + i);
+        urls.push(publicUrl);
+      } catch (e) {
+        console.error('Image upload failed:', e);
+      } finally {
+        completed += 1;
+        setProgress(Math.round((completed / imageFiles.length) * 100));
+      }
+    }
+    setUploadedUrls(urls);
+    if (onUrlsChange) onUrlsChange(urls);
+    setUploading(false);
 
     // Create previews
     imageFiles.forEach(file => {
@@ -41,7 +67,7 @@ export default function ImageUpload({ onImagesChange, maxImages = 5 }: ImageUplo
     const newPreviews = previews.filter((_, i) => i !== index);
     setImages(newImages);
     setPreviews(newPreviews);
-    onImagesChange(newImages);
+    if (onImagesChange) onImagesChange(newImages);
   };
 
   const handleDrop = (event: React.DragEvent) => {
@@ -108,6 +134,9 @@ export default function ImageUpload({ onImagesChange, maxImages = 5 }: ImageUplo
           >
             Select Images
           </button>
+          {uploading && (
+            <div className="mt-3 text-sm text-gray-700">Uploading... {progress}%</div>
+          )}
         </div>
       </div>
 
@@ -138,6 +167,10 @@ export default function ImageUpload({ onImagesChange, maxImages = 5 }: ImageUplo
         <p className="text-sm text-gray-500">
           {images.length} of {maxImages} images selected
         </p>
+      )}
+
+      {uploadedUrls.length > 0 && (
+        <p className="text-xs text-gray-500">Uploaded: {uploadedUrls.length} images</p>
       )}
     </div>
   );

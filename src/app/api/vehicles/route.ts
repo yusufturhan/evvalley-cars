@@ -99,34 +99,27 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    console.log('=== FORM DATA DEBUG ===');
-    console.log('Received form data');
-    
-    // Debug: FormData içeriğini logla
-    console.log('FormData keys:', Array.from(formData.keys()));
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-    console.log('=== END FORM DATA DEBUG ===');
+    // Accept JSON body instead of multipart form (client uploads images to storage)
+    const json = await request.json();
+    console.log('Received JSON body for vehicle create');
 
-    const title = formData.get('title') as string;
-    const description = formData.get('description') as string;
-    const price = formData.get('price') as string;
-    const year = formData.get('year') as string;
-    const mileage = formData.get('mileage') as string;
-    const fuel_type = formData.get('fuel_type') as string;
-    const brand = formData.get('brand') as string;
-    const model = formData.get('model') as string;
-    const category = formData.get('category') as string;
-    const range_miles = formData.get('range_miles') as string;
-    const max_speed = formData.get('max_speed') as string;
-    const battery_capacity = formData.get('battery_capacity') as string;
-    const location = formData.get('location') as string;
-    const seller_id = formData.get('seller_id') as string;
-    const vehicle_condition = formData.get('vehicle_condition') as string;
-    const title_status = formData.get('title_status') as string;
-    const highlighted_features = formData.get('highlighted_features') as string;
+    const title = json.title as string;
+    const description = json.description as string;
+    const price = json.price as string;
+    const year = json.year as string;
+    const mileage = json.mileage as string;
+    const fuel_type = json.fuel_type as string;
+    const brand = json.brand as string;
+    const model = json.model as string;
+    const category = json.category as string;
+    const range_miles = json.range_miles as string;
+    const max_speed = json.max_speed as string;
+    const battery_capacity = json.battery_capacity as string;
+    const location = json.location as string;
+    const seller_id = json.seller_id as string;
+    const vehicle_condition = json.vehicle_condition as string;
+    const title_status = json.title_status as string;
+    const highlighted_features = json.highlighted_features as string;
 
     // Validate required fields
     if (!title || !price || !year || !brand || !model || !category) {
@@ -136,7 +129,7 @@ export async function POST(request: Request) {
     }
 
     // Validate VIN if provided
-    const vin = formData.get('vin') as string;
+    const vin = json.vin as string;
     if (vin && vin.trim()) {
       // Check VIN length (should be 17 characters)
       if (vin.trim().length !== 17) {
@@ -167,7 +160,7 @@ export async function POST(request: Request) {
     }
 
     // Get seller email from form data - this should be the actual user's email
-    const seller_email = formData.get('seller_email') as string;
+    const seller_email = json.seller_email as string;
     
     if (!seller_email) {
       console.error('❌ Seller email is missing from form data');
@@ -238,7 +231,7 @@ export async function POST(request: Request) {
       battery_warranty: formData.get('battery_warranty') as string || null,
       drivetrain: formData.get('drivetrain') as string || null,
       vin: formData.get('vin') as string || null,
-      images: [], // Will be populated after upload
+      images: Array.isArray(json.images) ? json.images : [],
       is_active: true
     };
 
@@ -264,67 +257,7 @@ export async function POST(request: Request) {
 
     console.log('Successfully created vehicle:', vehicle);
 
-    // Handle image uploads
-    const uploadedImages: string[] = [];
-    const imageFiles = formData.getAll('images') as File[];
-
-    console.log('=== IMAGE UPLOAD DEBUG ===');
-    console.log('Image files found:', imageFiles.length);
-    console.log('FormData keys:', Array.from(formData.keys()));
-
-    if (imageFiles && imageFiles.length > 0) {
-      console.log(`Uploading ${imageFiles.length} images...`);
-      
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        console.log(`Processing image ${i + 1}:`, { 
-          name: file.name, 
-          size: file.size, 
-          type: file.type,
-          lastModified: file.lastModified
-        });
-        
-        if (file && file.size > 0) {
-          try {
-            console.log(`Attempting to upload image ${i + 1} to Supabase Storage...`);
-            const imageUrl = await uploadToStorage(file, vehicle.id, i);
-            uploadedImages.push(imageUrl);
-            console.log(`Successfully uploaded image ${i + 1}:`, imageUrl);
-          } catch (uploadError) {
-            console.error(`Error uploading image ${i + 1}:`, uploadError);
-            console.error('Error details:', {
-              message: uploadError instanceof Error ? uploadError.message : 'Unknown error',
-              stack: uploadError instanceof Error ? uploadError.stack : undefined
-            });
-            // Continue with other images even if one fails
-          }
-        } else {
-          console.log(`Skipping image ${i + 1}: file is empty or invalid`);
-        }
-      }
-
-      console.log('Final uploaded images:', uploadedImages);
-
-      // Update vehicle with image URLs
-      if (uploadedImages.length > 0) {
-        console.log('Updating vehicle with image URLs...');
-        const { error: updateError } = await supabaseAdmin
-          .from('vehicles')
-          .update({ images: uploadedImages })
-          .eq('id', vehicle.id);
-
-        if (updateError) {
-          console.error('Error updating vehicle with images:', updateError);
-        } else {
-          console.log('Successfully updated vehicle with image URLs');
-        }
-      } else {
-        console.log('No images were successfully uploaded');
-      }
-    } else {
-      console.log('No image files found in form data');
-    }
-    console.log('=== END IMAGE UPLOAD DEBUG ===');
+    // No server-side uploads anymore. Client sends URLs.
 
     // Send new listing notifications to users who might be interested
     try {

@@ -61,6 +61,7 @@ export default function SellPage() {
     vin: ""
   });
   const [images, setImages] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   // Fetch user's Supabase ID when component mounts
   useEffect(() => {
@@ -184,8 +185,8 @@ export default function SellPage() {
       newErrors.description = 'Description must be less than 2000 characters';
     }
 
-    // Images validation
-    if (images.length === 0) {
+    // Images validation (prefer uploaded URLs)
+    if (imageUrls.length === 0 && images.length === 0) {
       newErrors.images = 'At least one image is required';
     } else if (images.length > 12) {
       newErrors.images = 'Maximum 12 images allowed';
@@ -219,51 +220,47 @@ export default function SellPage() {
     try {
       console.log("🚀 Starting vehicle submission...");
       console.log("📝 Form data:", formData);
-      console.log("🖼️ Images count:", images.length);
+      console.log("🖼️ Images count:", images.length, 'uploaded urls:', imageUrls.length);
       console.log("👤 User Supabase ID:", userSupabaseId);
       
-      // Create FormData
-      const submitFormData = new FormData();
-      submitFormData.append('title', formData.title.trim());
-      submitFormData.append('description', formData.description.trim());
-      submitFormData.append('price', formData.price);
-      submitFormData.append('year', formData.year);
-      submitFormData.append('mileage', formData.mileage || '');
-      submitFormData.append('fuel_type', formData.fuel_type);
-      submitFormData.append('brand', formData.brand.trim());
-      submitFormData.append('model', formData.model.trim());
-      submitFormData.append('category', formData.category);
-      submitFormData.append('range_miles', formData.range_miles || '');
-      submitFormData.append('max_speed', formData.max_speed || '');
-      submitFormData.append('battery_capacity', formData.battery_capacity || '');
-      submitFormData.append('location', formData.location.trim() || '');
-      submitFormData.append('seller_id', userSupabaseId);
-      submitFormData.append('seller_email', formData.seller_email);
-
-      // Add new vehicle detail fields to FormData
-      submitFormData.append('vehicle_condition', formData.vehicle_condition || '');
-      submitFormData.append('title_status', formData.title_status || '');
-      submitFormData.append('highlighted_features', formData.highlighted_features || '');
-      submitFormData.append('interior_color', formData.interior_color || '');
-      submitFormData.append('exterior_color', formData.exterior_color || '');
-      submitFormData.append('body_seating', formData.body_seating || '');
-      submitFormData.append('combined_fuel_economy', formData.combined_fuel_economy || '');
-      submitFormData.append('transmission', formData.transmission || '');
-      submitFormData.append('horsepower', formData.horsepower || '');
-      submitFormData.append('electric_mile_range', formData.electric_mile_range || '');
-      submitFormData.append('battery_warranty', formData.battery_warranty || '');
-      submitFormData.append('drivetrain', formData.drivetrain || '');
-      submitFormData.append('vin', formData.vin || '');
-
-      // Add images to FormData
-      images.forEach((image, index) => {
-        submitFormData.append('images', image);
-      });
+      // Build JSON payload (send only URLs, no big files)
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        price: formData.price,
+        year: formData.year,
+        mileage: formData.mileage || '',
+        fuel_type: formData.fuel_type,
+        brand: formData.brand.trim(),
+        model: formData.model.trim(),
+        category: formData.category,
+        range_miles: formData.range_miles || '',
+        max_speed: formData.max_speed || '',
+        battery_capacity: formData.battery_capacity || '',
+        location: formData.location.trim() || '',
+        seller_id: userSupabaseId,
+        seller_email: formData.seller_email,
+        vehicle_condition: formData.vehicle_condition || '',
+        title_status: formData.title_status || '',
+        highlighted_features: formData.highlighted_features || '',
+        interior_color: formData.interior_color || '',
+        exterior_color: formData.exterior_color || '',
+        body_seating: formData.body_seating || '',
+        combined_fuel_economy: formData.combined_fuel_economy || '',
+        transmission: formData.transmission || '',
+        horsepower: formData.horsepower || '',
+        electric_mile_range: formData.electric_mile_range || '',
+        battery_warranty: formData.battery_warranty || '',
+        drivetrain: formData.drivetrain || '',
+        vin: formData.vin || '',
+        images: imageUrls,
+      };
       
       console.log("📤 Sending request to /api/vehicles...");
       const response = await fetch("/api/vehicles", {
         method: "POST",
-        body: submitFormData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
       
       console.log("📥 Response status:", response.status);
@@ -1319,7 +1316,7 @@ export default function SellPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Vehicle Images
               </label>
-              <ImageUpload onImagesChange={handleImagesChange} maxImages={12} />
+              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={setImageUrls} maxImages={12} />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
             </div>
 
