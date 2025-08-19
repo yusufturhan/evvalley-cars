@@ -135,6 +135,7 @@ export default function Home() {
       const url = `/vehicles${queryString ? `?${queryString}` : ''}`;
       
       trackSearch(searchQuery, featuredVehicles.length);
+      console.log('🔍 Search tracked:', searchQuery, 'Results:', featuredVehicles.length);
       router.push(url);
     } catch (searchError) {
       console.error('Error handling search:', searchError);
@@ -146,6 +147,7 @@ export default function Home() {
       setSelectedCategory(category);
       setShowCategoryDropdown(false);
       trackCategoryView(category);
+      console.log('📂 Category tracked:', category);
     } catch (categoryError) {
       console.error('Error selecting category:', categoryError);
     }
@@ -154,6 +156,7 @@ export default function Home() {
   const handleVehicleClick = (vehicleId: string) => {
     try {
       trackClick('vehicle_card', vehicleId);
+      console.log('🖱️ Click tracked:', vehicleId);
     } catch (clickError) {
       console.error('Error tracking vehicle click:', clickError);
     }
