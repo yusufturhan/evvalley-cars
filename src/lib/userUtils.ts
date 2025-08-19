@@ -6,38 +6,38 @@ export function calculateMembershipDuration(createdAt: string): string {
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   
   if (diffInDays === 0) {
-    return "Bugün üye oldu";
+    return "Joined today";
   } else if (diffInDays === 1) {
-    return "1 gündür üye";
+    return "Member for 1 day";
   } else if (diffInDays < 7) {
-    return `${diffInDays} gündür üye`;
+    return `Member for ${diffInDays} days`;
   } else if (diffInDays < 30) {
     const weeks = Math.floor(diffInDays / 7);
-    return `${weeks} haftadır üye`;
+    return `Member for ${weeks} weeks`;
   } else if (diffInDays < 365) {
     const months = Math.floor(diffInDays / 30);
-    return `${months} aydır üye`;
+    return `Member for ${months} months`;
   } else {
     const years = Math.floor(diffInDays / 365);
-    return `${years} yıldır üye`;
+    return `Member for ${years} years`;
   }
 }
 
 export function isVerifiedUser(email: string): boolean {
-  // Email doğrulandı kabul ediyoruz (Clerk ile giriş yapanlar)
+  // Consider email verified (users who sign in with Clerk)
   return Boolean(email && email.includes('@'));
 }
 
 export function getVerificationBadge(): string {
-  return "Doğrulanmış";
+  return "Verified";
 }
 
 export function formatListingCount(count: number): string {
   if (count === 0) {
-    return "Henüz ilan yok";
+    return "No listings yet";
   } else if (count === 1) {
-    return "1 ilan";
+    return "1 listing";
   } else {
-    return `${count} ilan`;
+    return `${count} listings`;
   }
 } 
