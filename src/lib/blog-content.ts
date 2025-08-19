@@ -375,7 +375,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-22',
     category: 'EV Guide',
     tags: ['Tesla Model 3', 'Tesla Model Y', 'Tesla comparison', 'EV comparison', 'Tesla buying guide'],
-    featuredImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800featuredImage: '/blog/tesla-comparison.jpg'h=400featuredImage: '/blog/tesla-comparison.jpg'fit=cropfeaturedImage: '/blog/tesla-comparison.jpg'crop=center',
+    featuredImage: '/blog/tesla-comparison.jpg',
     readTime: 12,
     metaDescription: 'Comprehensive Tesla Model 3 vs Model Y comparison for 2024. Compare price, performance, range, and features to choose the right Tesla.',
     keywords: ['Tesla Model 3 vs Model Y', 'Tesla comparison', 'Model 3 vs Model Y', 'Tesla buying guide', 'EV comparison']
