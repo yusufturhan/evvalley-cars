@@ -375,7 +375,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-22',
     category: 'EV Guide',
     tags: ['Tesla Model 3', 'Tesla Model Y', 'Tesla comparison', 'EV comparison', 'Tesla buying guide'],
-    featuredImage: '/blog/tesla-comparison.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
     metaDescription: 'Comprehensive Tesla Model 3 vs Model Y comparison for 2024. Compare price, performance, range, and features to choose the right Tesla.',
     keywords: ['Tesla Model 3 vs Model Y', 'Tesla comparison', 'Model 3 vs Model Y', 'Tesla buying guide', 'EV comparison']
@@ -490,7 +490,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-23',
     category: 'EV Guide',
     tags: ['best electric cars', 'top electric vehicles', 'EV comparison', 'electric car rankings', 'electric vehicle reviews'],
-    featuredImage: '/blog/best-evs-2024.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 15,
     metaDescription: 'Comprehensive ranking of the best electric cars in 2024. Compare top EVs by price, performance, range, and value.',
     keywords: ['Best Electric Cars 2024', 'top electric vehicles', 'best EVs', 'electric car rankings', 'EV comparison']
@@ -621,7 +621,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-24',
     category: 'Buying/Selling Tips',
     tags: ['EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates', 'electric car incentives'],
-    featuredImage: '/blog/ev-tax-credit.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&h=400&fit=crop&crop=center',
     readTime: 18,
     metaDescription: 'Complete guide to electric car tax credits and incentives in 2024. Learn about federal tax credits, state rebates, and eligibility criteria.',
     keywords: ['Electric Car Tax Credit 2024', 'EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates']
@@ -779,7 +779,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-25',
     category: 'EV Guide',
     tags: ['Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup', 'Tesla charger installation'],
-    featuredImage: '/blog/tesla-home-charging.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800&h=400&fit=crop&crop=center',
     readTime: 14,
     metaDescription: 'Complete guide to charging your Tesla at home. Learn about Tesla home charging options, wall connector installation, costs, and troubleshooting.',
     keywords: ['How to Charge Tesla at Home', 'Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup']
@@ -956,7 +956,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-28',
     category: 'Buying/Selling Tips',
     tags: ['EV cost analysis', 'total cost of ownership', 'electric car costs', 'EV vs gas car costs', 'electric vehicle expenses'],
-    featuredImage: '/blog/ev-cost-analysis.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1554224154-26032faded7?w=800&h=400&fit=crop&crop=center',
     readTime: 20,
     metaDescription: 'A data-driven total cost of ownership (TCO) guide covering purchase price, charging, maintenance, insurance, depreciation, incentives, regional differences, and 5-year examples.',
     keywords: ['Electric Vehicle Cost Analysis', 'EV cost analysis', 'total cost of ownership', 'electric car costs', 'EV vs gas car costs']
@@ -1103,7 +1103,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-27',
     category: 'E-Mobility',
     tags: ['e-bikes', 'electric bikes', 'buying guide', 'electric bicycle', 'e-bike selection'],
-    featuredImage: '/blog/e-bike-guide.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
     metaDescription: 'Comprehensive guide to buying an electric bike in 2024, covering different types, features, motors, batteries, and considerations.',
     keywords: ['E-Bike Buying Guide 2024', 'electric bike buying guide', 'e-bike guide', 'electric bicycle', 'e-bike selection']
@@ -1299,7 +1299,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-30',
     category: 'Buying/Selling Tips',
     tags: ['selling EVs', 'EV sales', 'selling guide', 'electric vehicle resale', 'EV marketplace'],
-    featuredImage: '/blog/ev-selling-guide.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop&crop=center',
     readTime: 15,
     metaDescription: 'Learn EV resale strategies, pricing tips, selling platforms, legal steps, and how to maximize your EV sales. Complete guide to selling electric vehicles.',
     keywords: ['How to Sell Your Electric Vehicle', 'selling EVs', 'EV sales', 'selling guide', 'electric vehicle resale']
@@ -1538,7 +1538,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-31',
     category: 'Safety',
     tags: ['EV safety', 'electric car safety', 'EV safety tips', 'electric vehicle safety features', 'EV driving safety'],
-    featuredImage: '/blog/ev-safety-guide.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop&crop=center',
     readTime: 18,
     metaDescription: 'Complete safety guide for electric vehicle owners. Learn about EV safety features, charging safety, driving tips, battery protection, and emergency procedures.',
     keywords: ['Electric Vehicle Safety Guide', 'EV safety', 'electric car safety', 'EV safety tips', 'electric vehicle safety features']
