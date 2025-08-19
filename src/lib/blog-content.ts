@@ -21,7 +21,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'complete-guide-to-buying-electric-vehicles',
     title: 'Complete Guide to Buying Electric Vehicles in 2024',
     excerpt: 'Everything you need to know about purchasing your first electric vehicle, from choosing the right model to understanding charging infrastructure.',
-    featuredImage: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     content: `
       <h1>Complete Guide to Buying Electric Vehicles in 2024</h1>
       
@@ -129,7 +129,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-20',
     category: 'EV Guide',
     tags: ['electric vehicles', 'buying guide', 'EV tips'],
-    featuredImage: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 8,
     metaDescription: 'Complete guide to buying electric vehicles in 2024. Learn about different types, features, and considerations.',
     keywords: ['electric vehicle buying guide', 'EV purchase', 'electric car buying tips']
@@ -288,7 +288,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-21',
     category: 'Technology Updates',
     tags: ['charging stations', 'EV charging'],
-    featuredImage: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 10,
     metaDescription: 'Complete guide to EV charging stations and infrastructure.',
     keywords: ['EV charging stations', 'electric vehicle charging', 'charging guide']
@@ -375,7 +375,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-22',
     category: 'EV Guide',
     tags: ['Tesla Model 3', 'Tesla Model Y', 'Tesla comparison', 'EV comparison', 'Tesla buying guide'],
-    featuredImage: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
     metaDescription: 'Comprehensive Tesla Model 3 vs Model Y comparison for 2024. Compare price, performance, range, and features to choose the right Tesla.',
     keywords: ['Tesla Model 3 vs Model Y', 'Tesla comparison', 'Model 3 vs Model Y', 'Tesla buying guide', 'EV comparison']
@@ -956,7 +956,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-28',
     category: 'Buying/Selling Tips',
     tags: ['EV cost analysis', 'total cost of ownership', 'electric car costs', 'EV vs gas car costs', 'electric vehicle expenses'],
-    featuredImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 20,
     metaDescription: 'A data-driven total cost of ownership (TCO) guide covering purchase price, charging, maintenance, insurance, depreciation, incentives, regional differences, and 5-year examples.',
     keywords: ['Electric Vehicle Cost Analysis', 'EV cost analysis', 'total cost of ownership', 'electric car costs', 'EV vs gas car costs']
@@ -1103,7 +1103,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-27',
     category: 'E-Mobility',
     tags: ['e-bikes', 'electric bikes', 'buying guide', 'electric bicycle', 'e-bike selection'],
-    featuredImage: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
     metaDescription: 'Comprehensive guide to buying an electric bike in 2024, covering different types, features, motors, batteries, and considerations.',
     keywords: ['E-Bike Buying Guide 2024', 'electric bike buying guide', 'e-bike guide', 'electric bicycle', 'e-bike selection']
@@ -1299,7 +1299,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-30',
     category: 'Buying/Selling Tips',
     tags: ['selling EVs', 'EV sales', 'selling guide', 'electric vehicle resale', 'EV marketplace'],
-    featuredImage: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 15,
     metaDescription: 'Learn EV resale strategies, pricing tips, selling platforms, legal steps, and how to maximize your EV sales. Complete guide to selling electric vehicles.',
     keywords: ['How to Sell Your Electric Vehicle', 'selling EVs', 'EV sales', 'selling guide', 'electric vehicle resale']
