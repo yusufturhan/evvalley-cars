@@ -65,6 +65,17 @@ const nextConfig = {
       },
     ];
   },
+  
+  // Redirect legacy favicon.ico to our SVG favicon
+  async redirects() {
+    return [
+      {
+        source: '/favicon.ico',
+        destination: '/favicon.svg?v=10',
+        permanent: true,
+      },
+    ];
+  },
 }
 
 module.exports = nextConfig 
