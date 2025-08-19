@@ -62,11 +62,27 @@ export default function BlogPageClient() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {filteredPosts.map((post, index) => (
             <article key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              {/* Featured Image Placeholder */}
-              <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <div className="text-white text-center">
-                  <div className="text-4xl mb-2">🚗</div>
-                  <div className="text-sm font-medium">{post.category}</div>
+              {/* Featured Image */}
+              <div className="h-48 relative overflow-hidden">
+                {post.featuredImage ? (
+                  <img
+                    src={post.featuredImage}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to gradient if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      target.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                {/* Fallback gradient */}
+                <div className={`h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center ${post.featuredImage ? 'hidden' : ''}`}>
+                  <div className="text-white text-center">
+                    <div className="text-4xl mb-2">🚗</div>
+                    <div className="text-sm font-medium">{post.category}</div>
+                  </div>
                 </div>
               </div>
 
