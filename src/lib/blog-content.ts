@@ -621,7 +621,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-24',
     category: 'Buying/Selling Tips',
     tags: ['EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates', 'electric car incentives'],
-    featuredImage: 'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 18,
     metaDescription: 'Complete guide to electric car tax credits and incentives in 2024. Learn about federal tax credits, state rebates, and eligibility criteria.',
     keywords: ['Electric Car Tax Credit 2024', 'EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates']
@@ -779,7 +779,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-25',
     category: 'EV Guide',
     tags: ['Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup', 'Tesla charger installation'],
-    featuredImage: 'https://images.unsplash.com/photo-1586854043131-af3a77b00bb3?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 14,
     metaDescription: 'Complete guide to charging your Tesla at home. Learn about Tesla home charging options, wall connector installation, costs, and troubleshooting.',
     keywords: ['How to Charge Tesla at Home', 'Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup']
@@ -1103,7 +1103,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-27',
     category: 'E-Mobility',
     tags: ['e-bikes', 'electric bikes', 'buying guide', 'electric bicycle', 'e-bike selection'],
-    featuredImage: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
     metaDescription: 'Comprehensive guide to buying an electric bike in 2024, covering different types, features, motors, batteries, and considerations.',
     keywords: ['E-Bike Buying Guide 2024', 'electric bike buying guide', 'e-bike guide', 'electric bicycle', 'e-bike selection']
@@ -1538,7 +1538,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-31',
     category: 'Safety',
     tags: ['EV safety', 'electric car safety', 'EV safety tips', 'electric vehicle safety features', 'EV driving safety'],
-    featuredImage: 'https://images.unsplash.com/photo-1565131222656-7833636648dd?w=800&h=400&fit=crop&crop=center',
+    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 18,
     metaDescription: 'Complete safety guide for electric vehicle owners. Learn about EV safety features, charging safety, driving tips, battery protection, and emergency procedures.',
     keywords: ['Electric Vehicle Safety Guide', 'EV safety', 'electric car safety', 'EV safety tips', 'electric vehicle safety features']
