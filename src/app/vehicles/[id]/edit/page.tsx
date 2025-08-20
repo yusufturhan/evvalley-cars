@@ -70,6 +70,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
     highlighted_features: ""
   });
   const [images, setImages] = useState<File[]>([]);
+  const [deletedImages, setDeletedImages] = useState<number[]>([]);
 
   // Fetch vehicle data and user info
   useEffect(() => {
@@ -279,6 +280,11 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
       images.forEach((image, index) => {
         submitFormData.append('images', image);
       });
+
+      // Add deleted image indices
+      if (deletedImages.length > 0) {
+        submitFormData.append('deletedImages', JSON.stringify(deletedImages));
+      }
       
       const response = await fetch(`/api/vehicles/${id}`, {
         method: "PUT",
@@ -345,6 +351,14 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
 
   const handleImagesChange = (newImages: File[]) => {
     setImages(newImages);
+  };
+
+  const handleDeleteImage = (index: number) => {
+    setDeletedImages(prev => [...prev, index]);
+  };
+
+  const handleRestoreImage = (index: number) => {
+    setDeletedImages(prev => prev.filter(i => i !== index));
   };
 
   if (!isSignedIn) {
@@ -788,19 +802,60 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                   Current Images
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {vehicle.images.map((image, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={image}
-                        alt={`Vehicle ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
-                      />
-                    </div>
-                  ))}
+                  {vehicle.images.map((image, index) => {
+                    const isDeleted = deletedImages.includes(index);
+                    return (
+                      <div key={index} className={`relative group ${isDeleted ? 'opacity-50' : ''}`}>
+                        <img
+                          src={image}
+                          alt={`Vehicle ${index + 1}`}
+                          className={`w-full h-24 object-cover rounded-lg ${isDeleted ? 'grayscale' : ''}`}
+                        />
+                        
+                        {/* Delete/Restore Button */}
+                        <button
+                          type="button"
+                          onClick={() => isDeleted ? handleRestoreImage(index) : handleDeleteImage(index)}
+                          className={`absolute top-1 right-1 p-1 rounded-full transition-all ${
+                            isDeleted 
+                              ? 'bg-green-500 hover:bg-green-600 text-white' 
+                              : 'bg-red-500 hover:bg-red-600 text-white opacity-0 group-hover:opacity-100'
+                          }`}
+                          title={isDeleted ? 'Restore image' : 'Delete image'}
+                        >
+                          {isDeleted ? (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          )}
+                        </button>
+                        
+                        {/* Deleted Overlay */}
+                        {isDeleted && (
+                          <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-xs font-medium bg-red-500 px-2 py-1 rounded">
+                              Deleted
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  Upload new images to replace the current ones
-                </p>
+                <div className="mt-2 space-y-2">
+                  <p className="text-sm text-gray-500">
+                    Click the X button on images to delete them. Deleted images will be removed when you save changes.
+                  </p>
+                  {deletedImages.length > 0 && (
+                    <p className="text-sm text-blue-600">
+                      {deletedImages.length} image(s) marked for deletion. Click the restore button (↻) to keep them.
+                    </p>
+                  )}
+                </div>
               </div>
             )}
 

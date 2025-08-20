@@ -144,6 +144,18 @@ export async function PUT(
       newImages = images.filter(img => img instanceof File && img.size > 0);
       
       console.log('📸 New images received:', newImages.length);
+
+      // Extract deleted image indices
+      const deletedImagesStr = formData.get('deletedImages') as string;
+      let deletedImages: number[] = [];
+      if (deletedImagesStr) {
+        try {
+          deletedImages = JSON.parse(deletedImagesStr);
+          console.log('🗑️ Deleted image indices:', deletedImages);
+        } catch (error) {
+          console.error('❌ Error parsing deletedImages:', error);
+        }
+      }
     } else {
       // Handle JSON
       updateData = await request.json();
@@ -160,26 +172,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
 
-    // Handle image replacement if new images are provided
+    // Handle image updates (new images and/or deleted images)
+    let finalImages: string[] = [];
+    
     if (newImages.length > 0) {
-      console.log('🔄 Replacing images for vehicle:', id);
+      console.log('🔄 Processing new images for vehicle:', id);
       
-      // Delete old images from storage
-      if (currentVehicle.images && currentVehicle.images.length > 0) {
-        console.log('🗑️ Deleting old images:', currentVehicle.images.length);
-        for (const imageUrl of currentVehicle.images) {
-          try {
-            const imagePath = imageUrl.split('/').pop();
-            if (imagePath) {
-              await supabase.storage.from('vehicle-images').remove([imagePath]);
-              console.log('🗑️ Deleted old image:', imagePath);
-            }
-          } catch (error) {
-            console.error('❌ Error deleting old image:', error);
-          }
-        }
-      }
-
       // Upload new images
       const newImageUrls: string[] = [];
       for (let i = 0; i < newImages.length; i++) {
@@ -211,11 +209,41 @@ export async function PUT(
           throw error;
         }
       }
-
-      // Update the images field
-      updateData.images = newImageUrls;
-      console.log('📸 Updated vehicle with new images:', newImageUrls.length);
+      
+      finalImages = newImageUrls;
+      console.log('📸 New images uploaded:', newImageUrls.length);
+    } else if (deletedImages.length > 0) {
+      console.log('🗑️ Processing deleted images for vehicle:', id);
+      
+      // Keep only non-deleted images
+      const remainingImages = currentVehicle.images.filter((_, index) => !deletedImages.includes(index));
+      finalImages = remainingImages;
+      
+      // Delete the removed images from storage
+      for (const deletedIndex of deletedImages) {
+        const imageUrl = currentVehicle.images[deletedIndex];
+        if (imageUrl) {
+          try {
+            const imagePath = imageUrl.split('/').pop();
+            if (imagePath) {
+              await supabase.storage.from('vehicle-images').remove([imagePath]);
+              console.log('🗑️ Deleted image from storage:', imagePath);
+            }
+          } catch (error) {
+            console.error('❌ Error deleting image from storage:', error);
+          }
+        }
+      }
+      
+      console.log('📸 Remaining images after deletion:', remainingImages.length);
+    } else {
+      // No image changes, keep current images
+      finalImages = currentVehicle.images || [];
     }
+    
+    // Update the images field
+    updateData.images = finalImages;
+    console.log('📸 Final images count:', finalImages.length);
 
     // Update vehicle
     const { data: vehicle, error } = await supabase
