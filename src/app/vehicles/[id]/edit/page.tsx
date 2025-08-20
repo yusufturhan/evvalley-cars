@@ -217,12 +217,8 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
       }
     }
 
-    // Description validation
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (formData.description.length < 20) {
-      newErrors.description = 'Description must be at least 20 characters';
-    } else if (formData.description.length > 2000) {
+    // Description validation (optional)
+    if (formData.description && formData.description.length > 2000) {
       newErrors.description = 'Description must be less than 2000 characters';
     }
 
@@ -596,6 +592,22 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                   placeholder="75 kWh"
                 />
               </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
+                placeholder="Describe your vehicle, its features, condition, and any additional information..."
+              />
+              {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
 
             {/* Location */}
