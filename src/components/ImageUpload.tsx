@@ -128,7 +128,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOverReorder = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
@@ -228,7 +228,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
                 }`}
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
-                onDragOver={handleDragOver}
+                onDragOver={handleDragOverReorder}
                 onDrop={(e) => handleDrop(e, index)}
               >
                 <img
