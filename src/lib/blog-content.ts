@@ -131,8 +131,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['electric vehicles', 'buying guide', 'EV tips'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 8,
-    metaDescription: 'Complete guide to buying electric vehicles in 2024. Learn about different types, features, and considerations.',
-    keywords: ['electric vehicle buying guide', 'EV purchase', 'electric car buying tips']
+    metaDescription: '🚗 Ultimate 2024 Electric Vehicle Buying Guide: Compare Tesla, Ford, Chevrolet EVs. Get $7,500 tax credits, charging tips & best EV deals. Expert advice on range, cost & incentives!',
+    keywords: ['electric vehicle buying guide 2024', 'how to buy electric car', 'best electric vehicles 2024', 'EV tax credit $7500', 'Tesla Model 3 buying guide', 'electric car comparison', 'EV charging guide', 'electric vehicle incentives']
   },
   {
     id: '2',
@@ -290,8 +290,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['charging stations', 'EV charging'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 10,
-    metaDescription: 'Complete guide to EV charging stations and infrastructure.',
-    keywords: ['EV charging stations', 'electric vehicle charging', 'charging guide']
+    metaDescription: '⚡ Complete EV Charging Station Guide 2024: Home installation, Tesla Supercharger, Electrify America. Level 1, 2, 3 charging costs & tips. Find charging stations near you!',
+    keywords: ['EV charging stations', 'electric vehicle charging guide', 'Tesla Supercharger network', 'home EV charger installation', 'Level 2 charging cost', 'Electrify America stations', 'EV charging near me', 'electric car charging tips']
   },
   {
     id: '3',
@@ -377,8 +377,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['Tesla Model 3', 'Tesla Model Y', 'Tesla comparison', 'EV comparison', 'Tesla buying guide'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 12,
-    metaDescription: 'Comprehensive Tesla Model 3 vs Model Y comparison for 2024. Compare price, performance, range, and features to choose the right Tesla.',
-    keywords: ['Tesla Model 3 vs Model Y', 'Tesla comparison', 'Model 3 vs Model Y', 'Tesla buying guide', 'EV comparison']
+    metaDescription: '🚗 Tesla Model 3 vs Model Y 2024: Which Tesla to Buy? Compare prices, range, performance & features. Expert comparison guide with real-world data. Find your perfect Tesla!',
+    keywords: ['Tesla Model 3 vs Model Y 2024', 'Tesla comparison guide', 'Model 3 vs Model Y which to buy', 'Tesla buying guide 2024', 'Tesla Model 3 price', 'Tesla Model Y price', 'Tesla range comparison', 'best Tesla to buy']
   },
   {
     id: '4',
@@ -492,8 +492,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['best electric cars', 'top electric vehicles', 'EV comparison', 'electric car rankings', 'electric vehicle reviews'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 15,
-    metaDescription: 'Comprehensive ranking of the best electric cars in 2024. Compare top EVs by price, performance, range, and value.',
-    keywords: ['Best Electric Cars 2024', 'top electric vehicles', 'best EVs', 'electric car rankings', 'EV comparison']
+    metaDescription: '🏆 Best Electric Cars 2024: Top 10 EVs Ranked by Value! Compare Tesla, Ford, Chevrolet prices, range & performance. Expert rankings with real-world data. Find your perfect EV!',
+    keywords: ['best electric cars 2024', 'top electric vehicles 2024', 'best EVs ranked', 'electric car comparison 2024', 'Tesla vs Ford EV', 'affordable electric cars', 'electric vehicle rankings', 'best EV for money']
   },
   {
     id: '5',
@@ -623,8 +623,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates', 'electric car incentives'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 18,
-    metaDescription: 'Complete guide to electric car tax credits and incentives in 2024. Learn about federal tax credits, state rebates, and eligibility criteria.',
-    keywords: ['Electric Car Tax Credit 2024', 'EV tax credit', 'electric vehicle incentives', 'federal tax credit', 'EV rebates']
+    metaDescription: '💰 Electric Car Tax Credit 2024: Get $7,500 Federal Credit + State Rebates! Complete guide to EV incentives, eligibility & how to claim. Save thousands on your electric vehicle!',
+    keywords: ['electric car tax credit 2024', 'EV tax credit $7500', 'federal EV incentives', 'electric vehicle rebates', 'EV tax credit eligibility', 'state EV rebates', 'how to claim EV credit', 'electric car incentives 2024']
   },
   {
     id: '6',
@@ -781,8 +781,8 @@ export const blogPosts: BlogPost[] = [
     tags: ['Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup', 'Tesla charger installation'],
     featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 14,
-    metaDescription: 'Complete guide to charging your Tesla at home. Learn about Tesla home charging options, wall connector installation, costs, and troubleshooting.',
-    keywords: ['How to Charge Tesla at Home', 'Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup']
+    metaDescription: '⚡ How to Charge Tesla at Home 2024: Complete Setup Guide! Tesla Wall Connector installation, costs & tips. Save money charging at home vs Supercharger. Expert guide!',
+    keywords: ['how to charge Tesla at home', 'Tesla home charging setup', 'Tesla Wall Connector installation', 'Tesla charging cost', 'Tesla home charger', 'Tesla charging guide', 'Tesla Wall Connector cost', 'Tesla home charging vs Supercharger']
   },
   {
     id: '7',
