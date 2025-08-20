@@ -817,7 +817,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                           <button
                             type="button"
                             onClick={() => handleRestoreImage(index)}
-                            className="absolute top-1 right-1 p-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all"
+                            className="absolute top-1 right-1 p-1 rounded-full bg-green-500 hover:bg-green-600 text-white transition-all z-10"
                             title="Restore image"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -839,7 +839,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                         
                         {/* Deleted Overlay */}
                         {isDeleted && (
-                          <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center pointer-events-none z-0">
                             <span className="text-white text-xs font-medium bg-red-500 px-2 py-1 rounded">
                               Deleted
                             </span>
