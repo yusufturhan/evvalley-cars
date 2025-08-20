@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { uploadTempImage } from "@/lib/storage";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Upload, X, Image as ImageIcon, Move } from "lucide-react";
 
 interface ImageUploadProps {
   onImagesChange?: (images: File[]) => void; // legacy
@@ -16,6 +16,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tempIdRef = useRef<string>(crypto.randomUUID());
 
@@ -65,9 +66,12 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     const newPreviews = previews.filter((_, i) => i !== index);
+    const newUrls = uploadedUrls.filter((_, i) => i !== index);
     setImages(newImages);
     setPreviews(newPreviews);
+    setUploadedUrls(newUrls);
     if (onImagesChange) onImagesChange(newImages);
+    if (onUrlsChange) onUrlsChange(newUrls);
   };
 
   const handleDrop = async (event: React.DragEvent) => {
@@ -118,6 +122,52 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     event.preventDefault();
   };
 
+  // Drag and drop reordering functions
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    // Reorder arrays
+    const newImages = [...images];
+    const newPreviews = [...previews];
+    const newUrls = [...uploadedUrls];
+
+    const draggedImage = newImages[draggedIndex];
+    const draggedPreview = newPreviews[draggedIndex];
+    const draggedUrl = newUrls[draggedIndex];
+
+    // Remove from original position
+    newImages.splice(draggedIndex, 1);
+    newPreviews.splice(draggedIndex, 1);
+    newUrls.splice(draggedIndex, 1);
+
+    // Insert at new position
+    newImages.splice(dropIndex, 0, draggedImage);
+    newPreviews.splice(dropIndex, 0, draggedPreview);
+    newUrls.splice(dropIndex, 0, draggedUrl);
+
+    setImages(newImages);
+    setPreviews(newPreviews);
+    setUploadedUrls(newUrls);
+    if (onImagesChange) onImagesChange(newImages);
+    if (onUrlsChange) onUrlsChange(newUrls);
+    setDraggedIndex(null);
+  };
+
   return (
     <div className="space-y-4">
       {/* Upload Area */}
@@ -161,25 +211,60 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
         </div>
       </div>
 
-      {/* Image Previews */}
+      {/* Image Previews with Reordering */}
       {previews.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {previews.map((preview, index) => (
-            <div key={index} className="relative group">
-              <img
-                src={preview}
-                alt={`Preview ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg"
-              />
-              <button
-                type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-medium text-gray-700">Image Order (First image = Cover Photo)</h4>
+            <p className="text-xs text-gray-500">Drag to reorder</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {previews.map((preview, index) => (
+              <div 
+                key={index} 
+                className={`relative group cursor-move ${
+                  draggedIndex === index ? 'opacity-50' : ''
+                }`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
               >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
+                <img
+                  src={preview}
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+                
+                {/* Cover Photo Badge */}
+                {index === 0 && (
+                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                    Cover
+                  </div>
+                )}
+                
+                {/* Position Number */}
+                <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                  {index + 1}
+                </div>
+                
+                {/* Remove Button */}
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute bottom-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                
+                {/* Drag Handle */}
+                <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Move className="h-4 w-4" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
