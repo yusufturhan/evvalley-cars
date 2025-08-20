@@ -108,6 +108,7 @@ export async function PUT(
     // Check if request is FormData or JSON
     const contentType = request.headers.get('content-type');
     let updateData: any = {};
+    let newImages: File[] = [];
     
     if (contentType?.includes('multipart/form-data')) {
       // Handle FormData
@@ -135,13 +136,20 @@ export async function PUT(
         battery_warranty: formData.get('battery_warranty') as string,
         drivetrain: formData.get('drivetrain') as string,
         vin: formData.get('vin') as string,
+        highlighted_features: formData.get('highlighted_features') as string,
       };
+
+      // Extract new images from FormData
+      const images = formData.getAll('images') as File[];
+      newImages = images.filter(img => img instanceof File && img.size > 0);
+      
+      console.log('📸 New images received:', newImages.length);
     } else {
       // Handle JSON
       updateData = await request.json();
     }
     
-    // Get current vehicle data to compare price changes
+    // Get current vehicle data to compare price changes and get current images
     const { data: currentVehicle, error: currentError } = await supabase
       .from('vehicles')
       .select('*')
@@ -150,6 +158,63 @@ export async function PUT(
 
     if (currentError || !currentVehicle) {
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
+    }
+
+    // Handle image replacement if new images are provided
+    if (newImages.length > 0) {
+      console.log('🔄 Replacing images for vehicle:', id);
+      
+      // Delete old images from storage
+      if (currentVehicle.images && currentVehicle.images.length > 0) {
+        console.log('🗑️ Deleting old images:', currentVehicle.images.length);
+        for (const imageUrl of currentVehicle.images) {
+          try {
+            const imagePath = imageUrl.split('/').pop();
+            if (imagePath) {
+              await supabase.storage.from('vehicle-images').remove([imagePath]);
+              console.log('🗑️ Deleted old image:', imagePath);
+            }
+          } catch (error) {
+            console.error('❌ Error deleting old image:', error);
+          }
+        }
+      }
+
+      // Upload new images
+      const newImageUrls: string[] = [];
+      for (let i = 0; i < newImages.length; i++) {
+        const image = newImages[i];
+        const fileExt = image.name.split('.').pop();
+        const fileName = `${id}_${Date.now()}_${i}.${fileExt}`;
+        
+        try {
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('vehicle-images')
+            .upload(fileName, image, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (uploadError) {
+            console.error('❌ Image upload error:', uploadError);
+            throw uploadError;
+          }
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('vehicle-images')
+            .getPublicUrl(fileName);
+
+          newImageUrls.push(publicUrl);
+          console.log('✅ Uploaded new image:', fileName);
+        } catch (error) {
+          console.error('❌ Failed to upload image:', error);
+          throw error;
+        }
+      }
+
+      // Update the images field
+      updateData.images = newImageUrls;
+      console.log('📸 Updated vehicle with new images:', newImageUrls.length);
     }
 
     // Update vehicle
