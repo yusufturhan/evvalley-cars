@@ -133,7 +133,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+  const handleDropReorder = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     
     if (draggedIndex === null || draggedIndex === dropIndex) {
@@ -229,7 +229,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={handleDragOverReorder}
-                onDrop={(e) => handleDrop(e, index)}
+                onDrop={(e) => handleDropReorder(e, index)}
               >
                 <img
                   src={preview}
