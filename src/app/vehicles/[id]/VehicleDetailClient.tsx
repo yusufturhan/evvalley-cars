@@ -17,7 +17,8 @@ import {
   Image as ImageIcon,
   User,
   Clock,
-  CheckCircle
+  CheckCircle,
+  Trash2
 } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -40,6 +41,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const [showMessaging, setShowMessaging] = useState(false);
   const [sellerInfo, setSellerInfo] = useState<any>(null);
   const [markingAsSold, setMarkingAsSold] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
 
   // Fetch user's Supabase ID when component mounts
@@ -169,6 +171,37 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     }
   };
 
+  const handleDelete = async () => {
+    if (!vehicle || !isSignedIn) return;
+    
+    const isOwner = vehicle.seller_id === userSupabaseId;
+    if (!isOwner) return;
+
+    // Confirm deletion
+    const confirmed = window.confirm('Are you sure you want to delete this listing? This action cannot be undone.');
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      const response = await fetch(`/api/vehicles/${vehicle.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('Listing deleted successfully');
+        router.push('/profile');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete listing: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting vehicle:', error);
+      alert('Error deleting listing');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const hasImages = vehicle.images && vehicle.images.length > 0;
 
   return (
@@ -291,15 +324,27 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
               <p className="text-gray-600">{vehicle.description}</p>
               
-              {/* Mark as Sold Button - Only show to vehicle owner */}
-              {isSignedIn && vehicle && !vehicle.sold && vehicle.seller_id === userSupabaseId && (
-                <div className="mt-4">
-                  <button
-                    onClick={handleMarkAsSold}
-                    disabled={markingAsSold}
-                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+              {/* Owner Actions - Only show to vehicle owner */}
+              {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
+                <div className="mt-4 space-y-2">
+                  {!vehicle.sold && (
+                    <button
+                      onClick={handleMarkAsSold}
+                      disabled={markingAsSold}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
                     {markingAsSold ? 'Marking as Sold...' : 'Mark as Sold'}
+                  </button>
+                  )}
+                  
+                  {/* Delete Button */}
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {deleting ? 'Deleting...' : 'Delete Listing'}
                   </button>
                 </div>
               )}
