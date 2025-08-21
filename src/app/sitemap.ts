@@ -104,30 +104,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch vehicles with enhanced filtering
-  const { data: vehicles } = await supabase
-    .from('vehicles')
-    .select('id, updated_at, category, brand, model')
-    .eq('sold_at', null)
-    .order('updated_at', { ascending: false })
-    .limit(2000); // Increased limit for better SEO coverage
-
-  const vehiclePages = vehicles?.map((vehicle) => ({
-    url: `${baseUrl}/vehicles/${vehicle.id}`,
-    lastModified: new Date(vehicle.updated_at),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  })) || [];
+  // Fetch vehicles with graceful fallback so sitemap never fails
+  let vehiclePages: MetadataRoute.Sitemap = [];
+  try {
+    const { data: vehicles } = await supabase
+      .from('vehicles')
+      .select('id, updated_at')
+      .eq('sold_at', null)
+      .order('updated_at', { ascending: false })
+      .limit(2000);
+    vehiclePages = (vehicles || []).map((vehicle: any) => ({
+      url: `${baseUrl}/vehicles/${vehicle.id}`,
+      lastModified: new Date(vehicle.updated_at),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }));
+  } catch (error) {
+    // If Supabase fails for any reason, proceed with static entries only
+    vehiclePages = [];
+  }
 
   // Blog posts (import from blog-content)
-  const { blogPosts } = await import('@/lib/blog-content');
-  
-  const blogPages = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
+  let blogPages: MetadataRoute.Sitemap = [];
+  try {
+    const { blogPosts } = await import('@/lib/blog-content');
+    blogPages = blogPosts.map((post: any) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.updatedAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }));
+  } catch (error) {
+    blogPages = [];
+  }
 
   // Add blog category pages
   const blogCategories = [
