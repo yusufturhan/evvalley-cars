@@ -78,9 +78,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Safari-specific favicon approach with SVG priority */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=10" />
-        <link rel="shortcut icon" href="/favicon.svg?v=10" />
-        <link rel="apple-touch-icon" href="/favicon.svg?v=10" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=11" />
+        <link rel="shortcut icon" href="/favicon.svg?v=11" />
+        <link rel="apple-touch-icon" href="/favicon.svg?v=11" />
         
         {/* Safari-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />

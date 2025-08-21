@@ -5,6 +5,12 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const { pathname } = url;
 
+  // Force favicon.ico to our SVG to avoid Vercel's default icon cache
+  if (pathname === '/favicon.ico') {
+    const to = new URL('/favicon.svg?v=11', url.origin);
+    return NextResponse.redirect(to, { status: 301 });
+  }
+
   // 1) Legacy Unicorn Platform paths that should be removed from index
   //    Return 410 Gone so Google drops them quickly
   if (/^\/car\//.test(pathname)) {
@@ -36,7 +42,9 @@ export function middleware(request: NextRequest) {
 // Exclude static assets and API from middleware for performance
 export const config = {
   matcher: [
-    '/((?!_next/|static/|favicon.svg|favicon.ico|robots.txt|sitemap.xml|api/).*)',
+    // Include /favicon.ico to override Vercel default
+    '/favicon.ico',
+    '/((?!_next/|static/|favicon.svg|robots.txt|sitemap.xml|api/).*)',
   ],
 };
 
