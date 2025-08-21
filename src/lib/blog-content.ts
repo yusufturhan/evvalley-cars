@@ -325,6 +325,15 @@ export const blogPosts: BlogPost[] = [
 
       <p>When it comes to buying a Tesla in 2024, the two most popular choices are the <strong>Tesla Model 3</strong> and the <strong>Tesla Model Y</strong>. Both vehicles offer cutting-edge EV technology, impressive performance, and access to Tesla's vast Supercharger network. However, deciding between the two can be tricky. In this comprehensive <strong>Tesla comparison</strong>, we'll explore everything from pricing and performance to cargo space and lifestyle fit—helping you choose the right Tesla for your needs.</p>
 
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>See real Model 3 & Model Y deals</strong> and compare trims side‑by‑side.</p>
+        <p style="margin:0;">
+          <a href="/vehicles?brand=Tesla" style="color:#0ea5e9;text-decoration:underline;">Browse Tesla listings</a>
+          ·
+          <a href="/blog/best-electric-cars-2024" style="color:#0ea5e9;text-decoration:underline;">Best EVs 2024</a>
+        </p>
+      </div>
+
       <h2>Quick Overview</h2>
       <p>The <strong>Model 3</strong> is a sleek, compact sedan that prioritizes efficiency and sporty handling, while the <strong>Model Y</strong> is a versatile compact SUV offering more space and practicality. Both share the same EV platform and software but cater to different lifestyles.</p>
 
@@ -537,6 +546,15 @@ export const blogPosts: BlogPost[] = [
 
       <p>The <strong>Electric Car Tax Credit 2024</strong> makes switching to electric vehicles more affordable than ever. Updated rules under the Inflation Reduction Act (IRA) ensure buyers can benefit from <strong>EV tax credits</strong>, <strong>federal tax credits</strong>, <strong>EV rebates</strong>, and various <strong>electric vehicle incentives</strong>. This year, the program expands instant rebates at dealerships, while enforcing stricter battery sourcing requirements. Let's explore the details, eligibility criteria, and state-by-state incentives in this complete guide.</p>
 
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Find credit‑eligible EVs</strong> and calculate your net price.</p>
+        <p style="margin:0;">
+          <a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">See eligible listings</a>
+          ·
+          <a href="/blog/complete-guide-to-buying-electric-vehicles" style="color:#0ea5e9;text-decoration:underline;">EV buying guide</a>
+        </p>
+      </div>
+
       <h2>What Changed in 2024?</h2>
       <ul>
         <li><strong>Instant dealer credit:</strong> Buyers can apply the federal EV tax credit at the dealership, lowering upfront costs immediately.</li>
@@ -667,6 +685,15 @@ export const blogPosts: BlogPost[] = [
       <h1>How to Charge Tesla at Home: Complete Setup Guide</h1>
 
       <p>One of the biggest advantages of owning a Tesla is the ability to charge at home. Knowing <strong>how to charge Tesla at home</strong> not only adds convenience but also helps you save money compared to public charging. In this complete guide, we'll explore <strong>Tesla home charging</strong> options, installation requirements, costs, charging speeds, and real-world energy usage examples.</p>
+
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Shopping for a Tesla?</strong> Compare Model 3 and Model Y deals.</p>
+        <p style="margin:0;">
+          <a href="/vehicles?brand=Tesla" style="color:#0ea5e9;text-decoration:underline;">Browse Tesla listings</a>
+          ·
+          <a href="/blog/tesla-model-3-vs-model-y-comparison" style="color:#0ea5e9;text-decoration:underline;">Model 3 vs Model Y</a>
+        </p>
+      </div>
 
       <h2>Home Charging Options</h2>
       <h3>1. Tesla Mobile Connector</h3>
@@ -825,6 +852,15 @@ export const blogPosts: BlogPost[] = [
       <h1>Electric Vehicle Cost Analysis: Total Cost of Ownership</h1>
 
       <p>Wondering if an EV is truly cheaper than a gas car over time? This <strong>Electric Vehicle Cost Analysis</strong> breaks down every line item in the <strong>total cost of ownership</strong> (TCO)—from the upfront price and incentives to charging, maintenance, insurance, depreciation, and resale value. You'll also find a step-by-step calculator, regional cost differences, and model comparisons to help you make a confident, data-driven decision.</p>
+
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Compare real prices</strong> and run your own TCO: pick a model and check deals.</p>
+        <p style="margin:0;">
+          <a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">See EV listings</a>
+          ·
+          <a href="/blog/electric-car-tax-credit-2024" style="color:#0ea5e9;text-decoration:underline;">Tax credit 2024 guide</a>
+        </p>
+      </div>
 
       <h2>Executive Summary (Key Takeaways)</h2>
       <ul>
