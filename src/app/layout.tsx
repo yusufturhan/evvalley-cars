@@ -81,6 +81,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=11" />
         <link rel="shortcut icon" href="/favicon.svg?v=11" />
         <link rel="apple-touch-icon" href="/favicon.svg?v=11" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1C1F4A" />
         
         {/* Safari-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
