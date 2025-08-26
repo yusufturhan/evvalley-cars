@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "Evvalley",
     images: [
       {
-        url: "https://www.evvalley.com/og-image.jpg",
+        url: "https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg",
         width: 1200,
         height: 630,
         alt: "Evvalley - US EV & E-Mobility Marketplace",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Evvalley - US EV & E-Mobility Marketplace",
     description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US.",
-    images: ["https://www.evvalley.com/og-image.jpg"],
+    images: ["https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg"],
     creator: "@evvalley",
   },
   robots: {
