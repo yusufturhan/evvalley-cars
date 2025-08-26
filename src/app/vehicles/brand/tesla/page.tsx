@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@supabase/supabasejs';
+import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 
 const supabase = createClient(

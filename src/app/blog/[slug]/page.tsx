@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       type: 'article',
       images: [
         {
-          url: post.featuredImage || 'https://www.evvalley.com/og-image.jpg',
+          url: post.featuredImage || 'https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg',
           width: 1200,
           height: 630,
           alt: post.title,
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: [post.featuredImage || 'https://www.evvalley.com/og-image.jpg'],
+      images: [post.featuredImage || 'https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg'],
     },
   };
 }
