@@ -68,6 +68,12 @@ export default function SellPage() {
     const fetchUserSupabaseId = async () => {
       if (isSignedIn && user) {
         try {
+          const userEmail = user.emailAddresses[0]?.emailAddress;
+          if (!userEmail) {
+            console.error('❌ No email address found for user');
+            return;
+          }
+
           const response = await fetch('/api/auth/sync', {
             method: 'POST',
             headers: {
@@ -75,7 +81,7 @@ export default function SellPage() {
             },
             body: JSON.stringify({
               clerkId: user.id,
-              email: user.emailAddresses[0]?.emailAddress,
+              email: userEmail,
               firstName: user.firstName,
               lastName: user.lastName,
             }),
@@ -85,6 +91,12 @@ export default function SellPage() {
             const data = await response.json();
             setUserSupabaseId(data.supabaseId);
             console.log('✅ User Supabase ID fetched:', data.supabaseId);
+            
+            // Update form data with user email
+            setFormData(prev => ({
+              ...prev,
+              seller_email: userEmail
+            }));
           } else {
             console.error('❌ Failed to fetch user Supabase ID');
           }
@@ -99,6 +111,18 @@ export default function SellPage() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
+    // Check if user is signed in and has email
+    if (!isSignedIn) {
+      newErrors.general = 'Please sign in to list a vehicle';
+      return false;
+    }
+
+    const userEmail = user?.emailAddresses[0]?.emailAddress;
+    if (!userEmail) {
+      newErrors.general = 'Unable to get your email address. Please sign out and sign in again.';
+      return false;
+    }
 
     // Title validation
     if (!formData.title.trim()) {
@@ -193,6 +217,13 @@ export default function SellPage() {
     }
 
     setErrors(newErrors);
+    
+    // If there are general errors, show them
+    if (newErrors.general) {
+      alert(newErrors.general);
+      return false;
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -206,6 +237,13 @@ export default function SellPage() {
 
     if (!userSupabaseId) {
       alert("Please wait while we load your account information");
+      return;
+    }
+
+    // Get user email from Clerk
+    const userEmail = user?.emailAddresses[0]?.emailAddress;
+    if (!userEmail) {
+      alert("Unable to get your email address. Please sign out and sign in again.");
       return;
     }
 
@@ -223,6 +261,7 @@ export default function SellPage() {
       console.log("🖼️ Images count:", images.length, 'uploaded urls:', imageUrls.length);
       console.log("📸 Uploaded URLs:", imageUrls);
       console.log("👤 User Supabase ID:", userSupabaseId);
+      console.log("📧 User email:", userEmail);
       
       // Build JSON payload (send only URLs, no big files)
       const payload = {
@@ -240,7 +279,7 @@ export default function SellPage() {
         battery_capacity: formData.battery_capacity || '',
         location: formData.location.trim() || '',
         seller_id: userSupabaseId,
-        seller_email: formData.seller_email,
+        seller_email: userEmail, // Use the email from Clerk directly
         vehicle_condition: formData.vehicle_condition || '',
         title_status: formData.title_status || '',
         highlighted_features: formData.highlighted_features || '',

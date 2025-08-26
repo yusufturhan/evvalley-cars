@@ -164,8 +164,18 @@ export async function POST(request: Request) {
     
     if (!seller_email) {
       console.error('❌ Seller email is missing from form data');
+      console.error('❌ Form data received:', JSON.stringify(json, null, 2));
       return NextResponse.json({ 
-        error: 'Seller email is required' 
+        error: 'Seller email is required. Please make sure you are signed in with a valid email address.' 
+      }, { status: 400 });
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(seller_email)) {
+      console.error('❌ Invalid email format:', seller_email);
+      return NextResponse.json({ 
+        error: 'Invalid email format. Please provide a valid email address.' 
       }, { status: 400 });
     }
     

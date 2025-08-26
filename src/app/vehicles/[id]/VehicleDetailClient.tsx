@@ -25,7 +25,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import SimpleChat from "@/components/SimpleChat";
 import OptimizedImage from "@/components/OptimizedImage";
 import { Vehicle } from "@/lib/database";
-import { calculateMembershipDuration, isVerifiedUser, getVerificationBadge, formatListingCount } from "@/lib/userUtils";
+import { calculateSellingDuration, calculateMemberDuration, isVerifiedUser, getVerificationBadge, formatListingCount } from "@/lib/userUtils";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
@@ -523,8 +523,17 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                         )}
                         <span className="text-xs text-gray-700 flex items-center">
                           <Clock className="h-3 w-3 mr-1" />
-                          {calculateMembershipDuration(sellerInfo.created_at)}
+                          {sellerInfo.first_listing_date 
+                            ? calculateSellingDuration(sellerInfo.first_listing_date)
+                            : calculateMemberDuration(sellerInfo.created_at)
+                          }
                         </span>
+                        {/* Debug info - remove after testing */}
+                        {process.env.NODE_ENV === 'development' && (
+                          <span className="text-xs text-red-500">
+                            (First listing: {sellerInfo.first_listing_date || 'None'})
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">

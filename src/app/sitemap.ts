@@ -8,151 +8,206 @@ const supabase = createClient(
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.evvalley.com';
+  const currentDate = new Date();
 
   // Static pages with enhanced priorities and frequencies
   const staticPages = [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'daily' as const,
       priority: 1,
     },
     {
       url: `${baseUrl}/vehicles`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'hourly' as const,
       priority: 0.9,
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
     {
       url: `${baseUrl}/sell`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/community`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
     {
       url: `${baseUrl}/escrow`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/safety`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
     {
       url: `${baseUrl}/terms`,
-      lastModified: new Date(),
+      lastModified: currentDate,
       changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
-    // Category pages
+    // Category pages with canonical URLs
     {
-      url: `${baseUrl}/vehicles?category=ev-car`,
-      lastModified: new Date(),
+      url: `${baseUrl}/vehicles/ev-cars`,
+      lastModified: currentDate,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles?category=hybrid-car`,
-      lastModified: new Date(),
+      url: `${baseUrl}/vehicles/hybrid-cars`,
+      lastModified: currentDate,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles?category=ev-scooter`,
-      lastModified: new Date(),
+      url: `${baseUrl}/vehicles/ev-scooters`,
+      lastModified: currentDate,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles?category=e-bike`,
-      lastModified: new Date(),
+      url: `${baseUrl}/vehicles/e-bikes`,
+      lastModified: currentDate,
       changeFrequency: 'daily' as const,
       priority: 0.8,
     },
   ];
 
-  // Fetch vehicles with graceful fallback so sitemap never fails
+  // Fetch vehicles with enhanced error handling and validation
   let vehiclePages: MetadataRoute.Sitemap = [];
   try {
-    const { data: vehicles } = await supabase
+    const { data: vehicles, error } = await supabase
       .from('vehicles')
-      .select('id, updated_at')
+      .select('id, updated_at, vin, title, sold_at')
       .eq('sold_at', null)
+      .not('updated_at', 'is', null)
+      .not('id', 'is', null)
+      .not('title', 'is', null)
       .order('updated_at', { ascending: false })
-      .limit(2000);
-    vehiclePages = (vehicles || []).map((vehicle: any) => ({
-      url: `${baseUrl}/vehicles/${vehicle.id}`,
-      lastModified: new Date(vehicle.updated_at),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
+      .limit(5000); // Increased limit for better coverage
+    
+    if (error) {
+      console.error('Sitemap: Error fetching vehicles:', error);
+    } else if (vehicles && vehicles.length > 0) {
+      vehiclePages = vehicles
+        .filter((vehicle: any) => 
+          vehicle.id && 
+          vehicle.title && 
+          vehicle.vin && 
+          !vehicle.sold_at
+        )
+        .map((vehicle: any) => ({
+          url: `${baseUrl}/vehicles/${vehicle.id}`,
+          lastModified: vehicle.updated_at ? new Date(vehicle.updated_at) : currentDate,
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        }));
+    }
   } catch (error) {
-    // If Supabase fails for any reason, proceed with static entries only
+    console.error('Sitemap: Unexpected error fetching vehicles:', error);
     vehiclePages = [];
   }
 
-  // Blog posts (import from blog-content)
+  // Blog posts with enhanced error handling
   let blogPages: MetadataRoute.Sitemap = [];
   try {
     const { blogPosts } = await import('@/lib/blog-content');
-    blogPages = blogPosts.map((post: any) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: new Date(post.updatedAt),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }));
+    if (blogPosts && Array.isArray(blogPosts)) {
+      blogPages = blogPosts
+        .filter((post: any) => post && post.slug && post.title)
+        .map((post: any) => ({
+          url: `${baseUrl}/blog/${post.slug}`,
+          lastModified: post.updatedAt ? new Date(post.updatedAt) : currentDate,
+          changeFrequency: 'monthly' as const,
+          priority: 0.7,
+        }));
+    }
   } catch (error) {
+    console.error('Sitemap: Error importing blog content:', error);
     blogPages = [];
   }
 
-  // Add blog category pages
+  // Blog category pages with canonical URLs
   const blogCategories = [
-    'EV Guide',
-    'Market Analysis', 
-    'Technology Updates',
-    'Buying/Selling Tips',
-    'E-Mobility'
+    'ev-guide',
+    'market-analysis', 
+    'technology-updates',
+    'buying-selling-tips',
+    'e-mobility'
   ];
 
   const blogCategoryPages = blogCategories.map((category) => ({
-    url: `${baseUrl}/blog?category=${encodeURIComponent(category)}`,
-    lastModified: new Date(),
+    url: `${baseUrl}/blog/category/${category}`,
+    lastModified: currentDate,
     changeFrequency: 'weekly' as const,
     priority: 0.6,
   }));
 
-  return [...staticPages, ...vehiclePages, ...blogPages, ...blogCategoryPages];
+  // Brand and model specific pages to prevent duplicate content
+  const brandPages = [
+    'tesla', 'bmw', 'audi', 'mercedes', 'volkswagen', 'ford', 'toyota', 'honda', 'nissan'
+  ].map(brand => ({
+    url: `${baseUrl}/vehicles/brand/${brand}`,
+    lastModified: currentDate,
+    changeFrequency: 'daily' as const,
+    priority: 0.7,
+  }));
+
+  // Combine all pages and ensure we always return something
+  const allPages = [
+    ...staticPages, 
+    ...vehiclePages, 
+    ...blogPages, 
+    ...blogCategoryPages,
+    ...brandPages
+  ];
+  
+  // Remove any duplicate URLs to prevent duplicate content issues
+  const uniquePages = allPages.filter((page, index, self) => 
+    index === self.findIndex(p => p.url === page.url)
+  );
+  
+  // Log sitemap generation for debugging
+  console.log(`Sitemap generated with ${uniquePages.length} unique URLs:`, {
+    static: staticPages.length,
+    vehicles: vehiclePages.length,
+    blogs: blogPages.length,
+    categories: blogCategoryPages.length,
+    brands: brandPages.length,
+    duplicatesRemoved: allPages.length - uniquePages.length
+  });
+
+  return uniquePages;
 }

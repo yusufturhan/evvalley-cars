@@ -64,6 +64,32 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/sitemap.xml',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, s-maxage=3600',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/xml; charset=utf-8',
+          },
+        ],
+      },
+      {
+        source: '/robots.txt',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, s-maxage=86400',
+          },
+          {
+            key: 'Content-Type',
+            value: 'text/plain; charset=utf-8',
+          },
+        ],
+      },
     ];
   },
   
@@ -72,7 +98,7 @@ const nextConfig = {
     return [
       {
         source: '/favicon.ico',
-        destination: '/favicon.svg?v=11',
+        destination: '/favicon.svg?v=14',
         permanent: true,
       },
     ];

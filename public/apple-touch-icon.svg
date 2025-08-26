@@ -1,10 +1,13 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background circle -->
-  <circle cx="90" cy="90" r="90" fill="#1C1F4A"/>
+  <circle cx="90" cy="90" r="85" fill="#1C1F4A" stroke="#1C1F4A" stroke-width="2"/>
   
-  <!-- Lightning bolt - larger for Apple Touch Icon -->
-  <path d="M35 25L20 70H45L30 115L70 70H50L60 25Z" fill="#3AB0FF" stroke="#3AB0FF" stroke-width="2"/>
+  <!-- Lightning bolt -->
+  <path d="M45 34L23 79H56L34 124L79 79H56L67 34Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1"/>
   
-  <!-- EVVALLEY text - larger and more readable -->
-  <text x="90" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">EVVALLEY</text>
+  <!-- EVVALLEY text -->
+  <text x="90" y="145" font-family="Arial, sans-serif" font-size="32" font-weight="bold" text-anchor="middle" fill="#FFFFFF">EVVALLEY</text>
+  
+  <!-- "Make electricity" tagline -->
+  <text x="90" y="165" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#FFFFFF">Make electricity</text>
 </svg>

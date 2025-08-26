@@ -20,19 +20,24 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Get user's vehicle count
-    const { count: vehicleCount, error: vehicleError } = await supabase
+    // Get user's vehicle count and first listing date
+    const { data: vehicles, error: vehicleError } = await supabase
       .from('vehicles')
-      .select('*', { count: 'exact', head: true })
-      .eq('seller_id', id);
+      .select('created_at')
+      .eq('seller_id', id)
+      .order('created_at', { ascending: true });
 
     if (vehicleError) {
-      console.error('Error fetching vehicle count:', vehicleError);
+      console.error('Error fetching vehicle data:', vehicleError);
     }
+
+    const vehicleCount = vehicles?.length || 0;
+    const firstListingDate = vehicles && vehicles.length > 0 ? vehicles[0].created_at : null;
 
     const userData = {
       ...user,
-      vehicle_count: vehicleCount || 0
+      vehicle_count: vehicleCount,
+      first_listing_date: firstListingDate
     };
 
     return NextResponse.json({ user: userData });

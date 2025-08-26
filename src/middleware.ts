@@ -7,7 +7,7 @@ export function middleware(request: NextRequest) {
 
   // Force favicon.ico to our SVG to avoid Vercel's default icon cache
   if (pathname === '/favicon.ico') {
-    const to = new URL('/favicon.svg?v=11', url.origin);
+    const to = new URL('/favicon.svg?v=14', url.origin);
     return NextResponse.redirect(to, { status: 301 });
   }
 
@@ -31,12 +31,90 @@ export function middleware(request: NextRequest) {
 
   // 2) Known obsolete single paths → redirect to best replacement
   if (pathname === '/ebike') {
-    const to = new URL('/vehicles?category=e-bike', url.origin);
+    const to = new URL('/vehicles/e-bikes', url.origin);
     return NextResponse.redirect(to, { status: 301 });
   }
 
-  // 3) favicon.ico already redirected in next.config.js; let it pass
-  return NextResponse.next();
+  // 3) Redirect old query parameter URLs to canonical URLs
+  if (pathname === '/vehicles' && url.search) {
+    const searchParams = url.searchParams;
+    const category = searchParams.get('category');
+    
+    if (category === 'ev-car') {
+      const to = new URL('/vehicles/ev-cars', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'hybrid-car') {
+      const to = new URL('/vehicles/hybrid-cars', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'ev-scooter') {
+      const to = new URL('/vehicles/ev-scooters', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'e-bike') {
+      const to = new URL('/vehicles/e-bikes', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+  }
+
+  // 4) Redirect old blog query parameter URLs to canonical URLs
+  if (pathname === '/blog' && url.search) {
+    const searchParams = url.searchParams;
+    const category = searchParams.get('category');
+    
+    if (category === 'EV Guide') {
+      const to = new URL('/blog/category/ev-guide', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'Market Analysis') {
+      const to = new URL('/blog/category/market-analysis', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'Technology Updates') {
+      const to = new URL('/blog/category/technology-updates', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'Buying/Selling Tips') {
+      const to = new URL('/blog/category/buying-selling-tips', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    if (category === 'E-Mobility') {
+      const to = new URL('/blog/category/e-mobility', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+  }
+
+  // 5) Prevent Soft 404s by redirecting invalid vehicle IDs
+  if (pathname.match(/^\/vehicles\/(999999|000000|test|demo|null)$/)) {
+    const to = new URL('/vehicles', url.origin);
+    return NextResponse.redirect(to, { status: 301 });
+  }
+
+  // 6) Prevent Soft 404s by redirecting invalid blog slugs
+  if (pathname.match(/^\/blog\/(test|demo)$/)) {
+    const to = new URL('/blog', url.origin);
+    return NextResponse.redirect(to, { status: 301 });
+  }
+
+  // 7) Add canonical headers for important pages
+  const response = NextResponse.next();
+  
+  // Add canonical header for main pages
+  if (pathname === '/vehicles/ev-cars') {
+    response.headers.set('Link', '<https://www.evvalley.com/vehicles/ev-cars>; rel="canonical"');
+  }
+  if (pathname === '/vehicles/hybrid-cars') {
+    response.headers.set('Link', '<https://www.evvalley.com/vehicles/hybrid-cars>; rel="canonical"');
+  }
+  if (pathname === '/vehicles/ev-scooters') {
+    response.headers.set('Link', '<https://www.evvalley.com/vehicles/ev-scooters>; rel="canonical"');
+  }
+  if (pathname === '/vehicles/e-bikes') {
+    response.headers.set('Link', '<https://www.evvalley.com/vehicles/e-bikes>; rel="canonical"');
+  }
+
+  return response;
 }
 
 // Exclude static assets and API from middleware for performance

@@ -21,7 +21,7 @@ export const blogPosts: BlogPost[] = [
     slug: 'complete-guide-to-buying-electric-vehicles',
     title: 'Complete Guide to Buying Electric Vehicles in 2024',
     excerpt: 'Everything you need to know about purchasing your first electric vehicle, from choosing the right model to understanding charging infrastructure.',
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    featuredImage: '/blog-images/complete-guide-buying-electric-vehicles-2024.jpg',
     content: `
       <h1>Complete Guide to Buying Electric Vehicles in 2024</h1>
       
@@ -141,7 +141,6 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-20',
     category: 'EV Guide',
     tags: ['electric vehicles', 'buying guide', 'EV tips'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
     readTime: 8,
     metaDescription: '🚗 Ultimate 2024 Electric Vehicle Buying Guide: Compare Tesla, Ford, Chevrolet EVs. Get $7,500 tax credits, charging tips & best EV deals. Expert advice on range, cost & incentives!',
     keywords: ['electric vehicle buying guide 2024', 'how to buy electric car', 'best electric vehicles 2024', 'EV tax credit $7500', 'Tesla Model 3 buying guide', 'electric car comparison', 'EV charging guide', 'electric vehicle incentives']
@@ -310,106 +309,101 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-21',
     category: 'Technology Updates',
     tags: ['charging stations', 'EV charging'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    featuredImage: '/blog-images/ev-charging-station-guide.jpg',
     readTime: 10,
     metaDescription: '⚡ Complete EV Charging Station Guide 2024: Home installation, Tesla Supercharger, Electrify America. Level 1, 2, 3 charging costs & tips. Find charging stations near you!',
     keywords: ['EV charging stations', 'electric vehicle charging guide', 'Tesla Supercharger network', 'home EV charger installation', 'Level 2 charging cost', 'Electrify America stations', 'EV charging near me', 'electric car charging tips']
   },
   {
     id: '3',
-    slug: 'tesla-model-3-vs-model-y-comparison',
+    slug: 'tesla-model-3-vs-model-y-comparison-2024',
     title: 'Tesla Model 3 vs Model Y: Which One Should You Buy in 2024?',
-    excerpt: 'Comprehensive comparison of Tesla Model 3 vs Model Y in 2024. Compare price, performance, range, and features to choose the right Tesla for you.',
+    excerpt: 'Comprehensive comparison of Tesla Model 3 vs Model Y in 2024. Compare price, performance, range, and features to choose the right Tesla for your needs.',
     content: `
-      <h1>Tesla Model 3 vs Model Y: Which One Should You Buy in 2024?</h1>
+      <h2>Introduction</h2>
+      <p>Choosing between Tesla Model 3 and Model Y can be challenging. Both are excellent electric vehicles, but they serve different purposes and lifestyles. This comprehensive comparison will help you make the right decision for 2024.</p>
 
-      <p>When it comes to buying a Tesla in 2024, the two most popular choices are the <strong>Tesla Model 3</strong> and the <strong>Tesla Model Y</strong>. Both vehicles offer cutting-edge EV technology, impressive performance, and access to Tesla's vast Supercharger network. However, deciding between the two can be tricky. In this comprehensive <strong>Tesla comparison</strong>, we'll explore everything from pricing and performance to cargo space and lifestyle fit—helping you choose the right Tesla for your needs.</p>
-
-      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
-        <p style="margin:0 0 8px 0;"><strong>See real Model 3 & Model Y deals</strong> and compare trims side‑by‑side.</p>
-        <p style="margin:0;">
-          <a href="/vehicles?brand=Tesla" style="color:#0ea5e9;text-decoration:underline;">Browse Tesla listings</a>
-          ·
-          <a href="/blog/best-electric-cars-2024" style="color:#0ea5e9;text-decoration:underline;">Best EVs 2024</a>
-        </p>
+      <h2>Key Differences at a Glance</h2>
+      <div class="comparison-table">
+        <table>
+          <tr>
+            <th>Feature</th>
+            <th>Model 3</th>
+            <th>Model Y</th>
+          </tr>
+          <tr>
+            <td>Body Style</td>
+            <td>Sedan</td>
+            <td>SUV/Crossover</td>
+          </tr>
+          <tr>
+            <td>Starting Price</td>
+            <td>$38,990</td>
+            <td>$43,990</td>
+          </tr>
+          <tr>
+            <td>Cargo Space</td>
+            <td>23 cu ft</td>
+            <td>76 cu ft</td>
+          </tr>
+          <tr>
+            <td>Range (Long Range)</td>
+            <td>341 miles</td>
+            <td>330 miles</td>
+          </tr>
+        </table>
       </div>
 
-      <h2>Quick Overview</h2>
-      <p>The <strong>Model 3</strong> is a sleek, compact sedan that prioritizes efficiency and sporty handling, while the <strong>Model Y</strong> is a versatile compact SUV offering more space and practicality. Both share the same EV platform and software but cater to different lifestyles.</p>
+      <h2>Design and Styling</h2>
+      <p>The Model 3 is a sleek sedan with a sporty profile, while the Model Y is a more practical SUV with higher ground clearance and more interior space. The Model Y shares about 75% of its parts with the Model 3, but offers significantly more cargo space.</p>
 
-      <h2>Price Analysis: Which Tesla Is More Affordable?</h2>
-      <p>If price is your main concern, the <strong>Model 3</strong> is the more budget-friendly option. With a starting MSRP of under $40,000, it's one of the most affordable premium EVs on the market. The <strong>Model Y</strong>, on the other hand, starts around $5,000 higher but adds SUV practicality. Both are eligible for the federal EV tax credit (depending on trim), making them even more attractive for U.S. buyers in 2024.</p>
+      <h2>Performance Comparison</h2>
+      <p>Both vehicles offer impressive acceleration, but the Model 3 is slightly more agile due to its lower center of gravity. The Model Y provides better visibility and a commanding driving position typical of SUVs.</p>
 
-      <h2>Performance and Range Comparison</h2>
-      <h3>Tesla Model 3</h3>
+      <h2>Interior and Comfort</h2>
+      <p>The Model Y's higher roofline provides more headroom and easier access. The rear seats fold flat, creating a large cargo area perfect for families or outdoor enthusiasts. The Model 3 offers a more traditional sedan experience with better handling.</p>
+
+      <h2>Range and Efficiency</h2>
+      <p>The Model 3 typically achieves slightly better range due to its more aerodynamic design. However, the difference is minimal, and both vehicles offer more than enough range for daily driving and road trips.</p>
+
+      <h2>Price and Value</h2>
+      <p>The Model Y costs about $5,000 more than the Model 3, but offers significantly more utility. For families or those who need more cargo space, the Model Y provides better value despite the higher price.</p>
+
+      <h2>Which One Should You Choose?</h2>
+      <p><strong>Choose Model 3 if:</strong></p>
       <ul>
-        <li>Standard Range RWD: ~272 miles</li>
-        <li>Long Range AWD: ~341 miles</li>
-        <li>Performance: 0–60 mph in 3.1 seconds</li>
+        <li>You prefer sporty driving dynamics</li>
+        <li>You don't need extra cargo space</li>
+        <li>You want to save money</li>
+        <li>You primarily drive alone or with one passenger</li>
       </ul>
 
-      <h3>Tesla Model Y</h3>
+      <p><strong>Choose Model Y if:</strong></p>
       <ul>
-        <li>Long Range AWD: ~330 miles</li>
-        <li>Performance: 0–60 mph in 3.5 seconds</li>
-        <li>Better efficiency than most SUVs, but slightly less than Model 3</li>
+        <li>You have a family or frequently carry passengers</li>
+        <li>You need more cargo space</li>
+        <li>You prefer a higher driving position</li>
+        <li>You plan to use the vehicle for outdoor activities</li>
       </ul>
 
-      <p>For maximum range and efficiency, the <strong>Model 3 Long Range</strong> is the winner. However, if you value a higher driving position and SUV practicality, the <strong>Model Y</strong> balances performance and space effectively.</p>
+      <h2>Conclusion</h2>
+      <p>Both the Tesla Model 3 and Model Y are excellent choices for 2024. The Model 3 is perfect for those who want a sporty, efficient sedan, while the Model Y is ideal for families and those who need more utility. Consider your lifestyle, budget, and space requirements when making your decision.</p>
 
-      <h2>Interior and Cargo Space</h2>
-      <p>This is where the <strong>Model Y</strong> clearly outshines the <strong>Model 3</strong>. Thanks to its hatchback design and larger body, the Model Y offers nearly three times the cargo space. It can even be configured with a third-row seat, making it a family-friendly EV.</p>
-
-      <ul>
-        <li><strong>Model 3:</strong> Sedan layout, 15 cubic feet trunk + frunk</li>
-        <li><strong>Model Y:</strong> SUV layout, 76 cubic feet total cargo space with rear seats folded</li>
-      </ul>
-
-      <h2>Technology and Features</h2>
-      <p>Both the Tesla Model 3 and Model Y come standard with Tesla's latest software features:</p>
-      <ul>
-        <li>15-inch touchscreen interface</li>
-        <li>Over-the-air software updates</li>
-        <li>Autopilot (with optional Full Self-Driving package)</li>
-        <li>Premium connectivity (subscription available)</li>
-      </ul>
-      <p>Functionally, they are nearly identical in terms of technology. The main difference lies in size and comfort rather than tech features.</p>
-
-      <h2>Use Case Scenarios: Which Tesla Fits Your Lifestyle?</h2>
-      <h3>Choose the Tesla Model 3 if:</h3>
-      <ul>
-        <li>You want the most affordable Tesla</li>
-        <li>You prefer sporty handling and efficiency</li>
-        <li>You don't need large cargo space</li>
-        <li>You mainly commute or drive solo/couples</li>
-      </ul>
-
-      <h3>Choose the Tesla Model Y if:</h3>
-      <ul>
-        <li>You need more space for family or road trips</li>
-        <li>You prefer a higher seating position</li>
-        <li>You occasionally carry more passengers or cargo</li>
-        <li>You want SUV practicality without sacrificing Tesla performance</li>
-      </ul>
-
-      <h2>Tesla Buying Guide 2024</h2>
-      <p>When comparing <strong>Model 3 vs Model Y</strong>, think about your lifestyle first. Do you want efficiency and sporty driving? Go with the Model 3. Do you need versatility and room for kids, gear, or road trips? The Model Y is your best bet. Either way, you'll benefit from Tesla's Supercharger network, software ecosystem, and strong resale value.</p>
-
-      <h2>Final Verdict: Tesla Model 3 vs Model Y</h2>
-      <p>Both vehicles are excellent EVs, but the right choice depends on your personal needs. If budget and efficiency are top priorities, the <strong>Tesla Model 3</strong> is the smart pick. If practicality, space, and versatility matter more, the <strong>Tesla Model Y</strong> justifies its higher price tag. Ultimately, you can't go wrong with either Tesla in 2024.</p>
-
-      <h2>Ready to Buy Your Tesla?</h2>
-      <p>Looking for the best deals on new and pre-owned Teslas? Visit <strong>Evvalley Marketplace</strong> today to explore Tesla Model 3 and Model Y listings. Find your perfect EV and join the future of clean transportation.</p>
+      <div class="bg-green-50 border border-green-200 rounded-lg p-4 mt-6 text-center">
+        <h3 className="text-lg font-semibold text-green-800 mb-2">Ready to Buy Your Tesla?</h3>
+        <p className="text-green-700 mb-4">Browse Tesla vehicles and other electric cars on Evvalley Marketplace.</p>
+        <a href="/vehicles" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors duration-300">Find Your Perfect EV</a>
+      </div>
     `,
-    author: 'EvValley Team',
-    publishedAt: '2024-03-22',
-    updatedAt: '2024-03-22',
+    featuredImage: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=400&fit=crop&crop=center',
+    metaDescription: '🚗 Tesla Model 3 vs Model Y 2024 Comparison: Price, Range, Performance & Features. Expert guide to choose between Tesla sedan vs SUV. Compare $38,990 Model 3 vs $43,990 Model Y!',
+    keywords: ['Tesla Model 3 vs Model Y 2024', 'Tesla comparison', 'Model 3 vs Model Y', 'Tesla sedan vs SUV', 'Tesla Model 3 price', 'Tesla Model Y price', 'electric vehicle comparison', 'Tesla buying guide'],
     category: 'EV Guide',
     tags: ['Tesla Model 3', 'Tesla Model Y', 'Tesla comparison', 'EV comparison', 'Tesla buying guide'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    author: 'EvValley Team',
     readTime: 12,
-    metaDescription: '🚗 Tesla Model 3 vs Model Y 2024: Which Tesla to Buy? Compare prices, range, performance & features. Expert comparison guide with real-world data. Find your perfect Tesla!',
-    keywords: ['Tesla Model 3 vs Model Y 2024', 'Tesla comparison guide', 'Model 3 vs Model Y which to buy', 'Tesla buying guide 2024', 'Tesla Model 3 price', 'Tesla Model Y price', 'Tesla range comparison', 'best Tesla to buy']
+    publishedAt: '2024-03-21',
+    updatedAt: '2024-08-21',
   },
   {
     id: '4',
@@ -838,7 +832,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-25',
     category: 'EV Guide',
     tags: ['Tesla home charging', 'Tesla wall connector', 'EV home charging', 'Tesla charging setup', 'Tesla charger installation'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    featuredImage: '/blog-images/how-to-charge-tesla-at-home-complete-setup-guide.jpg',
     readTime: 14,
     metaDescription: '⚡ How to Charge Tesla at Home 2024: Complete Setup Guide! Tesla Wall Connector installation, costs & tips. Save money charging at home vs Supercharger. Expert guide!',
     keywords: ['how to charge Tesla at home', 'Tesla home charging setup', 'Tesla Wall Connector installation', 'Tesla charging cost', 'Tesla home charger', 'Tesla charging guide', 'Tesla Wall Connector cost', 'Tesla home charging vs Supercharger']
@@ -1171,7 +1165,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-27',
     category: 'E-Mobility',
     tags: ['e-bikes', 'electric bikes', 'buying guide', 'electric bicycle', 'e-bike selection'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    featuredImage: '/blog-images/e-bike-buying-guide-2024-how-to-choose-your-perfect-electric-bike.jpg',
     readTime: 12,
     metaDescription: 'Comprehensive guide to buying an electric bike in 2024, covering different types, features, motors, batteries, and considerations.',
     keywords: ['E-Bike Buying Guide 2024', 'electric bike buying guide', 'e-bike guide', 'electric bicycle', 'e-bike selection']

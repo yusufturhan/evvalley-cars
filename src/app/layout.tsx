@@ -20,12 +20,15 @@ export const metadata: Metadata = {
     telephone: false,
   },
   metadataBase: new URL('https://www.evvalley.com'),
+  alternates: {
+    canonical: 'https://www.evvalley.com',
+  },
   icons: {
     icon: [
-      { url: '/favicon.svg?v=10', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=14', type: 'image/svg+xml' },
     ],
-    shortcut: '/favicon.svg?v=10',
-    apple: '/favicon.svg?v=10',
+    shortcut: '/favicon.svg?v=14',
+    apple: '/apple-touch-icon.svg?v=14',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
@@ -66,6 +69,7 @@ export const metadata: Metadata = {
   },
   other: {
     "google-site-verification": process.env.GOOGLE_VERIFICATION_CODE || "",
+    "msvalidate.01": process.env.BING_VERIFICATION_CODE || "",
   },
 };
 
@@ -78,20 +82,36 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Safari-specific favicon approach with SVG priority */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=11" />
-        <link rel="shortcut icon" href="/favicon.svg?v=11" />
-        <link rel="apple-touch-icon" href="/favicon.svg?v=11" />
+        {/* Safari-specific favicon links */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=14" />
+        <link rel="shortcut icon" href="/favicon.svg?v=14" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=14" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1C1F4A" />
+        {/* Additional Safari compatibility */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg?v=14" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg?v=14" />
         
         {/* Safari-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Evvalley" />
         
+        {/* Force favicon refresh in Safari */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
+              const link = document.createElement('link');
+              link.rel = 'icon';
+              link.type = 'image/svg+xml';
+              link.href = '/favicon.svg?v=14&t=' + Date.now();
+              document.head.appendChild(link);
+            }
+          `
+        }} />
         {/* Force cache refresh */}
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta http-equiv="Pragma" content="no-cache" />
-        <meta http-equiv="Expires" content="0" />
+        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
       </head>
       <body className={inter.className}>
         {/* Google Analytics */}
