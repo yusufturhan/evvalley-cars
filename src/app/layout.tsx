@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "Evvalley",
     images: [
       {
-        url: "https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg",
+        url: "/opengraph-image",
         width: 1200,
         height: 630,
         alt: "Evvalley - US EV & E-Mobility Marketplace",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Evvalley - US EV & E-Mobility Marketplace",
     description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US.",
-    images: ["https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg"],
+    images: ["/twitter-image"],
     creator: "@evvalley",
   },
   robots: {
@@ -100,7 +100,7 @@ export default function RootLayout({
         {/* Manual Open Graph tags for better Facebook compatibility */}
         <meta property="og:title" content="Evvalley - US EV & E-Mobility Marketplace" />
         <meta property="og:description" content="Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility." />
-        <meta property="og:image" content="https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg" />
+        <meta property="og:image" content="https://www.evvalley.com/opengraph-image" />
         <meta property="og:url" content="https://www.evvalley.com" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Evvalley" />
@@ -112,7 +112,7 @@ export default function RootLayout({
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Evvalley - US EV & E-Mobility Marketplace" />
         <meta name="twitter:description" content="Buy and sell electric vehicles, e-scooters, and e-bikes in the US." />
-        <meta name="twitter:image" content="https://www.evvalley.com/blog-images/ev-charging-station-guide.jpg" />
+        <meta name="twitter:image" content="https://www.evvalley.com/twitter-image" />
         <meta name="twitter:creator" content="@evvalley" />
         
         <script dangerouslySetInnerHTML={{
