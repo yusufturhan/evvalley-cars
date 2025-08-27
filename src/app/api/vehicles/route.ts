@@ -55,22 +55,37 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`);
     }
 
-    // Location search - exact city/area matching
+    // Location search - exact city/area matching with strict exclusions
     if (location) {
-      const locationQuery = location.trim();
-      // Use exact matching to prevent "San Francisco" from matching "Santa Clara"
-      // Only match if the location field contains the exact search term
-      query = query.ilike('location', `%${locationQuery}%`);
+      const locationQuery = location.trim().toLowerCase();
       
-      // Additional check: if searching for "San Francisco", exclude "Santa Clara" type locations
-      if (locationQuery.toLowerCase().includes('san francisco')) {
+      // For San Francisco searches, use strict matching and exclude nearby cities
+      if (locationQuery.includes('san francisco')) {
+        query = query.or(
+          'location.ilike.%San Francisco%',
+          'location.ilike.%san francisco%',
+          'location.ilike.%SF%'
+        );
+        // Strictly exclude nearby cities
         query = query.not('location', 'ilike', '%santa clara%');
         query = query.not('location', 'ilike', '%san jose%');
         query = query.not('location', 'ilike', '%palo alto%');
+        query = query.not('location', 'ilike', '%sunnyvale%');
+        query = query.not('location', 'ilike', '%mountain view%');
       }
-      if (locationQuery.toLowerCase().includes('santa clara')) {
+      // For Santa Clara searches, use strict matching
+      else if (locationQuery.includes('santa clara')) {
+        query = query.or(
+          'location.ilike.%Santa Clara%',
+          'location.ilike.%santa clara%'
+        );
+        // Exclude San Francisco
         query = query.not('location', 'ilike', '%san francisco%');
-        query = query.not('location', 'ilike', '%san jose%');
+        query = query.not('location', 'ilike', '%SF%');
+      }
+      // For other locations, use standard matching
+      else {
+        query = query.ilike('location', `%${locationQuery}%`);
       }
     }
 
