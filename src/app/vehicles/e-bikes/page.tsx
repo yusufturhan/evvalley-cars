@@ -233,6 +233,63 @@ export default function EBikesPage() {
         </div>
       </section>
 
+      {/* Category Filters */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button 
+              onClick={() => {
+                router.push('/vehicles');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            >
+              <Zap className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">All Electric Vehicles</span>
+            </button>
+            
+            <button 
+              onClick={() => {
+                router.push('/vehicles/ev-cars');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            >
+              <Car className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Cars</span>
+            </button>
+            
+            <button 
+              onClick={() => {
+                router.push('/vehicles/hybrid-cars');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            >
+              <Car className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Hybrid Cars</span>
+            </button>
+            
+            <button 
+              onClick={() => {
+                router.push('/vehicles/ev-scooters');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            >
+              <Bike className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Scooters</span>
+            </button>
+            
+            <button 
+              onClick={() => {
+                router.push('/vehicles/e-bikes');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
+            >
+              <Bike className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium">Electric Bikes</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Filters Section */}
       <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
