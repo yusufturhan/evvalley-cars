@@ -136,6 +136,7 @@ export default function Home() {
       
       trackSearch(searchQuery, featuredVehicles.length);
       console.log('🔍 Search tracked:', searchQuery, 'Results:', featuredVehicles.length);
+      console.log('🔍 Redirecting to:', url);
       router.push(url);
     } catch (searchError) {
       console.error('Error handling search:', searchError);
@@ -147,7 +148,7 @@ export default function Home() {
       setSelectedCategory(category);
       setShowCategoryDropdown(false);
       trackCategoryView(category);
-      console.log('📂 Category tracked:', category);
+      console.log('📂 Category selected:', category);
     } catch (categoryError) {
       console.error('Error selecting category:', categoryError);
     }
@@ -366,40 +367,60 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/vehicles" onClick={() => handleCategorySelect('all')}>
-              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md">
-                <Zap className="w-4 h-4 text-white" />
-                <span className="text-sm font-medium text-white">All Electric Vehicles</span>
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                setSelectedCategory('all');
+                router.push('/vehicles');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
+            >
+              <Zap className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium text-white">All Electric Vehicles</span>
+            </button>
             
-            <Link href="/vehicles?category=ev-car" onClick={() => handleCategorySelect('ev-car')}>
-              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
-                <Car className="w-4 h-4 text-gray-700" />
-                <span className="text-sm font-medium text-gray-900">Electric Cars</span>
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                setSelectedCategory('ev-car');
+                router.push('/vehicles?category=ev-car');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+            >
+              <Car className="w-4 h-4 text-gray-700" />
+              <span className="text-sm font-medium text-gray-900">Electric Cars</span>
+            </button>
             
-            <Link href="/vehicles?category=hybrid-car" onClick={() => handleCategorySelect('hybrid-car')}>
-              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
-                <Car className="w-4 h-4 text-gray-700" />
-                <span className="text-sm font-medium text-gray-900">Hybrid Cars</span>
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                setSelectedCategory('hybrid-car');
+                router.push('/vehicles?category=hybrid-car');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+            >
+              <Car className="w-4 h-4 text-gray-700" />
+              <span className="text-sm font-medium text-gray-900">Hybrid Cars</span>
+            </button>
             
-            <Link href="/vehicles?category=ev-scooter" onClick={() => handleCategorySelect('ev-scooter')}>
-              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
-                <Bike className="w-4 h-4 text-gray-700" />
-                <span className="text-sm font-medium text-gray-900">Electric Scooters</span>
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                setSelectedCategory('ev-scooter');
+                router.push('/vehicles?category=ev-scooter');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+            >
+              <Bike className="w-4 h-4 text-gray-700" />
+              <span className="text-sm font-medium text-gray-900">Electric Scooters</span>
+            </button>
             
-            <Link href="/vehicles?category=ev-bike" onClick={() => handleCategorySelect('ev-bike')}>
-              <button className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]">
-                <Bike className="w-4 h-4 text-gray-700" />
-                <span className="text-sm font-medium text-gray-900">Electric Bikes</span>
-              </button>
-            </Link>
+            <button 
+              onClick={() => {
+                setSelectedCategory('ev-bike');
+                router.push('/vehicles?category=ev-bike');
+              }}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+            >
+              <Bike className="w-4 h-4 text-gray-700" />
+              <span className="text-sm font-medium text-gray-900">Electric Bikes</span>
+            </button>
           </div>
         </div>
       </section>
