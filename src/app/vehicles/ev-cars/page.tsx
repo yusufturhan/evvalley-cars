@@ -25,7 +25,7 @@ export default async function EVCarsPage() {
     .from('vehicles')
     .select('*')
     .eq('category', 'ev-car')
-    .eq('sold_at', null)
+    .eq('sold', false)
     .order('created_at', { ascending: false });
 
   return (

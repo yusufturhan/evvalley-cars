@@ -68,7 +68,6 @@ export const metadata: Metadata = {
     google: process.env.GOOGLE_VERIFICATION_CODE || "your-google-verification-code",
   },
   other: {
-    "google-site-verification": process.env.GOOGLE_VERIFICATION_CODE || "",
     "msvalidate.01": process.env.BING_VERIFICATION_CODE || "",
   },
 };

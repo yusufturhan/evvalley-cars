@@ -25,7 +25,7 @@ export default async function HybridCarsPage() {
     .from('vehicles')
     .select('*')
     .eq('category', 'hybrid-car')
-    .eq('sold_at', null)
+    .eq('sold', false)
     .order('created_at', { ascending: false });
 
   return (

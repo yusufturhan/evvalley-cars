@@ -3,7 +3,20 @@ import { NextRequest, NextResponse } from 'next/server';
 // Middleware to harden SEO by handling legacy/invalid URLs from old platform
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
-  const { pathname } = url;
+  const { pathname, hostname } = url;
+
+  // 0) Force HTTPS and www for all requests
+  if (hostname === 'evvalley.com' || hostname === 'www.evvalley.com') {
+    const newHostname = 'www.evvalley.com';
+    const newUrl = new URL(request.url);
+    newUrl.hostname = newHostname;
+    newUrl.protocol = 'https:';
+    
+    // Don't redirect if already correct
+    if (url.hostname !== newHostname || url.protocol !== 'https:') {
+      return NextResponse.redirect(newUrl, { status: 301 });
+    }
+  }
 
   // Force favicon.ico to our SVG to avoid Vercel's default icon cache
   if (pathname === '/favicon.ico') {
@@ -17,10 +30,30 @@ export function middleware(request: NextRequest) {
     return new NextResponse('Gone', { status: 410 });
   }
 
+  // 1.1) Additional legacy paths that cause 404s
+  const legacyPaths = new Set<string>([
+    '/ebike',
+    '/electric-cars',
+    '/hybrid-cars', 
+    '/scooters',
+    '/bikes',
+    '/old-blog',
+    '/legacy',
+    '/v1',
+    '/v2',
+    '/api/v1',
+    '/api/v2',
+  ]);
+  
+  if (legacyPaths.has(pathname)) {
+    return new NextResponse('Gone', { status: 410 });
+  }
+
   const legacyBlogSlugs = new Set<string>([
     'environmental-benefits-of-electric-cars',
     'the-advantages-of-using-electric-vehicles-on-uber-and-lyft',
     'a-major-leap-in-ev-charging-infrastructure-in-san-francisco-2024-2025',
+    'battery-technology-advancements-and-the-ev-range-problem', // This was causing 404s
   ]);
   if (pathname.startsWith('/blog/')) {
     const slug = pathname.replace(/^\/blog\//, '').replace(/\/$/, '');
@@ -54,6 +87,12 @@ export function middleware(request: NextRequest) {
     }
     if (category === 'e-bike') {
       const to = new URL('/vehicles/e-bikes', url.origin);
+      return NextResponse.redirect(to, { status: 301 });
+    }
+    
+    // Redirect dynamic search URLs to clean canonical URL
+    if (searchParams.get('search')) {
+      const to = new URL('/vehicles', url.origin);
       return NextResponse.redirect(to, { status: 301 });
     }
   }

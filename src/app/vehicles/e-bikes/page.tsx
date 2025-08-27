@@ -22,10 +22,9 @@ export const metadata: Metadata = {
 
 export default async function EBikesPage() {
   const { data: vehicles } = await supabase
-    .from('vehicles')
+    .from('e_bikes')
     .select('*')
-    .eq('category', 'e-bike')
-    .eq('sold_at', null)
+    .eq('sold', false)
     .order('created_at', { ascending: false });
 
   return (
