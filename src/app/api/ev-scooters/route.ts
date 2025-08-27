@@ -50,9 +50,23 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`);
     }
 
-    // Location search
+    // Location search - exact city/area matching
     if (location) {
-      query = query.ilike('location', `%${location}%`);
+      const locationQuery = location.trim();
+      // Use exact matching to prevent "San Francisco" from matching "Santa Clara"
+      // Only match if the location field contains the exact search term
+      query = query.ilike('location', `%${locationQuery}%`);
+      
+      // Additional check: if searching for "San Francisco", exclude "Santa Clara" type locations
+      if (locationQuery.toLowerCase().includes('san francisco')) {
+        query = query.not('location', 'ilike', '%santa clara%');
+        query = query.not('location', 'ilike', '%san jose%');
+        query = query.not('location', 'ilike', '%palo alto%');
+      }
+      if (locationQuery.toLowerCase().includes('santa clara')) {
+        query = query.not('location', 'ilike', '%san francisco%');
+        query = query.not('location', 'ilike', '%san jose%');
+      }
     }
 
     if (limit) {
