@@ -1,138 +1,571 @@
-import { Metadata } from 'next';
-import { createClient } from '@supabase/supabase-js';
+"use client";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { useState, useEffect } from "react";
+import { Search, Filter, Car, Zap, Battery, Bike, MapPin } from "lucide-react";
+import Header from "@/components/Header";
+import FavoriteButton from "@/components/FavoriteButton";
+import Link from "next/link";
+import { Vehicle } from "@/lib/database";
+import { useSearchParams, useRouter } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: 'Elektrikli Araçlar - Evvalley',
-  description: 'En iyi elektrikli araçları Evvalley\'de bulun. Tesla, BMW, Audi ve daha fazlası. Uygun fiyatlarla elektrikli araç alım satımı.',
-  keywords: 'elektrikli araçlar, EV, Tesla, BMW i3, Audi e-tron, elektrikli otomobil, sıfır emisyon',
-  alternates: {
-    canonical: 'https://www.evvalley.com/vehicles/ev-cars',
-  },
-  openGraph: {
-    title: 'Elektrikli Araçlar - Evvalley',
-    description: 'En iyi elektrikli araçları Evvalley\'de bulun. Tesla, BMW, Audi ve daha fazlası.',
-    url: 'https://www.evvalley.com/vehicles/ev-cars',
-  },
-};
+export default function EVCarsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
+  const [filters, setFilters] = useState({
+    brand: 'all',
+    year: 'all',
+    minPrice: '',
+    maxPrice: ''
+  });
+  const [showSoldVehicles, setShowSoldVehicles] = useState(false);
 
-export default async function EVCarsPage() {
-  const { data: vehicles } = await supabase
-    .from('vehicles')
-    .select('*')
-    .eq('category', 'ev-car')
-    .eq('sold', false)
-    .order('created_at', { ascending: false });
+  // Sync filters state with URL params for UI
+  useEffect(() => {
+    const brandFromUrl = searchParams.get('brand') || 'all';
+    const yearFromUrl = searchParams.get('year') || 'all';
+    const minPriceFromUrl = searchParams.get('minPrice') || '';
+    const maxPriceFromUrl = searchParams.get('maxPrice') || '';
+    const searchFromUrl = searchParams.get('search') || '';
+    const locationFromUrl = searchParams.get('location') || '';
+    
+    setFilters({
+      brand: brandFromUrl,
+      year: yearFromUrl,
+      minPrice: minPriceFromUrl,
+      maxPrice: maxPriceFromUrl
+    });
+    
+    setSearchQuery(searchFromUrl);
+    setLocationQuery(locationFromUrl);
+  }, [searchParams]);
+
+  // Fetch vehicles when URL params change
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        setLoading(true);
+        
+        // Get current filters from URL params
+        const currentBrand = searchParams.get('brand') || 'all';
+        const currentYear = searchParams.get('year') || 'all';
+        const currentMinPrice = searchParams.get('minPrice') || '';
+        const currentMaxPrice = searchParams.get('maxPrice') || '';
+        const currentSearch = searchParams.get('search') || '';
+        const currentLocation = searchParams.get('location') || '';
+
+        // Fetch EV cars
+        const params = new URLSearchParams();
+        params.append('category', 'ev-car');
+        if (currentBrand !== 'all') params.append('brand', currentBrand);
+        if (currentYear !== 'all') params.append('year', currentYear);
+        if (currentMinPrice) params.append('minPrice', currentMinPrice);
+        if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+        if (showSoldVehicles) params.append('includeSold', 'true');
+
+        const response = await fetch(`/api/vehicles?${params.toString()}`);
+        const data = await response.json();
+        
+        let filteredVehicles = data.vehicles || [];
+        
+        // Apply search filtering
+        if (currentSearch.trim()) {
+          const searchQuery = currentSearch.toLowerCase().trim();
+          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
+            const title = vehicle.title?.toLowerCase() || '';
+            const brand = vehicle.brand?.toLowerCase() || '';
+            const model = vehicle.model?.toLowerCase() || '';
+            
+            const searchWords = searchQuery.split(' ').filter(word => word.length > 0);
+            
+            if (searchWords.length > 1) {
+              return searchWords.some(word => 
+                title.includes(word) || 
+                brand.includes(word) || 
+                model.includes(word)
+              );
+            }
+            
+            return title.includes(searchQuery) || 
+                   brand.includes(searchQuery) || 
+                   model.includes(searchQuery);
+          });
+        }
+
+        // Apply location filtering
+        if (currentLocation.trim()) {
+          const locationQuery = currentLocation.toLowerCase().trim();
+          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
+            const vehicleLocation = vehicle.location?.toLowerCase() || '';
+            const searchWords = locationQuery.split(' ').filter(word => word.length > 0);
+            
+            if (searchWords.length > 1) {
+              return searchWords.some(word => vehicleLocation.includes(word));
+            }
+            
+            return vehicleLocation.includes(locationQuery);
+          });
+        }
+
+        // Ensure all data is properly serialized
+        const serializedVehicles = filteredVehicles.map((vehicle: any) => {
+          const plainVehicle = { ...vehicle };
+          if (plainVehicle.created_at) {
+            plainVehicle.created_at = plainVehicle.created_at.toString();
+          }
+          if (plainVehicle.updated_at) {
+            plainVehicle.updated_at = plainVehicle.updated_at.toString();
+          }
+          if (plainVehicle.sold_at) {
+            plainVehicle.sold_at = plainVehicle.sold_at.toString();
+          }
+          return JSON.parse(JSON.stringify(plainVehicle));
+        });
+        
+        setVehicles(serializedVehicles);
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, [searchParams, showSoldVehicles, searchQuery, locationQuery]);
+
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'ev-car':
+        return 'bg-blue-100 text-blue-800';
+      case 'hybrid-car':
+        return 'bg-green-100 text-green-800';
+      case 'ev-scooter':
+        return 'bg-purple-100 text-purple-800';
+      case 'e-bike':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleSearch = async () => {
+    // Search functionality is handled by the useEffect above
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            ⚡ Elektrikli Araçlar
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Geleceğin teknolojisi ile bugün tanışın. En yeni elektrikli araçlar, 
-            uygun fiyatlar ve profesyonel hizmet.
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#F5F9FF]">
+      <Header />
 
-        {/* Vehicle Count */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-2xl font-semibold text-gray-900">
-              {vehicles?.length || 0} Elektrikli Araç
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Electric Vehicles
+            </h1>
+            <p className="text-xl text-white/90">
+              Discover the future of transportation with zero emissions
             </p>
-            <p className="text-gray-600">Şu anda satışta</p>
-          </div>
-        </div>
 
-        {/* Vehicles Grid */}
-        {vehicles && vehicles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {vehicles.map((vehicle: any) => (
-              <div key={vehicle.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                  {vehicle.images && vehicle.images[0] ? (
-                    <img
-                      src={vehicle.images[0]}
-                      alt={vehicle.title}
-                      className="w-full h-48 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">Resim Yok</span>
+            {/* Search Bar */}
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg p-4 shadow-lg">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search electric vehicles..."
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      />
                     </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {vehicle.title}
-                  </h3>
-                  <p className="text-2xl font-bold text-blue-600 mb-2">
-                    ${vehicle.price?.toLocaleString() || 'Fiyat Belirtilmemiş'}
-                  </p>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p>📍 {vehicle.location || 'Konum Belirtilmemiş'}</p>
-                    <p>📅 {vehicle.year || 'Yıl Belirtilmemiş'}</p>
-                    <p>🔋 {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} km` : 'Kilometre Belirtilmemiş'}</p>
                   </div>
-                  <a
-                    href={`/vehicles/${vehicle.id}`}
-                    className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center block"
+                  <div className="flex-1">
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={locationQuery}
+                        onChange={(e) => setLocationQuery(e.target.value)}
+                        placeholder="Select location..."
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      />
+                    </div>
+                  </div>
+                  <button 
+                    onClick={handleSearch}
+                    className="bg-[#1C1F4A] text-white px-8 py-3 rounded-lg hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
                   >
-                    Detayları Gör
-                  </a>
+                    <Filter className="mr-2 h-5 w-5" />
+                    Search
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">🚗</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Henüz Elektrikli Araç Yok
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Şu anda satışta elektrikli araç bulunmuyor. Yeni araçlar eklendiğinde haberdar olmak için takipte kalın.
-            </p>
-            <a
-              href="/vehicles"
-              className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Tüm Araçları Gör
-            </a>
-          </div>
-        )}
-
-        {/* SEO Content */}
-        <div className="mt-16 bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Elektrikli Araçlar Hakkında
-          </h2>
-          <div className="prose max-w-none text-gray-600">
-            <p className="mb-4">
-              Elektrikli araçlar, çevre dostu ulaşımın geleceğidir. Sıfır emisyon, 
-              düşük bakım maliyeti ve gelişmiş teknoloji ile elektrikli araçlar 
-              günümüzde en popüler ulaşım seçeneklerinden biri haline gelmiştir.
-            </p>
-            <p className="mb-4">
-              Evvalley'de Tesla, BMW i3, Audi e-tron, Nissan Leaf gibi popüler 
-              elektrikli araç markalarını bulabilir, uygun fiyatlarla satın alabilir 
-              veya mevcut elektrikli aracınızı satabilirsiniz.
-            </p>
-            <p>
-              Elektrikli araç alım satımında uzman ekibimiz size yardımcı olur. 
-              Detaylı bilgi için bizimle iletişime geçin.
-            </p>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Category Info */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Car className="w-8 h-8 text-blue-600 mr-3" />
+              <h2 className="text-3xl font-bold text-gray-900">Electric Vehicles</h2>
+            </div>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Experience the future of transportation with zero emissions. Electric vehicles offer incredible performance, 
+              lower operating costs, and a cleaner environment for everyone.
+            </p>
+            <div className="mt-4 text-2xl font-bold text-green-600">
+              {loading ? 'Loading...' : `${vehicles.length} Electric Vehicles`} Currently Available
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filters Section */}
+      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center mb-4">
+              <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Brand Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Brand</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.brand}
+                    onChange={(e) => {
+                      const newBrand = e.target.value;
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      params.append('category', 'ev-car');
+                      if (newBrand !== 'all') params.append('brand', newBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles/ev-cars?${params.toString()}`);
+                    }}
+                  >
+                    <option value="all" className="text-gray-900">All Brands</option>
+                    <option value="Tesla" className="text-gray-900">Tesla</option>
+                    <option value="Rivian" className="text-gray-900">Rivian</option>
+                    <option value="Lucid" className="text-gray-900">Lucid</option>
+                    <option value="Ford" className="text-gray-900">Ford</option>
+                    <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
+                    <option value="Nissan" className="text-gray-900">Nissan</option>
+                    <option value="BMW" className="text-gray-900">BMW</option>
+                    <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                    <option value="Audi" className="text-gray-900">Audi</option>
+                    <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                    <option value="Hyundai" className="text-gray-900">Hyundai</option>
+                    <option value="Kia" className="text-gray-900">Kia</option>
+                    <option value="Porsche" className="text-gray-900">Porsche</option>
+                    <option value="Volvo" className="text-gray-900">Volvo</option>
+                    <option value="Polestar" className="text-gray-900">Polestar</option>
+                    <option value="Fisker" className="text-gray-900">Fisker</option>
+                    <option value="VinFast" className="text-gray-900">VinFast</option>
+                    <option value="Other" className="text-gray-900">Other</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Year Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Year</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.year}
+                    onChange={(e) => {
+                      const newYear = e.target.value;
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      params.append('category', 'ev-car');
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (newYear !== 'all') params.append('year', newYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles/ev-cars?${params.toString()}`);
+                    }}
+                  >
+                    <option value="all" className="text-gray-900">All Years</option>
+                    <option value="2025" className="text-gray-900">2025</option>
+                    <option value="2024" className="text-gray-900">2024</option>
+                    <option value="2023" className="text-gray-900">2023</option>
+                    <option value="2022" className="text-gray-900">2022</option>
+                    <option value="2021" className="text-gray-900">2021</option>
+                    <option value="2020" className="text-gray-900">2020</option>
+                    <option value="2019" className="text-gray-900">2019</option>
+                    <option value="2018" className="text-gray-900">2018</option>
+                    <option value="2017" className="text-gray-900">2017</option>
+                    <option value="2016" className="text-gray-900">2016</option>
+                    <option value="2015" className="text-gray-900">2015</option>
+                    <option value="2014" className="text-gray-900">2014</option>
+                    <option value="2013" className="text-gray-900">2013</option>
+                    <option value="2012" className="text-gray-900">2012</option>
+                    <option value="2011" className="text-gray-900">2011</option>
+                    <option value="2010" className="text-gray-900">2010</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Min Price Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Min Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    value={filters.minPrice}
+                    onChange={(e) => {
+                      const newMinPrice = e.target.value;
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      params.append('category', 'ev-car');
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (newMinPrice) params.append('minPrice', newMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles/ev-cars?${params.toString()}`);
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Max Price Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Max Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    placeholder="100,000"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    value={filters.maxPrice}
+                    onChange={(e) => {
+                      const newMaxPrice = e.target.value;
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      params.append('category', 'ev-car');
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (newMaxPrice) params.append('maxPrice', newMaxPrice);
+                      
+                      router.push(`/vehicles/ev-cars?${params.toString()}`);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => {
+                  router.push('/vehicles/ev-cars');
+                }}
+                className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear all filters
+              </button>
+            </div>
+            
+            {/* Show Sold Vehicles Toggle */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="showSoldVehicles"
+                    checked={showSoldVehicles}
+                    onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                    className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                  />
+                  <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
+                    Show sold vehicles
+                  </label>
+                </div>
+                {showSoldVehicles && (
+                  <span className="text-xs text-gray-500">
+                    Showing all vehicles including sold ones
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vehicles Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                    <div className="flex justify-between">
+                      <div className="h-6 bg-gray-200 rounded w-20"></div>
+                      <div className="h-8 bg-gray-200 rounded w-24"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : vehicles.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">🚗</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No electric vehicles found</h3>
+              <p className="text-gray-600">Try adjusting your filters or check back later.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {vehicles.map((vehicle) => (
+                <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                  <div className="relative">
+                    <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+                      {vehicle.images && vehicle.images.length > 0 ? (
+                        <img
+                          src={vehicle.images[0]}
+                          alt={vehicle.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                        <div className="text-4xl mb-2">🚗</div>
+                        <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2">
+                      <FavoriteButton vehicleId={vehicle.id} size="sm" />
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center mb-2 gap-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
+                        {vehicle.category.replace('-', ' ').toUpperCase()}
+                      </span>
+                      {vehicle.sold && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          SOLD
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.title}</h3>
+                    <p className="text-gray-600 mb-4">
+                      {vehicle.year} • {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'} 
+                      {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold text-green-600">
+                        ${vehicle.price.toLocaleString()}
+                      </span>
+                      <Link href={`/vehicles/${vehicle.id}`}>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                          View Details
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">About Electric Vehicles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Zero Emissions, Maximum Performance</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles represent the future of transportation, offering zero emissions while delivering 
+                  incredible performance and acceleration. With instant torque and smooth operation, EVs provide 
+                  a driving experience unlike any traditional vehicle.
+                </p>
+                <p className="text-gray-600">
+                  Modern electric vehicles feature advanced battery technology, providing ranges of 200-400+ miles 
+                  on a single charge, making them practical for daily commuting and long-distance travel.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Cost Savings & Environmental Benefits</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles offer significant cost savings over time, with lower fuel costs, reduced 
+                  maintenance requirements, and various government incentives. They also contribute to a cleaner 
+                  environment by eliminating tailpipe emissions.
+                </p>
+                <p className="text-gray-600">
+                  At Evvalley, we offer a wide selection of electric vehicles from leading manufacturers like 
+                  Tesla, Rivian, Lucid, and more. Our expert team can help you find the perfect EV for your 
+                  lifestyle and budget.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
