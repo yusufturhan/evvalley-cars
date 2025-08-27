@@ -80,6 +80,8 @@ export default function VehiclesPage() {
           if (currentYear !== 'all') params.append('year', currentYear);
           if (currentMinPrice) params.append('minPrice', currentMinPrice);
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+          if (currentSearch) params.append('search', currentSearch);
+          if (currentLocation) params.append('location', currentLocation);
           if (showSoldVehicles) params.append('includeSold', 'true');
 
           console.log('🔍 Fetching vehicles with params:', params.toString());
@@ -99,10 +101,14 @@ export default function VehiclesPage() {
           if (currentYear !== 'all') params.append('year', currentYear);
           if (currentMinPrice) params.append('minPrice', currentMinPrice);
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+          if (currentSearch) params.append('search', currentSearch);
+          if (currentLocation) params.append('location', currentLocation);
 
+          console.log('🔍 Fetching scooters with params:', params.toString());
           const response = await fetch(`/api/ev-scooters?${params.toString()}`);
           const data = await response.json();
           if (data.scooters) {
+            console.log('✅ Adding scooters:', data.scooters.length);
             allVehicles.push(...data.scooters);
           }
         }
@@ -114,72 +120,24 @@ export default function VehiclesPage() {
           if (currentYear !== 'all') params.append('year', currentYear);
           if (currentMinPrice) params.append('minPrice', currentMinPrice);
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+          if (currentSearch) params.append('search', currentSearch);
+          if (currentLocation) params.append('location', currentLocation);
 
+          console.log('🔍 Fetching bikes with params:', params.toString());
           const response = await fetch(`/api/e-bikes?${params.toString()}`);
           const data = await response.json();
           if (data.bikes) {
+            console.log('✅ Adding bikes:', data.bikes.length);
             allVehicles.push(...data.bikes);
           }
         }
 
-        // Apply additional client-side filtering
+        // No need for client-side filtering since API handles it
         let filteredVehicles = allVehicles;
         
-        console.log('🔍 Before filtering - Total vehicles:', allVehicles.length);
+        console.log('🔍 Total vehicles from API:', allVehicles.length);
         console.log('🔍 Search query:', currentSearch);
         console.log('🔍 Location query:', currentLocation);
-        
-        // Filter by search query - more flexible matching
-        if (currentSearch.trim()) {
-          const searchQuery = currentSearch.toLowerCase().trim();
-          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
-            const title = vehicle.title?.toLowerCase() || '';
-            const brand = vehicle.brand?.toLowerCase() || '';
-            const model = vehicle.model?.toLowerCase() || '';
-            const category = vehicle.category?.toLowerCase() || '';
-            
-            // Check if any part of the search query matches any vehicle field
-            const searchWords = searchQuery.split(' ').filter(word => word.length > 0);
-            
-            // If search query has multiple words, check if any word matches
-            if (searchWords.length > 1) {
-              return searchWords.some(word => 
-                title.includes(word) || 
-                brand.includes(word) || 
-                model.includes(word) || 
-                category.includes(word)
-              );
-            }
-            
-            // Single word search - check if it's contained in any field
-            return title.includes(searchQuery) || 
-                   brand.includes(searchQuery) || 
-                   model.includes(searchQuery) || 
-                   category.includes(searchQuery);
-          });
-        }
-
-        // Filter by location - more flexible matching
-        if (currentLocation.trim()) {
-          const locationQuery = currentLocation.toLowerCase().trim();
-          filteredVehicles = filteredVehicles.filter((vehicle: any) => {
-            const vehicleLocation = vehicle.location?.toLowerCase() || '';
-            
-            // Check if any part of the search query matches the vehicle location
-            const searchWords = locationQuery.split(' ').filter(word => word.length > 0);
-            
-            // If search query has multiple words, check if any word matches
-            if (searchWords.length > 1) {
-              return searchWords.some(word => vehicleLocation.includes(word));
-            }
-            
-            // Single word search - check if it's contained in the location
-            return vehicleLocation.includes(locationQuery);
-          });
-        }
-
-        console.log('🔍 After search filtering - Vehicles:', filteredVehicles.length);
-        console.log('🔍 After location filtering - Vehicles:', filteredVehicles.length);
         
         // Ensure all data is properly serialized for Next.js 15 compatibility
         const serializedVehicles = filteredVehicles.map((vehicle: any) => {
