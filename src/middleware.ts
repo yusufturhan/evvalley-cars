@@ -75,26 +75,51 @@ export function middleware(request: NextRequest) {
     
     if (category === 'ev-car') {
       const to = new URL('/vehicles/ev-cars', url.origin);
+      // Preserve search and location parameters
+      if (searchParams.get('search')) to.searchParams.set('search', searchParams.get('search')!);
+      if (searchParams.get('location')) to.searchParams.set('location', searchParams.get('location')!);
+      if (searchParams.get('brand')) to.searchParams.set('brand', searchParams.get('brand')!);
+      if (searchParams.get('year')) to.searchParams.set('year', searchParams.get('year')!);
+      if (searchParams.get('minPrice')) to.searchParams.set('minPrice', searchParams.get('minPrice')!);
+      if (searchParams.get('maxPrice')) to.searchParams.set('maxPrice', searchParams.get('maxPrice')!);
       return NextResponse.redirect(to, { status: 301 });
     }
     if (category === 'hybrid-car') {
       const to = new URL('/vehicles/hybrid-cars', url.origin);
+      // Preserve search and location parameters
+      if (searchParams.get('search')) to.searchParams.set('search', searchParams.get('search')!);
+      if (searchParams.get('location')) to.searchParams.set('location', searchParams.get('location')!);
+      if (searchParams.get('brand')) to.searchParams.set('brand', searchParams.get('brand')!);
+      if (searchParams.get('year')) to.searchParams.set('year', searchParams.get('year')!);
+      if (searchParams.get('minPrice')) to.searchParams.set('minPrice', searchParams.get('minPrice')!);
+      if (searchParams.get('maxPrice')) to.searchParams.set('maxPrice', searchParams.get('maxPrice')!);
       return NextResponse.redirect(to, { status: 301 });
     }
     if (category === 'ev-scooter') {
       const to = new URL('/vehicles/ev-scooters', url.origin);
+      // Preserve search and location parameters
+      if (searchParams.get('search')) to.searchParams.set('search', searchParams.get('search')!);
+      if (searchParams.get('location')) to.searchParams.set('location', searchParams.get('location')!);
+      if (searchParams.get('brand')) to.searchParams.set('brand', searchParams.get('brand')!);
+      if (searchParams.get('year')) to.searchParams.set('year', searchParams.get('year')!);
+      if (searchParams.get('minPrice')) to.searchParams.set('minPrice', searchParams.get('minPrice')!);
+      if (searchParams.get('maxPrice')) to.searchParams.set('maxPrice', searchParams.get('maxPrice')!);
       return NextResponse.redirect(to, { status: 301 });
     }
     if (category === 'e-bike') {
       const to = new URL('/vehicles/e-bikes', url.origin);
+      // Preserve search and location parameters
+      if (searchParams.get('search')) to.searchParams.set('search', searchParams.get('search')!);
+      if (searchParams.get('location')) to.searchParams.set('location', searchParams.get('location')!);
+      if (searchParams.get('brand')) to.searchParams.set('brand', searchParams.get('brand')!);
+      if (searchParams.get('year')) to.searchParams.set('year', searchParams.get('year')!);
+      if (searchParams.get('minPrice')) to.searchParams.set('minPrice', searchParams.get('minPrice')!);
+      if (searchParams.get('maxPrice')) to.searchParams.set('maxPrice', searchParams.get('maxPrice')!);
       return NextResponse.redirect(to, { status: 301 });
     }
     
-    // Redirect dynamic search URLs to clean canonical URL
-    if (searchParams.get('search')) {
-      const to = new URL('/vehicles', url.origin);
-      return NextResponse.redirect(to, { status: 301 });
-    }
+    // Don't redirect if only search/location parameters (no category)
+    // This allows the main /vehicles page to handle search queries
   }
 
   // 4) Redirect old blog query parameter URLs to canonical URLs
