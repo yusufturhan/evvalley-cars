@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Favicons</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f0f0f0; 
+        }
+        .favicon-container { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+        }
+        .favicon-item { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            text-align: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .favicon-32 { 
+            width: 32px; 
+            height: 32px; 
+            margin: 0 auto 10px; 
+        }
+        .favicon-16 { 
+            width: 16px; 
+            height: 16px; 
+            margin: 0 auto 10px; 
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>📱 PNG Favicon Oluşturma Talimatları</h2>
+        <p><strong>1.</strong> Aşağıdaki favicon'ları sağ tıklayıp "Resmi Farklı Kaydet" seçin</p>
+        <p><strong>2.</strong> Dosya adlarını şu şekilde kaydedin:</p>
+        <ul>
+            <li><code>favicon-32x32.png</code> (32x32 boyutunda)</li>
+            <li><code>favicon-16x16.png</code> (16x16 boyutunda)</li>
+            <li><code>apple-touch-icon.png</code> (180x180 boyutunda)</li>
+        </ul>
+        <p><strong>3.</strong> Bu dosyaları <code>public/</code> klasörüne kopyalayın</p>
+    </div>
+
+    <div class="favicon-container">
+        <div class="favicon-item">
+            <h3>32x32 Favicon</h3>
+            <svg class="favicon-32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="4" fill="#1C1F4A"/>
+                <path d="M10 8L6 16H12L8 24L16 16H12L14 8Z" fill="#FFFFFF"/>
+                <text x="16" y="28" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="900" text-anchor="middle" fill="#FFFFFF">EV</text>
+            </svg>
+            <p><strong>favicon-32x32.png</strong></p>
+        </div>
+
+        <div class="favicon-item">
+            <h3>16x16 Favicon</h3>
+            <svg class="favicon-16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="16" height="16" rx="2" fill="#1C1F4A"/>
+                <path d="M5 4L3 8H6L4 12L8 8H6L7 4Z" fill="#FFFFFF"/>
+                <text x="8" y="14" font-family="Arial, Helvetica, sans-serif" font-size="4" font-weight="900" text-anchor="middle" fill="#FFFFFF">EV</text>
+            </svg>
+            <p><strong>favicon-16x16.png</strong></p>
+        </div>
+
+        <div class="favicon-item">
+            <h3>180x180 Apple Touch Icon</h3>
+            <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="180" height="180" rx="20" fill="#1C1F4A"/>
+                <path d="M56.25 45L42.1875 90H67.5L50.625 135L90 90H67.5L78.75 45Z" fill="#FFFFFF"/>
+                <text x="90" y="157.5" font-family="Arial, Helvetica, sans-serif" font-size="45" font-weight="900" text-anchor="middle" fill="#FFFFFF">EV</text>
+            </svg>
+            <p><strong>apple-touch-icon.png</strong></p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #fff3e0; border-radius: 10px; border-left: 4px solid #ff9800;">
+        <h3>⚠️ Önemli Not</h3>
+        <p>Bu HTML dosyası sadece favicon'ları görüntülemek için. Gerçek PNG dosyalarını oluşturmak için:</p>
+        <ol>
+            <li>Her favicon'ı sağ tıklayın</li>
+            <li>"Resmi Farklı Kaydet" seçin</li>
+            <li>PNG formatında kaydedin</li>
+            <li>Dosyaları <code>public/</code> klasörüne kopyalayın</li>
+        </ol>
+    </div>
+</body>
+</html>

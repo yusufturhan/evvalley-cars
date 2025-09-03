@@ -41,7 +41,7 @@ export default function EscrowPage() {
             </p>
             <div className="flex items-center justify-center space-x-2 text-white/80">
               <Clock className="h-5 w-5" />
-              <span className="text-lg">Coming Soon</span>
+              <span className="text-lg">In Development</span>
             </div>
           </div>
         </div>

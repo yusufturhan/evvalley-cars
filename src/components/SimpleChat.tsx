@@ -309,6 +309,12 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
     
+    // Security check: Ensure user is authenticated
+    if (!currentUserEmail || currentUserEmail === '') {
+      console.error('❌ Cannot send message: User not authenticated');
+      return;
+    }
+    
     const receiverEmail = isCurrentUserSeller ? selectedConversation : sellerEmail;
     if (!receiverEmail) return;
     
@@ -539,33 +545,36 @@ export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, i
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="p-4 border-t">
-        <div className="flex gap-2">
-          <input
-            id="message-input"
-            name="message"
-            type="text"
-            value={newMessage}
-            onChange={handleInputChange}
-            placeholder={
-              isCurrentUserSeller 
-                ? selectedConversation 
-                  ? `Reply to ${getConversationName(selectedConversation)}...`
-                  : "Select a conversation to reply..."
-                : "Ask seller about this vehicle..."
-            }
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 font-medium"
-            disabled={loading || (isCurrentUserSeller && !selectedConversation)}
-          />
-          <button
-            type="submit"
-            disabled={!newMessage.trim() || loading || (isCurrentUserSeller && !selectedConversation)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </div>
-      </form>
+      {/* Only show message form for authenticated users */}
+      {currentUserEmail && currentUserEmail !== '' && (
+        <form onSubmit={handleSubmit} className="p-4 border-t">
+          <div className="flex gap-2">
+            <input
+              id="message-input"
+              name="message"
+              type="text"
+              value={newMessage}
+              onChange={handleInputChange}
+              placeholder={
+                isCurrentUserSeller 
+                  ? selectedConversation 
+                    ? `Reply to ${getConversationName(selectedConversation)}...`
+                    : "Select a conversation to reply..."
+                  : "Ask seller about this vehicle..."
+              }
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500 font-medium"
+              disabled={loading || (isCurrentUserSeller && !selectedConversation)}
+            />
+            <button
+              type="submit"
+              disabled={!newMessage.trim() || loading || (isCurrentUserSeller && !selectedConversation)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 } 

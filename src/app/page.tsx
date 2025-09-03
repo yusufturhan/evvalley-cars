@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight, ChevronDown } from "lucide-react";
+import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import OptimizedImage from "@/components/OptimizedImage";
@@ -11,6 +11,8 @@ import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { trackEvent, trackSearch, trackCategoryView, trackClick, trackScrollDepth, trackSocialMediaClick } from "@/lib/analytics";
+import Head from "next/head";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 export default function Home() {
   const router = useRouter();
@@ -21,6 +23,44 @@ export default function Home() {
   const [locationQuery, setLocationQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalVehicles, setTotalVehicles] = useState(0);
+  const vehiclesPerPage = 12;
+
+  // Structured Data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Evvalley",
+    "description": "Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility with expert guidance.",
+    "url": "https://www.evvalley.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.evvalley.com/vehicles?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Evvalley",
+    "url": "https://www.evvalley.com",
+    "logo": "https://www.evvalley.com/logo.svg",
+    "description": "US Electric Vehicle & E-Mobility Marketplace",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "San Francisco",
+      "addressRegion": "CA",
+      "addressCountry": "US"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "evvalley@evvalley.com"
+    }
+  };
+
 
   useEffect(() => {
     const fetchFeaturedVehicles = async () => {
@@ -28,7 +68,9 @@ export default function Home() {
         setLoading(true);
         setError(null);
         
-        const response = await fetch('/api/vehicles?limit=12');
+        // Calculate offset for pagination
+        const offset = (currentPage - 1) * vehiclesPerPage;
+        const response = await fetch(`/api/vehicles?limit=${vehiclesPerPage}&offset=${offset}&includeSold=true`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,6 +81,14 @@ export default function Home() {
         if (!data.vehicles) {
           throw new Error('No vehicles data received');
         }
+        
+        // Set total count and calculate total pages
+        if (data.total !== undefined) {
+          setTotalVehicles(data.total);
+          setTotalPages(Math.ceil(data.total / vehiclesPerPage));
+        }
+        
+
         
         // Ensure all data is properly serialized for Next.js 15 compatibility
         const serializedVehicles = data.vehicles.map((vehicle: any) => {
@@ -94,7 +144,7 @@ export default function Home() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentPage]); // Add currentPage as dependency
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -117,6 +167,12 @@ export default function Home() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showCategoryDropdown]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleSearch = () => {
     try {
@@ -231,6 +287,34 @@ export default function Home() {
     }
   };
 
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      let start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let end = Math.min(totalPages, start + maxVisiblePages - 1);
+      
+      // Adjust start if we're near the end
+      if (end - start + 1 < maxVisiblePages) {
+        start = Math.max(1, end - maxVisiblePages + 1);
+      }
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  };
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -240,9 +324,27 @@ export default function Home() {
     }).format(price);
   };
 
+
+
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
       <AuthSync />
+      
+      {/* Structured Data for SEO */}
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
+      <Script
+        id="organization-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationData)
+        }}
+      />
       
       {/* Google Analytics */}
       <Script
@@ -437,9 +539,14 @@ export default function Home() {
                 Discover top-rated electric cars, hybrid vehicles, and e-mobility solutions
               </p>
             </div>
-            <Link href="/vehicles" className="text-[#3AB0FF] hover:text-[#2A2F6B] font-semibold transition-colors">
-              View All Electric Vehicles →
-            </Link>
+            <div className="flex gap-4">
+              <Link href="/vehicles" className="text-[#3AB0FF] hover:text-[#2A2F6B] font-semibold transition-colors">
+                View All Electric Vehicles →
+              </Link>
+              <Link href="/incentives" className="text-[#78D64B] hover:text-[#5BBF3A] font-semibold transition-colors">
+                Earn Money Selling →
+              </Link>
+            </div>
           </div>
 
           {loading ? (
@@ -483,8 +590,16 @@ export default function Home() {
                         <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
                     </div>
+                    {/* SOLD Badge - Small and positioned */}
+                    {vehicle.sold && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
+                          SOLD
+                        </span>
+                      </div>
+                    )}
                     <div className="absolute top-2 right-2">
-                      <FavoriteButton vehicleId={vehicle.id} size="sm" />
+                      <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
                   <div className="p-6">
@@ -505,7 +620,11 @@ export default function Home() {
                       </span>
                       <Link href={`/vehicles/${vehicle.id}`} onClick={() => handleVehicleClick(vehicle.id)}>
                         <button 
-                          className="bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors"
+                          className={`px-4 py-2 rounded-lg transition-colors ${
+                            vehicle.sold 
+                              ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                              : 'bg-[#1C1F4A] text-white hover:bg-[#2A2F6B]'
+                          }`}
                           onClick={() => trackClick('view_details_button', vehicle.title)}
                         >
                           View Details
@@ -518,7 +637,107 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-12">
+            <div className="flex items-center space-x-2">
+              {/* Previous button */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </button>
+
+              {/* Page numbers */}
+              {getPageNumbers().map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`px-3 py-2 rounded-lg transition-colors ${
+                    currentPage === page 
+                      ? 'bg-[#3AB0FF] text-white' 
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+              {/* Next button */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </button>
+            </div>
+
+            {/* Page info */}
+            <div className="ml-8 text-sm text-gray-600">
+              Page {currentPage} of {totalPages} • {totalVehicles} vehicles total
+            </div>
+          </div>
+        )}
       </section>
+
+      {/* Newsletter Signup Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <NewsletterSignup
+            campaignType="buyer_updates"
+            title="Get Electric Vehicle Deals First"
+            description="Subscribe to get notified about new listings, price drops, and exclusive deals"
+            buttonText="Get Notified"
+            className="max-w-md mx-auto"
+          />
+        </div>
+      </section>
+
+      {/* Product Schema for Featured Vehicles */}
+      {featuredVehicles.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "Featured Electric Vehicles",
+              "description": "Featured electric vehicles available for purchase on Evvalley",
+              "numberOfItems": featuredVehicles.length,
+              "itemListElement": featuredVehicles.map((vehicle, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "item": {
+                  "@type": "Product",
+                  "name": vehicle.title,
+                  "description": `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''} - ${vehicle.category}`,
+                  "brand": {
+                    "@type": "Brand",
+                    "name": vehicle.make
+                  },
+                  "model": vehicle.model,
+                  "category": vehicle.category,
+                  "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
+                  "offers": {
+                    "@type": "Offer",
+                    "price": vehicle.price,
+                    "priceCurrency": "USD",
+                    "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    "availability": vehicle.sold_at ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+                    "itemCondition": "https://schema.org/UsedCondition"
+                  }
+                }
+              }))
+            })
+          }}
+        />
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
@@ -552,7 +771,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Follow Us</h4>
               <div className="flex space-x-4">
                 <a
-                  href="https://www.facebook.com/profile.php?id=61574833470669"
+                  href="https://www.facebook.com/profile.php?id=61579466595719"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => trackSocialMediaClick('facebook', 'link')}

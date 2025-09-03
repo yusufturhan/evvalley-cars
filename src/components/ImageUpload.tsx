@@ -133,6 +133,27 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     e.dataTransfer.dropEffect = 'move';
   };
 
+  const applyReorder = (from: number, to: number) => {
+    if (from === to || from < 0 || to < 0 || from >= images.length || to >= images.length) return;
+    const newImages = [...images];
+    const newPreviews = [...previews];
+    const newUrls = [...uploadedUrls];
+    const draggedImage = newImages[from];
+    const draggedPreview = newPreviews[from];
+    const draggedUrl = newUrls[from];
+    newImages.splice(from, 1);
+    newPreviews.splice(from, 1);
+    newUrls.splice(from, 1);
+    newImages.splice(to, 0, draggedImage);
+    newPreviews.splice(to, 0, draggedPreview);
+    newUrls.splice(to, 0, draggedUrl);
+    setImages(newImages);
+    setPreviews(newPreviews);
+    setUploadedUrls(newUrls);
+    if (onImagesChange) onImagesChange(newImages);
+    if (onUrlsChange) onUrlsChange(newUrls);
+  };
+
   const handleDropReorder = (e: React.DragEvent, dropIndex: number) => {
     e.preventDefault();
     
@@ -140,31 +161,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
       setDraggedIndex(null);
       return;
     }
-
-    // Reorder arrays
-    const newImages = [...images];
-    const newPreviews = [...previews];
-    const newUrls = [...uploadedUrls];
-
-    const draggedImage = newImages[draggedIndex];
-    const draggedPreview = newPreviews[draggedIndex];
-    const draggedUrl = newUrls[draggedIndex];
-
-    // Remove from original position
-    newImages.splice(draggedIndex, 1);
-    newPreviews.splice(draggedIndex, 1);
-    newUrls.splice(draggedIndex, 1);
-
-    // Insert at new position
-    newImages.splice(dropIndex, 0, draggedImage);
-    newPreviews.splice(dropIndex, 0, draggedPreview);
-    newUrls.splice(dropIndex, 0, draggedUrl);
-
-    setImages(newImages);
-    setPreviews(newPreviews);
-    setUploadedUrls(newUrls);
-    if (onImagesChange) onImagesChange(newImages);
-    if (onUrlsChange) onUrlsChange(newUrls);
+    applyReorder(draggedIndex, dropIndex);
     setDraggedIndex(null);
   };
 
@@ -239,13 +236,13 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
                 
                 {/* Cover Photo Badge */}
                 {index === 0 && (
-                  <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  <div className="absolute top-2 left-8 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                     Cover
                   </div>
                 )}
                 
                 {/* Position Number */}
-                <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
                   {index + 1}
                 </div>
                 
@@ -253,14 +250,42 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute bottom-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-100 z-10"
                 >
                   <X className="h-4 w-4" />
                 </button>
                 
                 {/* Drag Handle */}
-                <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white rounded-full p-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                   <Move className="h-4 w-4" />
+                </div>
+
+                {/* Mobile-friendly controls - also show on web for consistency */}
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+                  <button
+                    type="button"
+                    aria-label="Move left"
+                    onClick={() => applyReorder(index, Math.max(0, index - 1))}
+                    className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
+                  >
+                    ◀
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move right"
+                    onClick={() => applyReorder(index, Math.min(previews.length - 1, index + 1))}
+                    className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
+                  >
+                    ▶
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Set as cover"
+                    onClick={() => applyReorder(index, 0)}
+                    className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700"
+                  >
+                    Set cover
+                  </button>
                 </div>
               </div>
             ))}

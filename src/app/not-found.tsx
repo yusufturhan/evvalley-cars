@@ -4,7 +4,11 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sayfa Bulunamadı - Evvalley',
   description: 'Aradığınız sayfa bulunamadı. Evvalley\'de elektrikli araçlar, hibrit araçlar ve e-mobility çözümleri için doğru sayfaları ziyaret edin.',
-  robots: 'noindex, nofollow',
+  // Remove robots noindex to allow Google to understand the page structure
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 export default function NotFound() {

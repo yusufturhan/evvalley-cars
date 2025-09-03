@@ -22,50 +22,49 @@ interface Vehicle {
 }
 
 export default function ProfilePage() {
+  console.log('🎯 ProfilePage component rendered');
+  
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const [userVehicles, setUserVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
+  
+  console.log('🎯 ProfilePage state:', { isSignedIn, user: user?.emailAddresses?.[0]?.emailAddress, loading });
 
   // Fetch user's Supabase ID and vehicles
   useEffect(() => {
+    console.log('🚀 Profile page useEffect triggered');
+    console.log('🔑 isSignedIn:', isSignedIn);
+    console.log('👤 user:', user);
+    
     const fetchUserData = async () => {
+      console.log('📞 fetchUserData function called');
       if (isSignedIn && user) {
         try {
-          // First, sync user with Supabase
-          const syncResponse = await fetch('/api/auth/sync', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              clerkId: user.id,
-              email: user.emailAddresses[0]?.emailAddress,
-              firstName: user.firstName,
-              lastName: user.lastName,
-            }),
-          });
-
-          if (syncResponse.ok) {
-            const syncData = await syncResponse.json();
-            setUserSupabaseId(syncData.supabaseId);
-            console.log('✅ User Supabase ID fetched:', syncData.supabaseId);
-
-            // Then fetch user's vehicles
-            const vehiclesResponse = await fetch(`/api/vehicles?seller_id=${syncData.supabaseId}`);
-            if (vehiclesResponse.ok) {
-              const vehiclesData = await vehiclesResponse.json();
-              setUserVehicles(vehiclesData.vehicles || []);
-              console.log('✅ User vehicles fetched:', vehiclesData.vehicles?.length || 0);
+          console.log('🔄 Starting sync with Supabase...');
+          
+          // Simple test - just log the user info
+          console.log('👤 User ID:', user.id);
+          console.log('📧 User Email:', user.emailAddresses[0]?.emailAddress);
+          
+          // Test direct API call without sync
+          const email = user.emailAddresses[0]?.emailAddress;
+          if (email) {
+            console.log('🔍 Testing direct API call with email:', email);
+            const testRes = await fetch(`/api/vehicles?seller_email=${encodeURIComponent(email)}&includeSold=true`);
+            console.log('🔍 Test response status:', testRes.status);
+            if (testRes.ok) {
+              const testData = await testRes.json();
+              console.log('🔍 Test vehicles found:', testData.vehicles?.length || 0);
+              setUserVehicles(testData.vehicles || []);
             } else {
-              console.error('❌ Failed to fetch user vehicles');
+              console.log('❌ Test API call failed:', testRes.status);
             }
-          } else {
-            console.error('❌ Failed to sync user');
           }
+          
         } catch (error) {
-          console.error('❌ Error fetching user data:', error);
+          console.error('❌ Error in fetchUserData:', error);
         } finally {
           setLoading(false);
         }
@@ -140,22 +139,22 @@ export default function ProfilePage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* User Info Section */}
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex items-center space-x-4">
-            <div className="bg-[#F5F9FF] p-3 rounded-full">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="bg-[#F5F9FF] p-3 rounded-full self-start">
               <User className="h-8 w-8 text-[#3AB0FF]" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {user?.firstName} {user?.lastName}
               </h1>
-              <div className="flex items-center space-x-4 text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600">
                 <div className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2" />
-                  {user?.emailAddresses[0]?.emailAddress}
+                  <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{user?.emailAddresses[0]?.emailAddress}</span>
                 </div>
                 <div className="flex items-center">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Member since {new Date(user?.createdAt || '').toLocaleDateString()}
+                  <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="whitespace-nowrap">Member since {new Date(user?.createdAt || '').toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -223,14 +222,17 @@ export default function ProfilePage() {
                   ) : (
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => router.push(`/vehicles/${vehicle.id}/edit`)}
+                        onClick={() => router.push('/vehicles/' + vehicle.id + '/edit')}
                         className="flex-1 bg-[#3AB0FF] text-white px-3 py-2 rounded text-sm hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
                       >
                         <Edit className="h-4 w-4 mr-1" />
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDeleteVehicle(vehicle.id)}
+                        onClick={() => {
+                          console.log('🗑️ Delete button clicked for vehicle:', vehicle.id);
+                          handleDeleteVehicle(vehicle.id);
+                        }}
                         className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 flex items-center justify-center transition-colors"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />

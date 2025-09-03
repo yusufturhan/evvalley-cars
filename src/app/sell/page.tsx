@@ -235,9 +235,49 @@ export default function SellPage() {
       return;
     }
 
-    if (!userSupabaseId) {
-      alert("Please wait while we load your account information");
-      return;
+    // We'll resolve sellerId locally to avoid relying on async state updates
+    let sellerIdToUse: string | null = userSupabaseId;
+
+    if (!sellerIdToUse) {
+      // Try to sync the user on submit instead of blocking the flow
+      try {
+        const userEmail = user?.emailAddresses[0]?.emailAddress;
+        if (!userEmail) {
+          alert("Unable to get your email address. Please sign out and sign in again.");
+          return;
+        }
+
+        console.log('🔄 Supabase ID missing on submit. Attempting on-demand auth sync...');
+        const syncResponse = await fetch('/api/auth/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clerkId: user.id,
+            email: userEmail,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          }),
+        });
+
+        if (syncResponse.ok) {
+          const syncData = await syncResponse.json();
+          if (syncData?.supabaseId) {
+            console.log('✅ On-demand auth sync succeeded:', syncData.supabaseId);
+            setUserSupabaseId(syncData.supabaseId);
+            sellerIdToUse = syncData.supabaseId; // Use immediately in this submit
+          } else {
+            console.warn('⚠️ On-demand auth sync responded without supabaseId:', syncData);
+            // Proceed without blocking; we'll attach email and backfill later
+          }
+        } else {
+          const text = await syncResponse.text().catch(() => '');
+          console.warn('⚠️ On-demand auth sync failed status:', syncResponse.status, text);
+          // Proceed without blocking; we'll attach email and backfill later
+        }
+      } catch (err) {
+        console.error('❌ On-demand auth sync failed:', err);
+        // Proceed without blocking; we'll attach email and backfill later
+      }
     }
 
     // Get user email from Clerk
@@ -278,8 +318,9 @@ export default function SellPage() {
         max_speed: formData.max_speed || '',
         battery_capacity: formData.battery_capacity || '',
         location: formData.location.trim() || '',
-        seller_id: userSupabaseId,
+        seller_id: sellerIdToUse,
         seller_email: userEmail, // Use the email from Clerk directly
+        seller_type: formData.seller_type, // propagate selection to API
         vehicle_condition: formData.vehicle_condition || '',
         title_status: formData.title_status || '',
         highlighted_features: formData.highlighted_features || '',

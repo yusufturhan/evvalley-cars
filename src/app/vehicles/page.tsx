@@ -103,6 +103,7 @@ export default function VehiclesPage() {
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
           if (currentSearch) params.append('search', currentSearch);
           if (currentLocation) params.append('location', currentLocation);
+          if (showSoldVehicles) params.append('includeSold', 'true');
 
           console.log('🔍 Fetching scooters with params:', params.toString());
           const response = await fetch(`/api/ev-scooters?${params.toString()}`);
@@ -122,6 +123,7 @@ export default function VehiclesPage() {
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
           if (currentSearch) params.append('search', currentSearch);
           if (currentLocation) params.append('location', currentLocation);
+          if (showSoldVehicles) params.append('includeSold', 'true');
 
           console.log('🔍 Fetching bikes with params:', params.toString());
           const response = await fetch(`/api/e-bikes?${params.toString()}`);
@@ -631,6 +633,16 @@ export default function VehiclesPage() {
                         <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
                     </div>
+                    
+                    {/* SOLD Badge - Small and positioned */}
+                    {vehicle.sold && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
+                          SOLD
+                        </span>
+                      </div>
+                    )}
+                    
                     <div className="absolute top-2 right-2">
                       <FavoriteButton vehicleId={vehicle.id} size="sm" />
                     </div>
@@ -652,11 +664,15 @@ export default function VehiclesPage() {
                       {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
-                        ${vehicle.price.toLocaleString()}
+                      <span className={`text-2xl font-bold ${vehicle.sold ? 'text-red-600' : 'text-green-600'}`}>
+                        {vehicle.sold ? 'SOLD' : `$${vehicle.price.toLocaleString()}`}
                       </span>
                       <Link href={`/vehicles/${vehicle.id}`}>
-                        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                        <button className={`px-4 py-2 rounded-lg transition-colors ${
+                          vehicle.sold 
+                            ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        }`}>
                           View Details
                         </button>
                       </Link>

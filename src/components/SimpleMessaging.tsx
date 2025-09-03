@@ -2,14 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import { trackMessageSent } from '@/lib/analytics';
 
 interface SimpleMessagingProps {
   vehicleId: string;
+  vehicleTitle: string;
   userId: string;
   otherUserId: string;
 }
 
-export default function SimpleMessaging({ vehicleId, userId, otherUserId }: SimpleMessagingProps) {
+export default function SimpleMessaging({ vehicleId, vehicleTitle, userId, otherUserId }: SimpleMessagingProps) {
   const [messages, setMessages] = useState<any[]>([]);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,6 +66,8 @@ export default function SimpleMessaging({ vehicleId, userId, otherUserId }: Simp
       if (response.ok) {
         console.log('✅ Message sent!');
         setMessage('');
+        // Track message sent event
+        trackMessageSent(vehicleId, vehicleTitle);
         // Refresh messages
         setTimeout(fetchMessages, 500);
       }

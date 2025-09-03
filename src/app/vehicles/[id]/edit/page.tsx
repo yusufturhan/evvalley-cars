@@ -43,6 +43,10 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  console.log('EditVehiclePage loaded!');
+  console.log('isSignedIn:', isSignedIn);
+  console.log('user:', user?.emailAddresses?.[0]?.emailAddress);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -355,6 +359,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
 
   const handleDeleteImage = (index: number) => {
     setDeletedImages(prev => [...prev, index]);
+    alert("Image marked for deletion. To save changes, please click the 'Save Changes' button.");
   };
 
   const handleRestoreImage = (index: number) => {
@@ -828,7 +833,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                           <button
                             type="button"
                             onClick={() => handleDeleteImage(index)}
-                            className="absolute top-1 right-1 p-1 rounded-full bg-red-500 hover:bg-red-600 text-white opacity-0 group-hover:opacity-100 transition-all"
+                            className="absolute top-1 right-1 p-1 rounded-full bg-red-500 hover:bg-red-600 text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
                             title="Delete image"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -894,16 +899,15 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description *
+                Description
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                required
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                placeholder="Describe your vehicle's condition, features, and any additional information..."
+                placeholder="Describe your vehicle's condition, features, and any additional information... (Optional)"
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>

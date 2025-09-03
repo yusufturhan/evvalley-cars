@@ -316,7 +316,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     id: '3',
-    slug: 'tesla-model-3-vs-model-y-comparison-2024',
+    slug: 'tesla-model-3-vs-model-y-comparison',
     title: 'Tesla Model 3 vs Model Y: Which One Should You Buy in 2024?',
     excerpt: 'Comprehensive comparison of Tesla Model 3 vs Model Y in 2024. Compare price, performance, range, and features to choose the right Tesla for your needs.',
     content: `

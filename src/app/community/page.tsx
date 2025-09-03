@@ -333,7 +333,7 @@ export default function CommunityPage() {
                   <span className="hidden sm:inline">Instagram</span>
                 </a>
                 <a 
-                  href="https://www.facebook.com/profile.php?id=61574833470669" 
+                  href="https://www.facebook.com/profile.php?id=61579466595719" 
                   className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
                   title="Follow us on Facebook"
                   target="_blank" rel="noopener noreferrer"

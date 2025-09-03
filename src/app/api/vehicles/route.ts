@@ -6,10 +6,12 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit');
+    const offset = searchParams.get('offset');
     const category = searchParams.get('category');
     const brand = searchParams.get('brand');
     const year = searchParams.get('year');
     const seller_id = searchParams.get('seller_id');
+    const seller_email = searchParams.get('seller_email');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
     const search = searchParams.get('search');
@@ -36,6 +38,9 @@ export async function GET(request: Request) {
 
     if (seller_id) {
       query = query.eq('seller_id', seller_id);
+    } else if (seller_email) {
+      // Fallback: filter by seller email if seller_id is not provided
+      query = query.eq('seller_email', seller_email);
     }
 
     if (year && year !== 'all') {
@@ -89,8 +94,18 @@ export async function GET(request: Request) {
       }
     }
 
+    // Get total count first (simple approach)
+    const { count: totalCount } = await supabase
+      .from('vehicles')
+      .select('*', { count: 'exact', head: true })
+      .eq('sold', false);
+
     if (limit) {
       query = query.limit(parseInt(limit));
+    }
+
+    if (offset) {
+      query = query.range(parseInt(offset), parseInt(offset) + parseInt(limit || '12') - 1);
     }
 
     const { data, error } = await query;
@@ -119,7 +134,10 @@ export async function GET(request: Request) {
       return JSON.parse(JSON.stringify(plainVehicle));
     }) || [];
 
-    return NextResponse.json({ vehicles: serializedData });
+    return NextResponse.json({ 
+      vehicles: serializedData,
+      total: totalCount || 0
+    });
   } catch (error) {
     console.error('GET /api/vehicles error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -146,6 +164,7 @@ export async function POST(request: Request) {
     const battery_capacity = json.battery_capacity as string;
     const location = json.location as string;
     const seller_id = json.seller_id as string;
+    const seller_type_from_form = (json.seller_type as string) === 'dealer' ? 'dealer' : 'private';
     const vehicle_condition = json.vehicle_condition as string;
     const title_status = json.title_status as string;
     const highlighted_features = json.highlighted_features as string;
@@ -167,12 +186,15 @@ export async function POST(request: Request) {
         }, { status: 400 });
       }
 
-      // Check if VIN already exists
+      // Check if an ACTIVE, UNSOLD listing already exists with the same VIN
+      // Allow re-listing if previous listing is sold or inactive
       const { data: existingVehicle, error: vinCheckError } = await supabase
         .from('vehicles')
-        .select('id, title')
+        .select('id, title, sold, is_active')
         .eq('vin', vin.trim())
-        .single();
+        .eq('sold', false)
+        .eq('is_active', true)
+        .maybeSingle();
 
       if (vinCheckError && vinCheckError.code !== 'PGRST116') { // PGRST116 = no rows found
         console.error('VIN check error:', vinCheckError);
@@ -183,7 +205,7 @@ export async function POST(request: Request) {
 
       if (existingVehicle) {
         return NextResponse.json({ 
-          error: `Vehicle with VIN ${vin.trim()} already exists: ${existingVehicle.title}` 
+          error: `An active listing with VIN ${vin.trim()} already exists: ${existingVehicle.title}. Please mark the previous listing as sold or deactivate it before re-listing.` 
         }, { status: 400 });
       }
     }
@@ -212,7 +234,7 @@ export async function POST(request: Request) {
 
     // Get or create user in Supabase based on email
     let actualSellerId = seller_id;
-    
+
     if (!actualSellerId || actualSellerId === '1b69d5c5-283a-4d53-979f-4f6eb7a5ea0a') {
       // Try to find user by email
       const { data: existingUser, error: userError } = await supabase
@@ -231,11 +253,50 @@ export async function POST(request: Request) {
       if (existingUser) {
         actualSellerId = existingUser.id;
         console.log('✅ Found existing user by email:', actualSellerId);
+        // Update seller_type to reflect the user's current selection
+        try {
+          const supabaseAdminForUpdate = createServerSupabaseClient();
+          await supabaseAdminForUpdate
+            .from('users')
+            .update({ seller_type: seller_type_from_form })
+            .eq('id', existingUser.id);
+        } catch (e) {
+          console.warn('⚠️ Failed to update seller_type for existing user:', e);
+        }
       } else {
-        console.error('❌ User not found by email:', seller_email);
-        return NextResponse.json({ 
-          error: 'User account not found. Please sign in again.' 
-        }, { status: 400 });
+        // Create a minimal user record so the listing never blocks
+        try {
+          const supabaseAdminForUser = createServerSupabaseClient();
+          const inferredFirstName = seller_email.split('@')[0];
+          const desiredSellerType = (json.seller_type as string) === 'dealer' ? 'dealer' : 'private';
+
+          const { data: newUser, error: createUserError } = await supabaseAdminForUser
+            .from('users')
+            .insert({
+              clerk_id: json.clerk_id as string || `user_${Date.now()}`,
+              email: seller_email,
+              first_name: inferredFirstName,
+              last_name: '',
+              seller_type: seller_type_from_form || desiredSellerType,
+            })
+            .select('id')
+            .single();
+
+          if (createUserError || !newUser) {
+            console.error('❌ Failed to auto-create user for email:', seller_email, createUserError);
+            return NextResponse.json({ 
+              error: 'Could not create user account for listing' 
+            }, { status: 500 });
+          }
+
+          actualSellerId = newUser.id;
+          console.log('✅ Auto-created user by email:', actualSellerId);
+        } catch (autoCreateErr) {
+          console.error('❌ Auto-create user unexpected error:', autoCreateErr);
+          return NextResponse.json({ 
+            error: 'Could not prepare user account for listing' 
+          }, { status: 500 });
+        }
       }
     }
 

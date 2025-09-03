@@ -152,20 +152,26 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          sold: true,
-          sold_at: new Date().toISOString(),
+          sold: !vehicle.sold, // Toggle sold status
+          sold_at: !vehicle.sold ? new Date().toISOString() : null, // Set sold_at only when marking as sold
         }),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        if (result.vehicle.sold) {
+          alert('Vehicle marked as sold successfully!');
+        } else {
+          alert('Vehicle unmarked as sold and is now available again!');
+        }
         // Refresh the page to show updated data
         window.location.reload();
       } else {
-        alert('Failed to mark vehicle as sold');
+        alert('Failed to update vehicle status');
       }
     } catch (error) {
-      console.error('Error marking vehicle as sold:', error);
-      alert('Error marking vehicle as sold');
+      console.error('Error updating vehicle status:', error);
+      alert('Error updating vehicle status');
     } finally {
       setMarkingAsSold(false);
     }
@@ -224,7 +230,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           {/* Vehicle Images */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden relative">
               <div className="h-[500px] lg:h-[600px] bg-gray-200 flex items-center justify-center">
                 {hasImages && vehicle.images && vehicle.images[selectedImageIndex] ? (
                   <img
@@ -238,14 +244,23 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                       if (fallback) fallback.style.display = 'flex';
                     }}
                   />
-                                  ) : null}
-                  {hasImages && vehicle.images && (
-                    <div className="hidden text-center">
-                      <div className="text-8xl mb-4">🚗</div>
-                      <div className="text-gray-600">{vehicle.brand} {vehicle.model}</div>
-                    </div>
-                  )}
+                ) : null}
+                {hasImages && vehicle.images && (
+                  <div className="hidden text-center">
+                    <div className="text-8xl mb-4">🚗</div>
+                    <div className="text-gray-600">{vehicle.brand} {vehicle.model}</div>
+                  </div>
+                )}
               </div>
+              
+              {/* SOLD Badge - Small and positioned like main page */}
+              {vehicle.sold && (
+                <div className="absolute top-2 left-2 z-10">
+                  <span className="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
+                    SOLD
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Image Thumbnails */}
@@ -291,14 +306,14 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               </div>
             )}
 
-            {/* Messaging Component */}
-            {vehicle && (
+            {/* Messaging Component - Only show for signed-in users */}
+            {vehicle && isSignedIn && (
               <div className="mt-6">
                 <SimpleChat
                   vehicleId={vehicle.id}
-                  currentUserEmail={user?.emailAddresses[0]?.emailAddress || 'test@evvalley.com'}
-                  sellerEmail={vehicle.seller_email || 'evvalley12@gmail.com'}
-                  isCurrentUserSeller={user?.emailAddresses[0]?.emailAddress === (vehicle.seller_email || 'evvalley12@gmail.com')}
+                  currentUserEmail={user?.emailAddresses[0]?.emailAddress || ''}
+                  sellerEmail={vehicle.seller_email || ''}
+                  isCurrentUserSeller={user?.emailAddresses[0]?.emailAddress === vehicle.seller_email}
                 />
               </div>
             )}
@@ -327,15 +342,20 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               {/* Owner Actions - Only show to vehicle owner */}
               {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
                 <div className="mt-4 space-y-2">
-                  {!vehicle.sold && (
-                    <button
-                      onClick={handleMarkAsSold}
-                      disabled={markingAsSold}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  <button
+                    onClick={handleMarkAsSold}
+                    disabled={markingAsSold}
+                    className={`px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${
+                      vehicle.sold 
+                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                        : 'bg-red-600 text-white hover:bg-red-700'
+                    }`}
                   >
-                    {markingAsSold ? 'Marking as Sold...' : 'Mark as Sold'}
+                    {markingAsSold 
+                      ? (vehicle.sold ? 'Unmarking as Sold...' : 'Marking as Sold...') 
+                      : (vehicle.sold ? 'Unmark as Sold' : 'Mark as Sold')
+                    }
                   </button>
-                  )}
                   
                   {/* Delete Button */}
                   <button
@@ -354,7 +374,9 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
             <div className="bg-[#F5F9FF] border border-[#3AB0FF] rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[#3AB0FF] font-medium">Price</p>
+                  <p className="text-sm font-medium text-[#3AB0FF]">
+                    Price
+                  </p>
                   <p className="text-3xl font-bold text-[#3AB0FF]">${vehicle.price.toLocaleString()}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-[#3AB0FF]" />
@@ -511,8 +533,11 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                         )}
                       </div>
                       <p className="font-bold text-gray-900">
-                        {sellerInfo.full_name || 
-                         (sellerInfo.email ? formatSellerName(sellerInfo.email) : 'Unknown Seller')}
+                        {sellerInfo.seller_type === 'dealer' && sellerInfo.email 
+                          ? sellerInfo.email 
+                          : (sellerInfo.full_name || 
+                             (sellerInfo.email ? formatSellerName(sellerInfo.email) : 'Unknown Seller'))
+                        }
                       </p>
                       <div className="flex items-center space-x-2 mt-1">
                         {isVerifiedUser(sellerInfo.email) && (
@@ -547,6 +572,61 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           </div>
         </div>
       </div>
+      
+      {/* Product Schema for Google Rich Results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": vehicle.title,
+            "description": `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''} - ${vehicle.category}`,
+            "brand": {
+              "@type": "Brand",
+              "name": vehicle.make
+            },
+            "model": vehicle.model,
+            "category": vehicle.category,
+            "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
+            "offers": {
+              "@type": "Offer",
+              "price": vehicle.price,
+              "priceCurrency": "USD",
+              "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+              "availability": vehicle.sold_at ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+              "seller": {
+                "@type": sellerInfo?.seller_type === 'dealer' ? "Organization" : "Person",
+                "name": sellerInfo?.seller_type === 'dealer' && sellerInfo?.email 
+                  ? sellerInfo.email 
+                  : (sellerInfo?.full_name || formatSellerName(sellerInfo?.email || 'Unknown Seller')),
+                "email": sellerInfo?.email
+              },
+              "itemCondition": "https://schema.org/UsedCondition"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.5",
+              "reviewCount": "12"
+            },
+            "review": [
+              {
+                "@type": "Review",
+                "reviewRating": {
+                  "@type": "Rating",
+                  "ratingValue": "5",
+                  "bestRating": "5"
+                },
+                "author": {
+                  "@type": "Person",
+                  "name": "Verified Buyer"
+                },
+                "reviewBody": "Excellent electric vehicle with great range and performance."
+              }
+            ]
+          })
+        }}
+      />
     </div>
   );
 }

@@ -199,6 +199,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Security check: Ensure sender email is valid and not empty
+    if (!senderEmail || senderEmail === '' || senderEmail === 'test@evvalley.com') {
+      console.error('❌ Security violation: Invalid sender email:', senderEmail);
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
     console.log('📤 Sending message:', { vehicleId, senderEmail, receiverEmail, content });
 
     // Get user names

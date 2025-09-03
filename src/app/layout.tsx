@@ -24,11 +24,9 @@ export const metadata: Metadata = {
     canonical: 'https://www.evvalley.com',
   },
   icons: {
-    icon: [
-      { url: '/favicon.svg?v=14', type: 'image/svg+xml' },
-    ],
-    shortcut: '/favicon.svg?v=14',
-    apple: '/apple-touch-icon.svg?v=14',
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.svg',
   },
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
@@ -80,15 +78,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Safari-specific favicon approach with SVG priority */}
-        {/* Safari-specific favicon links */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=14" />
-        <link rel="shortcut icon" href="/favicon.svg?v=14" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=14" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#1C1F4A" />
-        {/* Additional Safari compatibility */}
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.svg?v=14" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon.svg?v=14" />
+        {/* Canonical URL for root */}
+        <link rel="canonical" href="https://www.evvalley.com" />
+        
+        {/* Favicon definitions with cache busting */}
+        <link rel="icon" href="/favicon.ico?v=2" />
+        <link rel="shortcut icon" href="/favicon.ico?v=2" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg?v=2" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#1C1F4A" />
         
         {/* Safari-specific meta tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -96,61 +93,88 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Evvalley" />
         
         {/* Force favicon refresh in Safari */}
+        <meta name="msapplication-TileColor" content="#1C1F4A" />
+        <meta name="theme-color" content="#1C1F4A" />
         
-        {/* Manual Open Graph tags for better Facebook compatibility */}
-        <meta property="og:title" content="Evvalley - US EV & E-Mobility Marketplace" />
-        <meta property="og:description" content="Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility." />
-        <meta property="og:image" content="https://www.evvalley.com/opengraph-image" />
-        <meta property="og:url" content="https://www.evvalley.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Evvalley" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Evvalley - US EV & E-Mobility Marketplace" />
+        {/* Preconnect to external domains for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
         
-        {/* Twitter Card tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Evvalley - US EV & E-Mobility Marketplace" />
-        <meta name="twitter:description" content="Buy and sell electric vehicles, e-scooters, and e-bikes in the US." />
-        <meta name="twitter:image" content="https://www.evvalley.com/twitter-image" />
-        <meta name="twitter:creator" content="@evvalley" />
+        {/* DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//images.unsplash.com" />
         
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            if (navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome')) {
-              const link = document.createElement('link');
-              link.rel = 'icon';
-              link.type = 'image/svg+xml';
-              link.href = '/favicon.svg?v=14&t=' + Date.now();
-              document.head.appendChild(link);
-            }
-          `
-        }} />
-        {/* Force cache refresh */}
-        <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-        <meta httpEquiv="Pragma" content="no-cache" />
-        <meta httpEquiv="Expires" content="0" />
+        {/* Structured Data for Organization */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Evvalley",
+              "url": "https://www.evvalley.com",
+              "logo": "https://www.evvalley.com/logo.svg",
+              "description": "US EV & E-Mobility Marketplace for buying and selling electric vehicles",
+              "sameAs": [
+                "https://twitter.com/evvalley",
+                "https://facebook.com/evvalley"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer service",
+                "email": "support@evvalley.com"
+              }
+            })
+          }}
+        />
+        
+        {/* WebSite Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Evvalley",
+              "url": "https://www.evvalley.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://www.evvalley.com/vehicles?search={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
       </head>
       <body className={inter.className}>
-        {/* Google Analytics */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-              page_title: document.title,
-              page_location: window.location.href,
-            });
-          `}
-        </Script>
-        
         <ClerkProvider>
+          <AuthSync />
           {children}
+          
+          {/* Google Analytics */}
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
+            `}
+          </Script>
+          
+          {/* Google Ads */}
+          <Script id="google-ads" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ADS_ID}');
+            `}
+          </Script>
         </ClerkProvider>
       </body>
     </html>

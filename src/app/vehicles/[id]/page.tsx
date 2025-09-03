@@ -138,8 +138,14 @@ export default async function VehicleDetailPage({ params }: { params: { id: stri
       }
     }
 
+    const vehicleUrl = `https://www.evvalley.com/vehicles/${vehicle.id}`;
+
     return (
       <>
+        {/* Canonical URL */}
+        <link rel="canonical" href={vehicleUrl} />
+        
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

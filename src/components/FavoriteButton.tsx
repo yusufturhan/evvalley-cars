@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { trackVehicleFavorite } from "@/lib/analytics";
 
 interface FavoriteButtonProps {
   vehicleId: string;
+  vehicleTitle: string;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export default function FavoriteButton({ vehicleId, className = "", size = "md" }: FavoriteButtonProps) {
+export default function FavoriteButton({ vehicleId, vehicleTitle, className = "", size = "md" }: FavoriteButtonProps) {
   const { isSignedIn, user } = useUser();
   const [isFavorited, setIsFavorited] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -94,6 +96,8 @@ export default function FavoriteButton({ vehicleId, className = "", size = "md" 
           if (response.ok) {
             setIsFavorited(true);
             console.log('Added to favorites:', vehicleId);
+            // Track favorite event
+            trackVehicleFavorite(vehicleId, vehicleTitle);
           }
         }
       }

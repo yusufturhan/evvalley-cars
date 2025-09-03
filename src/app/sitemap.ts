@@ -78,7 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly' as const,
       priority: 0.3,
     },
-    // Category pages with canonical URLs
+    // Category pages with canonical URLs - prevent duplicate content
     {
       url: `${baseUrl}/vehicles/ev-cars`,
       lastModified: currentDate,
@@ -110,30 +110,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const { data: vehicles, error } = await supabase
       .from('vehicles')
-      .select('id, updated_at, vin, title, sold_at')
-      .eq('sold_at', null)
-      .not('updated_at', 'is', null)
-      .not('id', 'is', null)
-      .not('title', 'is', null)
+      .select('id, updated_at, vin, title, sold_at, category')
+      .is('sold_at', null) // Only unsold vehicles
+      .not('id', 'is', null) // Must have ID
+      .not('title', 'is', null) // Must have title
       .order('updated_at', { ascending: false })
       .limit(5000); // Increased limit for better coverage
     
     if (error) {
       console.error('Sitemap: Error fetching vehicles:', error);
     } else if (vehicles && vehicles.length > 0) {
+      console.log(`Sitemap: Found ${vehicles.length} vehicles from database`);
+      
       vehiclePages = vehicles
-        .filter((vehicle: any) => 
-          vehicle.id && 
-          vehicle.title && 
-          vehicle.vin && 
-          !vehicle.sold_at
-        )
+        .filter((vehicle: any) => {
+          const hasId = vehicle.id;
+          const hasTitle = vehicle.title;
+          const isUnsold = vehicle.sold_at === null;
+          
+          if (!hasId) console.log(`Sitemap: Filtered out vehicle - missing ID`);
+          if (!hasTitle) console.log(`Sitemap: Filtered out vehicle - missing title`);
+          if (!isUnsold) console.log(`Sitemap: Filtered out vehicle - sold: ${vehicle.sold_at}`);
+          
+          return hasId && hasTitle && isUnsold;
+        })
         .map((vehicle: any) => ({
           url: `${baseUrl}/vehicles/${vehicle.id}`,
           lastModified: vehicle.updated_at ? new Date(vehicle.updated_at) : currentDate,
           changeFrequency: 'weekly' as const,
           priority: 0.8,
         }));
+      
+      console.log(`Sitemap: After filtering, ${vehiclePages.length} vehicles included in sitemap`);
+    } else {
+      console.log('Sitemap: No vehicles found in database');
     }
   } catch (error) {
     console.error('Sitemap: Unexpected error fetching vehicles:', error);
