@@ -3,19 +3,88 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Enhanced Supabase client with error handling
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: false
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'evvalley-web'
+    }
+  }
+});
 
-// Server-side client for admin operations
+// Server-side client for admin operations with retry logic
 export const createServerSupabaseClient = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  if (!supabaseServiceKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
+  }
 
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'evvalley-server'
+      }
     }
   });
+};
+
+// Enhanced database client with retry logic
+export const createRetrySupabaseClient = (maxRetries = 3, delay = 1000) => {
+  const client = createServerSupabaseClient();
+  
+  return {
+    ...client,
+    async queryWithRetry<T>(queryFn: () => Promise<T>): Promise<T> {
+      let lastError: any;
+      
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          return await queryFn();
+        } catch (error) {
+          lastError = error;
+          console.warn(`Database query attempt ${attempt} failed:`, error);
+          
+          if (attempt < maxRetries) {
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, delay * attempt));
+          }
+        }
+      }
+      
+      throw lastError;
+    }
+  };
+};
+
+// Health check function for database
+export const checkDatabaseHealth = async () => {
+  try {
+    const client = createServerSupabaseClient();
+    const { data, error } = await client
+      .from('vehicles')
+      .select('id')
+      .limit(1);
+    
+    if (error) {
+      console.error('Database health check failed:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Database health check error:', error);
+    return false;
+  }
 };
 
 // Database types

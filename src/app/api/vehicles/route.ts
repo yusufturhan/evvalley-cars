@@ -18,6 +18,10 @@ export async function GET(request: Request) {
     const location = searchParams.get('location');
     const includeSold = searchParams.get('includeSold');
 
+    // Validate and sanitize parameters
+    const parsedLimit = limit ? Math.min(parseInt(limit), 100) : 12; // Max 100 items
+    const parsedOffset = offset ? Math.max(parseInt(offset), 0) : 0;
+
     let query = supabase
       .from('vehicles')
       .select('*')
@@ -44,25 +48,35 @@ export async function GET(request: Request) {
     }
 
     if (year && year !== 'all') {
-      query = query.eq('year', parseInt(year));
+      const parsedYear = parseInt(year);
+      if (!isNaN(parsedYear)) {
+        query = query.eq('year', parsedYear);
+      }
     }
 
     if (minPrice) {
-      query = query.gte('price', parseFloat(minPrice));
+      const parsedMinPrice = parseFloat(minPrice);
+      if (!isNaN(parsedMinPrice)) {
+        query = query.gte('price', parsedMinPrice);
+      }
     }
 
     if (maxPrice) {
-      query = query.lte('price', parseFloat(maxPrice));
+      const parsedMaxPrice = parseFloat(maxPrice);
+      if (!isNaN(parsedMaxPrice)) {
+        query = query.lte('price', parsedMaxPrice);
+      }
     }
 
-    // Search functionality
-    if (search) {
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%,brand.ilike.%${search}%,model.ilike.%${search}%`);
+    // Search functionality with validation
+    if (search && search.trim().length > 0) {
+      const sanitizedSearch = search.trim().substring(0, 100); // Limit search length
+      query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
     // Location search - exact city/area matching with strict exclusions
-    if (location) {
-      const locationQuery = location.trim().toLowerCase();
+    if (location && location.trim().length > 0) {
+      const locationQuery = location.trim().toLowerCase().substring(0, 100); // Limit location length
       
       // For San Francisco searches, use strict matching and exclude nearby cities
       if (locationQuery.includes('san francisco')) {
@@ -94,53 +108,89 @@ export async function GET(request: Request) {
       }
     }
 
-    // Get total count first (simple approach)
-    const { count: totalCount } = await supabase
-      .from('vehicles')
-      .select('*', { count: 'exact', head: true })
-      .eq('sold', false);
-
-    if (limit) {
-      query = query.limit(parseInt(limit));
+    // Get total count first with error handling
+    let totalCount = 0;
+    try {
+      const { count, error: countError } = await supabase
+        .from('vehicles')
+        .select('*', { count: 'exact', head: true })
+        .eq('sold', false);
+      
+      if (countError) {
+        console.error('Error getting total count:', countError);
+        totalCount = 0;
+      } else {
+        totalCount = count || 0;
+      }
+    } catch (countError) {
+      console.error('Error in count query:', countError);
+      totalCount = 0;
     }
 
-    if (offset) {
-      query = query.range(parseInt(offset), parseInt(offset) + parseInt(limit || '12') - 1);
-    }
+    // Apply pagination
+    query = query.range(parsedOffset, parsedOffset + parsedLimit - 1);
 
-    const { data, error } = await query;
+    // Execute main query with timeout protection
+    const { data, error } = await Promise.race([
+      query,
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), 10000) // 10 second timeout
+      )
+    ]);
 
     if (error) {
       console.error('Error fetching vehicles:', error);
-      return NextResponse.json({ error: 'Failed to fetch vehicles' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Failed to fetch vehicles',
+        details: process.env.NODE_ENV === 'development' ? error.message : 'Internal error'
+      }, { status: 500 });
     }
-
-
 
     // Serialize dates and ensure all data is plain objects for Next.js 15 compatibility
     const serializedData = data?.map(vehicle => {
-      const plainVehicle = { ...vehicle };
-      // Convert dates to strings
-      if (plainVehicle.created_at) {
-        plainVehicle.created_at = plainVehicle.created_at.toString();
+      try {
+        const plainVehicle = { ...vehicle };
+        // Convert dates to strings
+        if (plainVehicle.created_at) {
+          plainVehicle.created_at = plainVehicle.created_at.toString();
+        }
+        if (plainVehicle.updated_at) {
+          plainVehicle.updated_at = plainVehicle.updated_at.toString();
+        }
+        if (plainVehicle.sold_at) {
+          plainVehicle.sold_at = plainVehicle.sold_at.toString();
+        }
+        // Ensure all properties are serializable
+        return JSON.parse(JSON.stringify(plainVehicle));
+      } catch (serializeError) {
+        console.error('Error serializing vehicle:', serializeError);
+        return null;
       }
-      if (plainVehicle.updated_at) {
-        plainVehicle.updated_at = plainVehicle.updated_at.toString();
-      }
-      if (plainVehicle.sold_at) {
-        plainVehicle.sold_at = plainVehicle.sold_at.toString();
-      }
-      // Ensure all properties are serializable
-      return JSON.parse(JSON.stringify(plainVehicle));
-    }) || [];
+    }).filter(Boolean) || []; // Remove any null entries
 
     return NextResponse.json({ 
       vehicles: serializedData,
-      total: totalCount || 0
+      total: totalCount,
+      limit: parsedLimit,
+      offset: parsedOffset
     });
   } catch (error) {
     console.error('GET /api/vehicles error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    // Return appropriate error based on error type
+    if (error instanceof Error) {
+      if (error.message.includes('timeout')) {
+        return NextResponse.json({ error: 'Request timeout' }, { status: 408 });
+      }
+      if (error.message.includes('database')) {
+        return NextResponse.json({ error: 'Database connection error' }, { status: 503 });
+      }
+    }
+    
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error : 'Unknown error'
+    }, { status: 500 });
   }
 }
 
