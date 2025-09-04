@@ -104,7 +104,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
             // ID resolution complete
-            console.log('DEBUG: ID resolved as:', id);
+            // ID resolved
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
@@ -164,7 +164,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 highlighted_features: vehicleInfo.highlighted_features || ""
               });
             } else {
-              console.log('DEBUG: Vehicle fetch failed with status:', vehicleResponse.status);
+              // Vehicle fetch failed
               alert("Vehicle not found");
               router.push("/profile");
             }
