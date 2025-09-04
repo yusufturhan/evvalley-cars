@@ -71,7 +71,9 @@ export default function EditVehiclePage() {
         });
 
         if (!syncResponse.ok) {
-          throw new Error('Failed to sync user with Supabase');
+          const errorData = await syncResponse.json();
+          console.error('Sync error:', errorData);
+          throw new Error(`Failed to sync user with Supabase: ${errorData.error || 'Unknown error'}`);
         }
         const syncData = await syncResponse.json();
         setUserSupabaseId(syncData.supabaseId);
