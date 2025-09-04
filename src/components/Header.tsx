@@ -9,6 +9,8 @@ export default function Header() {
   const { isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
 
+  console.log('Header - isLoaded:', isLoaded, 'isSignedIn:', isSignedIn);
+
   const handleSignOut = async () => {
     try {
       await signOut();

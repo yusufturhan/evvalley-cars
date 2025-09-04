@@ -7,12 +7,9 @@ export default function ClerkProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_live_Y2xlcmsuZXZ2YWxsZXkuY29tJA";
   
-  if (!publishableKey) {
-    console.error('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing!');
-    return <div>Error: Clerk configuration missing</div>;
-  }
+  console.log('ClerkProvider - publishableKey:', publishableKey ? 'Present' : 'Missing');
 
   return (
     <ClerkProviderBase
