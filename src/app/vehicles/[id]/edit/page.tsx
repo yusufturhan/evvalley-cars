@@ -108,7 +108,7 @@ export default function EditVehiclePage() {
 
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [deletedImageIndexes, setDeletedImageIndexes] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('ev-car');
 
   useEffect(() => {
@@ -222,10 +222,7 @@ export default function EditVehiclePage() {
   };
 
   const removeImage = (index: number) => {
-    const deletedImage = imageUrls[index];
-    const newUrls = imageUrls.filter((_, i) => i !== index);
-    setImageUrls(newUrls);
-    setDeletedImages(prev => [...prev, deletedImage]);
+    setDeletedImageIndexes(prev => [...prev, index]);
   };
 
   const setCoverImage = (index: number) => {
@@ -243,9 +240,8 @@ export default function EditVehiclePage() {
     setImageUrls(newUrls);
   };
 
-  const restoreImage = (deletedImageUrl: string) => {
-    setImageUrls(prev => [...prev, deletedImageUrl]);
-    setDeletedImages(prev => prev.filter(url => url !== deletedImageUrl));
+  const restoreImage = (index: number) => {
+    setDeletedImageIndexes(prev => prev.filter(i => i !== index));
   };
 
   const validateForm = () => {
@@ -304,9 +300,11 @@ export default function EditVehiclePage() {
         formDataToSend.append('images', image);
       });
 
-      // Add existing image URLs
+      // Add existing image URLs (excluding deleted ones)
       imageUrls.forEach((url, index) => {
-        formDataToSend.append('existingImages', url);
+        if (!deletedImageIndexes.includes(index)) {
+          formDataToSend.append('existingImages', url);
+        }
       });
 
       const response = await fetch(`/api/vehicles/${vehicle.id}`, {
@@ -855,9 +853,10 @@ export default function EditVehiclePage() {
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {imageUrls.map((rawUrl, index) => {
                       const url = `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
+                      const isDeleted = deletedImageIndexes.includes(index);
                       return (
                       <div key={index} className="relative group">
-                        <div className="relative w-full h-32 rounded-lg overflow-hidden border bg-gray-100">
+                        <div className={`relative w-full h-32 rounded-lg overflow-hidden border bg-gray-100 ${isDeleted ? 'opacity-50' : ''}`}>
                           <img
                             src={url}
                             alt={`Vehicle image ${index + 1}`}
@@ -869,10 +868,23 @@ export default function EditVehiclePage() {
                             }}
                             onLoad={() => console.log('Image loaded successfully (proxy):', url)}
                           />
+                          
+                          {/* Deleted Overlay */}
+                          {isDeleted && (
+                            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => restoreImage(index)}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium"
+                              >
+                                Restore
+                              </button>
+                            </div>
+                          )}
                         </div>
                         
                         {/* Cover Photo Badge */}
-                        {index === 0 && (
+                        {index === 0 && !isDeleted && (
                           <div className="absolute top-2 left-8 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                             Cover
                           </div>
@@ -884,43 +896,47 @@ export default function EditVehiclePage() {
                         </div>
                         
                         {/* Remove Button */}
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-100 z-10"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {!isDeleted && (
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-100 z-10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                         
                         {/* Mobile-friendly controls */}
-                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
-                          <button
-                            type="button"
-                            aria-label="Move left"
-                            onClick={() => moveImage(index, Math.max(0, index - 1))}
-                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
-                            disabled={index === 0}
-                          >
-                            ◀
-                          </button>
-                          <button
-                            type="button"
-                            aria-label="Move right"
-                            onClick={() => moveImage(index, Math.min(imageUrls.length - 1, index + 1))}
-                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
-                            disabled={index === imageUrls.length - 1}
-                          >
-                            ▶
-                          </button>
-                          <button
-                            type="button"
-                            aria-label="Set as cover"
-                            onClick={() => setCoverImage(index)}
-                            className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700"
-                          >
-                            Set cover
-                          </button>
-                        </div>
+                        {!isDeleted && (
+                          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+                            <button
+                              type="button"
+                              aria-label="Move left"
+                              onClick={() => moveImage(index, Math.max(0, index - 1))}
+                              className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
+                              disabled={index === 0}
+                            >
+                              ◀
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Move right"
+                              onClick={() => moveImage(index, Math.min(imageUrls.length - 1, index + 1))}
+                              className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
+                              disabled={index === imageUrls.length - 1}
+                            >
+                              ▶
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="Set as cover"
+                              onClick={() => setCoverImage(index)}
+                              className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700"
+                            >
+                              Set cover
+                            </button>
+                          </div>
+                        )}
                       </div>
                       );
                     })}
@@ -928,59 +944,16 @@ export default function EditVehiclePage() {
                   
                   {/* Image Count */}
                   <p className="text-sm text-gray-500">
-                    {imageUrls.length} of 12 images selected
+                    {imageUrls.length - deletedImageIndexes.length} of 12 images selected
+                    {deletedImageIndexes.length > 0 && (
+                      <span className="text-orange-600 ml-2">
+                        ({deletedImageIndexes.length} deleted - click "Save Changes" to permanently remove)
+                      </span>
+                    )}
                   </p>
                 </div>
               )}
 
-              {/* Deleted Images Section */}
-              {deletedImages.length > 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium text-gray-700">Recently Deleted Images</h4>
-                    <p className="text-xs text-gray-500">Click to restore</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {deletedImages.map((deletedUrl, index) => {
-                      const url = `/api/image-proxy?url=${encodeURIComponent(deletedUrl)}`;
-                      return (
-                        <div key={`deleted-${index}`} className="relative group">
-                          <div className="relative w-full h-32 rounded-lg overflow-hidden border bg-gray-100 opacity-60">
-                            <img
-                              src={url}
-                              alt={`Deleted image ${index + 1}`}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                              onError={(e) => {
-                                console.log('Deleted image failed to load (proxy):', url);
-                                e.currentTarget.style.display = 'none';
-                              }}
-                              onLoad={() => console.log('Deleted image loaded successfully (proxy):', url)}
-                            />
-                          </div>
-                          
-                          {/* Restore Button */}
-                          <button
-                            type="button"
-                            onClick={() => restoreImage(deletedUrl)}
-                            className="absolute inset-0 bg-green-500 bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center"
-                            title="Restore this image"
-                          >
-                            <div className="opacity-0 group-hover:opacity-100 bg-green-600 text-white px-3 py-1 rounded text-sm font-medium">
-                              Restore
-                            </div>
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  
-                  <p className="text-xs text-gray-500">
-                    {deletedImages.length} deleted image{deletedImages.length !== 1 ? 's' : ''} - Click "Save Changes" to permanently delete
-                  </p>
-                </div>
-              )}
 
               {/* New Image Upload */}
               <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={() => {}} maxImages={12} />
