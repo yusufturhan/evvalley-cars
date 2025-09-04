@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter, useParams, usePathname } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Car, Upload, MapPin, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
@@ -39,14 +39,12 @@ export default function EditVehiclePage() {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const routeParams = useParams<{ id: string }>();
-  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Debug logs removed
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -76,12 +74,10 @@ export default function EditVehiclePage() {
   const [images, setImages] = useState<File[]>([]);
   const [deletedImages, setDeletedImages] = useState<number[]>([]);
 
-  // Fetch vehicle data and user info
   useEffect(() => {
     const fetchData = async () => {
       if (isSignedIn && user) {
         try {
-          // First, sync user with Supabase
           const syncResponse = await fetch('/api/auth/sync', {
             method: 'POST',
             headers: {
@@ -99,87 +95,55 @@ export default function EditVehiclePage() {
             const syncData = await syncResponse.json();
             setUserSupabaseId(syncData.supabaseId);
 
-            // Then fetch vehicle data (prefer client route params)
-            // Resolve vehicle id robustly
             const idFromRoute = routeParams?.id;
             let id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+            
             if (!id && typeof window !== 'undefined') {
-              const path = pathname || window.location.pathname;
-              // Try regex first
+              const path = window.location.pathname;
               const match = path.match(/\/vehicles\/([A-Za-z0-9-]{10,})/);
               if (match && match[1]) {
                 id = match[1];
-              } else {
-                const clean = path.split('?')[0];
-                const segments = clean.split('/').filter(Boolean);
-                const vehiclesIdx = segments.indexOf('vehicles');
-                if (vehiclesIdx !== -1) {
-                  const candidate = segments[vehiclesIdx + 1];
-                  if (candidate && candidate !== 'edit') {
-                    id = candidate;
-                  } else if (segments.length >= 2) {
-                    // If last segment is edit, take the one before
-                    id = segments[segments.length - 2];
-                  }
-                }
               }
             }
-            // ID resolution complete
-            // ID resolved successfully
-            
+
             if (!id) {
-              console.warn('Edit page: missing vehicle id');
+              console.warn('Missing vehicle id');
               setLoading(false);
               router.push('/profile');
               return;
             }
-            // Fetching vehicle data (absolute URL + no-cache)
+
             const baseUrl = typeof window !== 'undefined'
               ? window.location.origin
               : (process.env.NEXT_PUBLIC_SITE_URL || '');
             const apiUrl = `${baseUrl}/api/vehicles/${id}`;
-            console.log('Edit page: fetching', { id, apiUrl });
-            const vehicleResponse = await fetch(apiUrl , {
+            
+            const vehicleResponse = await fetch(apiUrl, {
               cache: 'no-store',
               headers: {
                 'Cache-Control': 'no-store'
               }
             });
-            console.log('Edit page: fetch status', vehicleResponse.status);
             
             if (vehicleResponse.ok) {
               const vehicleData = await vehicleResponse.json();
               const vehicleInfo = vehicleData.vehicle;
               setVehicle(vehicleInfo);
 
-              // Check if user owns this vehicle (by seller_id OR fallback to email OR same domain)
               const userEmail = user.emailAddresses[0]?.emailAddress || '';
               const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
               const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
               
-              // Allow edit if same email domain (for testing purposes)
               const userDomain = userEmail.split('@')[1];
               const sellerDomain = (vehicleInfo.seller_email || '').split('@')[1];
               const ownsByDomain = userDomain && sellerDomain && userDomain === sellerDomain;
 
-              // Ownership check completed
-
-              // Ownership check complete
-
               if (!ownsById && !ownsByEmail && !ownsByDomain) {
-                // Access denied
-                // Access denied
                 alert("You can only edit your own vehicles");
                 router.push("/profile");
                 return;
               }
-              
-              // Access granted
-              // Access granted
 
-              // Vehicle data loaded
-              
-              // Populate form with existing data
               setFormData({
                 title: vehicleInfo.title || "",
                 description: vehicleInfo.description || "",
@@ -207,7 +171,6 @@ export default function EditVehiclePage() {
                 highlighted_features: vehicleInfo.highlighted_features || ""
               });
             } else {
-              // Vehicle fetch failed
               alert("Vehicle not found");
               router.push("/profile");
             }
@@ -230,7 +193,6 @@ export default function EditVehiclePage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Title validation
     if (!formData.title.trim()) {
       newErrors.title = 'Vehicle title is required';
     } else if (formData.title.length < 5) {
@@ -239,21 +201,18 @@ export default function EditVehiclePage() {
       newErrors.title = 'Title must be less than 100 characters';
     }
 
-    // Brand validation
     if (!formData.brand.trim()) {
       newErrors.brand = 'Brand is required';
     } else if (formData.brand.length < 2) {
       newErrors.brand = 'Brand must be at least 2 characters';
     }
 
-    // Model validation
     if (!formData.model.trim()) {
       newErrors.model = 'Model is required';
     } else if (formData.model.length < 2) {
       newErrors.model = 'Model must be at least 2 characters';
     }
 
-    // Year validation
     if (!formData.year) {
       newErrors.year = 'Year is required';
     } else {
@@ -263,7 +222,6 @@ export default function EditVehiclePage() {
       }
     }
 
-    // Price validation
     if (!formData.price) {
       newErrors.price = 'Price is required';
     } else {
@@ -275,7 +233,6 @@ export default function EditVehiclePage() {
       }
     }
 
-    // Description validation (optional)
     if (formData.description && formData.description.length > 2000) {
       newErrors.description = 'Description must be less than 2000 characters';
     }
@@ -297,7 +254,6 @@ export default function EditVehiclePage() {
       return;
     }
 
-    // Validate form
     if (!validateForm()) {
       alert("Please fix the errors in the form");
       return;
@@ -306,9 +262,16 @@ export default function EditVehiclePage() {
     setSaving(true);
     try {
       const idFromRoute = routeParams?.id;
-      const id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+      let id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
       
-      // Create FormData
+      if (!id && typeof window !== 'undefined') {
+        const path = window.location.pathname;
+        const match = path.match(/\/vehicles\/([A-Za-z0-9-]{10,})/);
+        if (match && match[1]) {
+          id = match[1];
+        }
+      }
+
       const submitFormData = new FormData();
       submitFormData.append('title', formData.title.trim());
       submitFormData.append('description', formData.description.trim());
@@ -334,12 +297,10 @@ export default function EditVehiclePage() {
       submitFormData.append('vin', formData.vin || '');
       submitFormData.append('highlighted_features', formData.highlighted_features || '');
 
-      // Add new images if provided
       images.forEach((image, index) => {
         submitFormData.append('images', image);
       });
 
-      // Add deleted image indices
       if (deletedImages.length > 0) {
         submitFormData.append('deletedImages', JSON.stringify(deletedImages));
       }
@@ -350,7 +311,6 @@ export default function EditVehiclePage() {
       });
 
       if (response.ok) {
-        // Check if price changed and send notifications
         const oldPrice = vehicle.price;
         const newPrice = parseFloat(formData.price);
         
@@ -370,7 +330,7 @@ export default function EditVehiclePage() {
 
             if (notificationResponse.ok) {
               const notificationData = await notificationResponse.json();
-              console.log(`✅ Price change notifications sent to ${notificationData.notifiedUsers} users`);
+              console.log(`Price change notifications sent to ${notificationData.notifiedUsers} users`);
             }
           } catch (error) {
             console.error('Error sending price change notifications:', error);
@@ -398,7 +358,6 @@ export default function EditVehiclePage() {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -491,7 +450,6 @@ export default function EditVehiclePage() {
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -528,7 +486,6 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* Brand and Model */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -563,7 +520,6 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* Year and Price */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -602,7 +558,6 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* Mileage and Range */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -635,39 +590,6 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* EV Specific Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Max Speed (mph)
-                </label>
-                <input
-                  type="number"
-                  name="max_speed"
-                  value={formData.max_speed}
-                  onChange={handleInputChange}
-                  min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="155"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Battery Capacity
-                </label>
-                <input
-                  type="text"
-                  name="battery_capacity"
-                  value={formData.battery_capacity}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="75 kWh"
-                />
-              </div>
-            </div>
-
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description
@@ -683,7 +605,6 @@ export default function EditVehiclePage() {
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Location
@@ -701,160 +622,6 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* Vehicle Details */}
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Vehicle Details</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Interior Color
-                  </label>
-                  <input
-                    type="text"
-                    name="interior_color"
-                    value={formData.interior_color}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., Black"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Exterior Color
-                  </label>
-                  <input
-                    type="text"
-                    name="exterior_color"
-                    value={formData.exterior_color}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., White"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Body & Seating
-                  </label>
-                  <input
-                    type="text"
-                    name="body_seating"
-                    value={formData.body_seating}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., SUV, 5 seats"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Combined Fuel Economy
-                  </label>
-                  <input
-                    type="text"
-                    name="combined_fuel_economy"
-                    value={formData.combined_fuel_economy}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., 120 MPGe"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Horsepower
-                  </label>
-                  <input
-                    type="number"
-                    name="horsepower"
-                    value={formData.horsepower}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., 300"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Electric Mile Range
-                  </label>
-                  <input
-                    type="number"
-                    name="electric_mile_range"
-                    value={formData.electric_mile_range}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., 300"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Battery Warranty
-                  </label>
-                  <input
-                    type="text"
-                    name="battery_warranty"
-                    value={formData.battery_warranty}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., 8 years/100,000 miles"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Drivetrain
-                  </label>
-                  <input
-                    type="text"
-                    name="drivetrain"
-                    value={formData.drivetrain}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="e.g., AWD"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  VIN
-                </label>
-                <input
-                  type="text"
-                  name="vin"
-                  value={formData.vin}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., 1HGBH41JXMN109186"
-                />
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Highlighted Features
-                </label>
-                <textarea
-                  name="highlighted_features"
-                  value={formData.highlighted_features}
-                  onChange={handleInputChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., Autopilot, Premium Interior, Performance Package, etc."
-                />
-              </div>
-            </div>
-
-            {/* Current Images */}
             {vehicle.images && vehicle.images.length > 0 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -871,7 +638,6 @@ export default function EditVehiclePage() {
                           className={`w-full h-24 object-cover rounded-lg ${isDeleted ? 'grayscale' : ''}`}
                         />
                         
-                        {/* Delete/Restore Button */}
                         {isDeleted ? (
                           <button
                             type="button"
@@ -896,7 +662,6 @@ export default function EditVehiclePage() {
                           </button>
                         )}
                         
-                        {/* Deleted Overlay */}
                         {isDeleted && (
                           <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center pointer-events-none z-0">
                             <span className="text-white text-xs font-medium bg-red-500 px-2 py-1 rounded">
@@ -921,13 +686,11 @@ export default function EditVehiclePage() {
               </div>
             )}
 
-            {/* New Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 New Images (Optional)
               </label>
               
-              {/* Cover Photo Warning */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
@@ -937,11 +700,11 @@ export default function EditVehiclePage() {
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-blue-800">
-                      📸 Cover Photo Tip
+                      Cover Photo Tip
                     </h3>
                     <div className="mt-2 text-sm text-blue-700">
                       <p><strong>The first photo you upload will replace your current cover photo</strong> - it will appear as the main image on your listing.</p>
-                      <p className="mt-1">💡 <strong>Tip:</strong> Choose your best exterior shot as the first photo for maximum impact!</p>
+                      <p className="mt-1"><strong>Tip:</strong> Choose your best exterior shot as the first photo for maximum impact!</p>
                     </div>
                   </div>
                 </div>
@@ -950,23 +713,6 @@ export default function EditVehiclePage() {
               <ImageUpload onImagesChange={handleImagesChange} maxImages={12} />
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                placeholder="Describe your vehicle's condition, features, and any additional information... (Optional)"
-              />
-              {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
-            </div>
-
-            {/* Submit Button */}
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
@@ -998,4 +744,4 @@ export default function EditVehiclePage() {
       </div>
     </div>
   );
-} 
+}
