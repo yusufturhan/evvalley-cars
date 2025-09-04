@@ -10,6 +10,7 @@ export default function Header() {
   const { signOut } = useClerk();
 
   console.log('Header - isLoaded:', isLoaded, 'isSignedIn:', isSignedIn);
+  console.log('Header - Clerk publishableKey:', process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Present' : 'Missing');
 
   const handleSignOut = async () => {
     try {
@@ -72,6 +73,7 @@ export default function Header() {
               <div className="flex items-center space-x-4">
                 <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
                 <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+                <div className="text-xs text-gray-500">Loading Clerk...</div>
               </div>
             ) : isSignedIn ? (
               <div className="flex items-center space-x-4">
