@@ -105,13 +105,13 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
-            console.log('🔍 Edit page - ID resolution: idFromRoute=' + idFromRoute + ', resolvedId=' + resolvedId + ', fallbackId=' + fallback.id + ', finalId=' + id);
+            console.log('Edit page ID resolution:', idFromRoute, resolvedId, fallback.id, id);
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
               return;
             }
-            console.log('🔍 Edit page - Fetching vehicle with ID: ' + id);
+            console.log('Edit page fetching vehicle with ID:', id);
             const vehicleResponse = await fetch(`/api/vehicles/${id}`);
             
             if (vehicleResponse.ok) {
@@ -124,7 +124,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
               const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
               const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
 
-              console.log('🔍 Ownership check: vehicleSellerId=' + vehicleInfo.seller_id + ', userSupabaseId=' + syncData.supabaseId + ', vehicleSellerEmail=' + vehicleInfo.seller_email + ', userEmail=' + userEmail + ', ownsById=' + ownsById + ', ownsByEmail=' + ownsByEmail);
+              console.log('Ownership check:', vehicleInfo.seller_id, syncData.supabaseId, vehicleInfo.seller_email, userEmail, ownsById, ownsByEmail);
 
               if (!ownsById && !ownsByEmail) {
                 console.log('❌ Access denied: User does not own this vehicle');
