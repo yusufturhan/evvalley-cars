@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Car, Zap, Battery, Bike, Upload, MapPin, Trash2, Star } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
+import OptimizedImage from "@/components/OptimizedImage";
 
 interface Vehicle {
   id: string;
@@ -834,14 +835,17 @@ export default function EditVehiclePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {imageUrls.map((url, index) => (
                       <div key={index} className="relative group">
-                        <img
-                          src={url}
-                          alt={`Vehicle image ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg border bg-gray-100"
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                          crossOrigin="anonymous"
-                        />
+                        <div className="relative w-full h-24 rounded-lg overflow-hidden border bg-gray-100">
+                          <OptimizedImage
+                            src={url}
+                            alt={`Vehicle image ${index + 1}`}
+                            className="object-cover"
+                            priority={false}
+                            width={400}
+                            height={200}
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                          />
+                        </div>
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
                           <div className="opacity-0 group-hover:opacity-100 flex space-x-2">
                             {index === 0 && (
