@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton, SignUpButton, UserButton, useUser, useClerk } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import Logo from "./Logo";
@@ -69,13 +69,7 @@ export default function Header() {
 
           {/* Desktop Auth Buttons */}
           <div className="flex items-center space-x-4">
-            {!isLoaded ? (
-              <div className="flex items-center space-x-4">
-                <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
-                <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
-                <div className="text-xs text-gray-500">Loading Clerk...</div>
-              </div>
-            ) : isSignedIn ? (
+            <SignedIn>
               <div className="flex items-center space-x-4">
                 <UserButton afterSignOutUrl="/" />
                 <button
@@ -85,7 +79,8 @@ export default function Header() {
                   Sign Out
                 </button>
               </div>
-            ) : (
+            </SignedIn>
+            <SignedOut>
               <div className="flex items-center space-x-4">
                 <SignInButton mode="redirect">
                   <button className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
@@ -98,7 +93,7 @@ export default function Header() {
                   </button>
                 </SignUpButton>
               </div>
-            )}
+            </SignedOut>
           </div>
         </div>
 
@@ -111,12 +106,7 @@ export default function Header() {
             
             {/* Mobile Auth Buttons */}
             <div className="flex items-center space-x-2">
-              {!isLoaded ? (
-                <div className="flex items-center space-x-2">
-                  <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
-                  <div className="animate-pulse bg-gray-200 h-6 w-16 rounded"></div>
-                </div>
-              ) : isSignedIn ? (
+              <SignedIn>
                 <div className="flex items-center space-x-2">
                   <UserButton afterSignOutUrl="/" />
                   <button
@@ -126,7 +116,8 @@ export default function Header() {
                     Sign Out
                   </button>
                 </div>
-              ) : (
+              </SignedIn>
+              <SignedOut>
                 <div className="flex items-center space-x-2">
                   <SignInButton mode="redirect">
                     <button className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors text-sm">
@@ -139,7 +130,7 @@ export default function Header() {
                     </button>
                   </SignUpButton>
                 </div>
-              )}
+              </SignedOut>
             </div>
           </div>
         </div>
