@@ -111,8 +111,16 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
               setLoading(false);
               return;
             }
-            // Fetching vehicle data
-            const vehicleResponse = await fetch(`/api/vehicles/${id}`);
+            // Fetching vehicle data (absolute URL + no-cache)
+            const baseUrl = typeof window !== 'undefined'
+              ? window.location.origin
+              : (process.env.NEXT_PUBLIC_SITE_URL || '');
+            const vehicleResponse = await fetch(`${baseUrl}/api/vehicles/${id}` , {
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-store'
+              }
+            });
             
             if (vehicleResponse.ok) {
               const vehicleData = await vehicleResponse.json();
