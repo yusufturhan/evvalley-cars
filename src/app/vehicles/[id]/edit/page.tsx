@@ -58,27 +58,7 @@ export default function EditVehiclePage() {
       }
 
       try {
-        // 1. Sync user with Supabase
-        const syncResponse = await fetch('/api/auth/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clerkId: user.id,
-            email: user.emailAddresses[0]?.emailAddress,
-            firstName: user.firstName,
-            lastName: user.lastName,
-          }),
-        });
-
-        if (!syncResponse.ok) {
-          const errorData = await syncResponse.json();
-          console.error('Sync error:', errorData);
-          throw new Error(`Failed to sync user with Supabase: ${errorData.error || 'Unknown error'}`);
-        }
-        const syncData = await syncResponse.json();
-        setUserSupabaseId(syncData.supabaseId);
-
-        // 2. Get vehicle ID
+        // 1. Get vehicle ID first
         const id = params?.id;
         if (!id) {
           setError("Vehicle ID not found");
@@ -86,7 +66,7 @@ export default function EditVehiclePage() {
           return;
         }
 
-        // 3. Fetch vehicle data
+        // 2. Fetch vehicle data
         const vehicleResponse = await fetch(`/api/vehicles/${id}`);
         if (!vehicleResponse.ok) {
           throw new Error('Failed to fetch vehicle data');
@@ -96,21 +76,20 @@ export default function EditVehiclePage() {
         const vehicleInfo = vehicleData.vehicle;
         setVehicle(vehicleInfo);
 
-        // 4. Ownership Check
+        // 3. Ownership Check (simplified - email only)
         const userEmail = user.emailAddresses[0]?.emailAddress || '';
-        const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
         const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
         const userDomain = userEmail.split('@')[1];
         const sellerDomain = (vehicleInfo.seller_email || '').split('@')[1];
         const ownsByDomain = userDomain && sellerDomain && userDomain === sellerDomain;
 
-        if (!ownsById && !ownsByEmail && !ownsByDomain) {
+        if (!ownsByEmail && !ownsByDomain) {
           setError("You can only edit your own vehicles.");
           router.push("/profile");
           return;
         }
 
-        // 5. Populate form with vehicle data
+        // 4. Populate form with vehicle data
         setFormData({
           title: vehicleInfo.title || "",
           brand: vehicleInfo.brand || "",
