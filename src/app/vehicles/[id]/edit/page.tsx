@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Car, Upload, MapPin, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
@@ -38,6 +38,7 @@ interface Vehicle {
 export default function EditVehiclePage({ params }: { params: Promise<{ id: string }> }) {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
+  const routeParams = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -99,8 +100,16 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const syncData = await syncResponse.json();
             setUserSupabaseId(syncData.supabaseId);
 
-            // Then fetch vehicle data
-            const { id } = await params;
+            // Then fetch vehicle data (prefer client route params)
+            const idFromRoute = routeParams?.id;
+            const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+            const fallback = await params; // keep SSR param as fallback
+            const id = resolvedId || fallback.id;
+            if (!id) {
+              console.warn('❌ Edit page: missing vehicle id from params');
+              setLoading(false);
+              return;
+            }
             const vehicleResponse = await fetch(`/api/vehicles/${id}`);
             
             if (vehicleResponse.ok) {
@@ -179,7 +188,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
     };
 
     fetchData();
-  }, [isSignedIn, user, params, router]);
+  }, [isSignedIn, user, params, routeParams, router]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -259,7 +268,10 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
 
     setSaving(true);
     try {
-      const { id } = await params;
+      const idFromRoute = routeParams?.id;
+      const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+      const fallback = await params;
+      const id = resolvedId || fallback.id;
       
       // Create FormData
       const submitFormData = new FormData();
