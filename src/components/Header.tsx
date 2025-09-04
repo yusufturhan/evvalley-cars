@@ -7,8 +7,11 @@ import { useState } from "react";
 import Logo from "./Logo";
 
 export default function Header() {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
+
+  // Debug logging
+  console.log('Header render - isLoaded:', isLoaded, 'isSignedIn:', isSignedIn);
 
   const handleSignOut = async () => {
     try {
@@ -68,7 +71,12 @@ export default function Header() {
 
             {/* Desktop Auth Buttons */}
             <div className="flex items-center space-x-4">
-              {isSignedIn ? (
+              {!isLoaded ? (
+                <div className="flex items-center space-x-4">
+                  <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+                  <div className="animate-pulse bg-gray-200 h-8 w-20 rounded"></div>
+                </div>
+              ) : isSignedIn ? (
                 <div className="flex items-center space-x-4">
                   <UserButton afterSignOutUrl="/" />
                   <button
@@ -105,7 +113,12 @@ export default function Header() {
               
               {/* Mobile Auth Buttons */}
               <div className="flex items-center space-x-2">
-                {isSignedIn ? (
+                {!isLoaded ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-pulse bg-gray-200 h-6 w-12 rounded"></div>
+                    <div className="animate-pulse bg-gray-200 h-6 w-16 rounded"></div>
+                  </div>
+                ) : isSignedIn ? (
                   <div className="flex items-center space-x-2">
                     <UserButton afterSignOutUrl="/" />
                     <button
