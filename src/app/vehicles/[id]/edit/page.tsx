@@ -841,9 +841,9 @@ export default function EditVehiclePage() {
                             alt={`Vehicle image ${index + 1}`}
                             className="object-cover"
                             priority={false}
-                            width={400}
-                            height={200}
                             sizes="(max-width: 768px) 50vw, 25vw"
+                            fill
+                            unoptimized={false}
                           />
                         </div>
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">

@@ -183,6 +183,9 @@ export async function PUT(
       
       console.log('📸 New images received:', newImages.length);
 
+      // Support two strategies:
+      // 1) Client sends deleted indices as JSON array in 'deletedImages'
+      // 2) Client sends the final list of existing URLs in 'existingImages' (multi-value)
       // Extract deleted image indices
       const deletedImagesStr = formData.get('deletedImages') as string;
       if (deletedImagesStr) {
@@ -191,6 +194,26 @@ export async function PUT(
           console.log('🗑️ Deleted image indices:', deletedImages);
         } catch (error) {
           console.error('❌ Error parsing deletedImages:', error);
+        }
+      }
+
+      // If existingImages provided, compute deletions from current images
+      const existingImagesRaw = formData.getAll('existingImages');
+      if (existingImagesRaw && existingImagesRaw.length > 0) {
+        const existingImages = existingImagesRaw.map(v => String(v));
+        // Load current images to diff
+        const { data: currentForDiff } = await supabase
+          .from('vehicles')
+          .select('images')
+          .eq('id', id)
+          .single();
+        const currentList: string[] = Array.isArray(currentForDiff?.images) ? currentForDiff.images : [];
+        const toDelete: number[] = [];
+        currentList.forEach((url, idx) => {
+          if (!existingImages.includes(url)) toDelete.push(idx);
+        });
+        if (toDelete.length > 0) {
+          deletedImages = Array.from(new Set([...(deletedImages || []), ...toDelete]));
         }
       }
     } else {

@@ -11,6 +11,8 @@ interface OptimizedImageProps {
   priority?: boolean;
   placeholder?: 'blur' | 'empty';
   sizes?: string;
+  fill?: boolean;
+  unoptimized?: boolean;
 }
 
 export default function OptimizedImage({
@@ -21,20 +23,24 @@ export default function OptimizedImage({
   className = '',
   priority = false,
   placeholder = 'empty',
-  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  fill = false,
+  unoptimized = false,
 }: OptimizedImageProps) {
   return (
     <Image
       src={src}
       alt={alt}
-      width={width}
-      height={height}
+      width={fill ? undefined : width}
+      height={fill ? undefined : height}
+      fill={fill}
       className={className}
       priority={priority}
       placeholder={placeholder}
       sizes={sizes}
       quality={85}
       loading={priority ? 'eager' : 'lazy'}
+      unoptimized={unoptimized}
     />
   );
 }
