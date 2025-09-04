@@ -838,14 +838,18 @@ export default function EditVehiclePage() {
 
               {/* Existing Images */}
               {imageUrls.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Current Images:</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-gray-700">Image Order (First image = Cover Photo)</h4>
+                    <p className="text-xs text-gray-500">Drag to reorder</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {imageUrls.map((rawUrl, index) => {
                       const url = `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
                       return (
                       <div key={index} className="relative group">
-                        <div className="relative w-full h-24 rounded-lg overflow-hidden border bg-gray-100">
+                        <div className="relative w-full h-32 rounded-lg overflow-hidden border bg-gray-100">
                           <img
                             src={url}
                             alt={`Vehicle image ${index + 1}`}
@@ -858,39 +862,27 @@ export default function EditVehiclePage() {
                             onLoad={() => console.log('Image loaded successfully (proxy):', url)}
                           />
                         </div>
+                        
                         {/* Cover Photo Badge */}
                         {index === 0 && (
-                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          <div className="absolute top-2 left-8 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
                             Cover
                           </div>
                         )}
                         
                         {/* Position Number */}
-                        <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                        <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
                           {index + 1}
                         </div>
                         
-                        {/* Controls Overlay */}
-                        <div className="absolute inset-0 pointer-events-none transition-all duration-200 rounded-lg flex items-center justify-center group-hover:bg-black/50">
-                          <div className="opacity-0 group-hover:opacity-100 flex space-x-2">
-                            <button
-                              type="button"
-                              onClick={() => setCoverImage(index)}
-                              className="bg-yellow-500 hover:bg-yellow-600 text-white p-1 rounded pointer-events-auto"
-                              title="Set as cover photo"
-                            >
-                              <Star className="h-4 w-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded pointer-events-auto"
-                              title="Remove image"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
+                        {/* Remove Button */}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-100 z-10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                         
                         {/* Mobile-friendly controls */}
                         <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
@@ -898,25 +890,25 @@ export default function EditVehiclePage() {
                             type="button"
                             aria-label="Move left"
                             onClick={() => moveImage(index, Math.max(0, index - 1))}
-                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100 pointer-events-auto"
+                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
                             disabled={index === 0}
                           >
-                            <ChevronLeft className="h-3 w-3" />
+                            ◀
                           </button>
                           <button
                             type="button"
                             aria-label="Move right"
                             onClick={() => moveImage(index, Math.min(imageUrls.length - 1, index + 1))}
-                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100 pointer-events-auto"
+                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100"
                             disabled={index === imageUrls.length - 1}
                           >
-                            <ChevronRight className="h-3 w-3" />
+                            ▶
                           </button>
                           <button
                             type="button"
                             aria-label="Set as cover"
                             onClick={() => setCoverImage(index)}
-                            className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700 pointer-events-auto"
+                            className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700"
                           >
                             Set cover
                           </button>
@@ -925,6 +917,11 @@ export default function EditVehiclePage() {
                       );
                     })}
                   </div>
+                  
+                  {/* Image Count */}
+                  <p className="text-sm text-gray-500">
+                    {imageUrls.length} of 12 images selected
+                  </p>
                 </div>
               )}
 
