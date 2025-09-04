@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter, useParams } from "next/navigation";
-import { Car, Zap, Battery, Bike, Upload, MapPin, Trash2, Star } from "lucide-react";
+import { Car, Zap, Battery, Bike, Upload, MapPin, Trash2, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
 import OptimizedImage from "@/components/OptimizedImage";
@@ -229,6 +229,14 @@ export default function EditVehiclePage() {
     const newUrls = [...imageUrls];
     const coverImage = newUrls.splice(index, 1)[0];
     newUrls.unshift(coverImage);
+    setImageUrls(newUrls);
+  };
+
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= imageUrls.length || toIndex >= imageUrls.length) return;
+    const newUrls = [...imageUrls];
+    const movedImage = newUrls.splice(fromIndex, 1)[0];
+    newUrls.splice(toIndex, 0, movedImage);
     setImageUrls(newUrls);
   };
 
@@ -850,17 +858,25 @@ export default function EditVehiclePage() {
                             onLoad={() => console.log('Image loaded successfully (proxy):', url)}
                           />
                         </div>
+                        {/* Cover Photo Badge */}
+                        {index === 0 && (
+                          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            Cover
+                          </div>
+                        )}
+                        
+                        {/* Position Number */}
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                          {index + 1}
+                        </div>
+                        
+                        {/* Controls Overlay */}
                         <div className="absolute inset-0 pointer-events-none transition-all duration-200 rounded-lg flex items-center justify-center group-hover:bg-black/50">
                           <div className="opacity-0 group-hover:opacity-100 flex space-x-2">
-                            {index === 0 && (
-                              <div className="bg-yellow-500 text-white px-2 py-1 rounded text-xs">
-                                Cover
-                              </div>
-                            )}
                             <button
                               type="button"
                               onClick={() => setCoverImage(index)}
-                              className="bg-yellow-500 hover:bg-yellow-600 text-white p-1 rounded"
+                              className="bg-yellow-500 hover:bg-yellow-600 text-white p-1 rounded pointer-events-auto"
                               title="Set as cover photo"
                             >
                               <Star className="h-4 w-4" />
@@ -868,12 +884,42 @@ export default function EditVehiclePage() {
                             <button
                               type="button"
                               onClick={() => removeImage(index)}
-                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded"
+                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded pointer-events-auto"
                               title="Remove image"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
+                        </div>
+                        
+                        {/* Mobile-friendly controls */}
+                        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-1">
+                          <button
+                            type="button"
+                            aria-label="Move left"
+                            onClick={() => moveImage(index, Math.max(0, index - 1))}
+                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100 pointer-events-auto"
+                            disabled={index === 0}
+                          >
+                            <ChevronLeft className="h-3 w-3" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Move right"
+                            onClick={() => moveImage(index, Math.min(imageUrls.length - 1, index + 1))}
+                            className="bg-white text-gray-800 rounded px-2 py-0.5 text-xs shadow hover:bg-gray-100 pointer-events-auto"
+                            disabled={index === imageUrls.length - 1}
+                          >
+                            <ChevronRight className="h-3 w-3" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label="Set as cover"
+                            onClick={() => setCoverImage(index)}
+                            className="bg-green-600 text-white rounded px-2 py-0.5 text-xs shadow hover:bg-green-700 pointer-events-auto"
+                          >
+                            Set cover
+                          </button>
                         </div>
                       </div>
                       );
