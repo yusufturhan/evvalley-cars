@@ -39,9 +39,6 @@ export default async function TeslaBrandPage() {
               src="/tesla-logo.png" 
               alt="Tesla Logo" 
               className="h-16 mx-auto mb-4"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
             />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
