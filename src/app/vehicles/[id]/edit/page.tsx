@@ -104,7 +104,14 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
             // ID resolution complete
-            // ID resolved
+            console.log('🔍 ID Debug:', {
+              routeParams: routeParams,
+              idFromRoute: idFromRoute,
+              resolvedId: resolvedId,
+              fallback: fallback,
+              finalId: id
+            });
+            
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
@@ -123,15 +130,27 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
               const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
               const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
 
+              console.log('🔍 Vehicle ownership check:', {
+                vehicleSellerId: vehicleInfo.seller_id,
+                userSupabaseId: syncData.supabaseId,
+                vehicleSellerEmail: vehicleInfo.seller_email,
+                userEmail: userEmail,
+                ownsById: ownsById,
+                ownsByEmail: ownsByEmail,
+                finalOwnership: ownsById || ownsByEmail
+              });
+
               // Ownership check complete
 
               if (!ownsById && !ownsByEmail) {
+                console.log('🔍 Access denied - not owner');
                 // Access denied
                 alert("You can only edit your own vehicles");
                 router.push("/profile");
                 return;
               }
               
+              console.log('🔍 Access granted - user is owner');
               // Access granted
 
               // Vehicle data loaded

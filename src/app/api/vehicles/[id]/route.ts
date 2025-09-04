@@ -8,10 +8,11 @@ export async function GET(
   try {
     const { id } = await params;
     // API called
+    console.log('🔍 API Debug - Searching for vehicle ID:', id);
     const supabase = createServerSupabaseClient();
     
     // First try vehicles table
-    // Searching vehicles table
+    console.log('🔍 Searching vehicles table...');
     let { data: vehicle, error } = await supabase
       .from('vehicles')
       .select(`
@@ -35,16 +36,29 @@ export async function GET(
       .single();
     
     // Vehicles table search complete
+    console.log('🔍 Vehicles table result:', { 
+      found: !!vehicle, 
+      error: error?.message,
+      vehicleId: vehicle?.id 
+    });
 
     // If not found in vehicles, try ev_scooters
     if (error || !vehicle) {
+      console.log('🔍 Trying ev_scooters table...');
       const { data: scooter, error: scooterError } = await supabase
         .from('ev_scooters')
         .select('*')
         .eq('id', id)
         .single();
       
+      console.log('🔍 EV Scooters result:', { 
+        found: !!scooter, 
+        error: scooterError?.message,
+        scooterId: scooter?.id 
+      });
+      
       if (scooter && !scooterError) {
+        console.log('🔍 Converting scooter to vehicle format...');
         // Convert scooter to vehicle format for compatibility
         vehicle = {
           ...scooter,
@@ -87,13 +101,47 @@ export async function GET(
           vin: null, // Bikes don't have VIN
         };
         error = null;
+      } else {
+        // Try e_bikes table
+        console.log('🔍 Trying e_bikes table...');
+        const { data: bike, error: bikeError } = await supabase
+          .from('e_bikes')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        console.log('🔍 E-bikes result:', { 
+          found: !!bike, 
+          error: bikeError?.message,
+          bikeId: bike?.id 
+        });
+        
+        if (bike && !bikeError) {
+          console.log('🔍 Converting bike to vehicle format...');
+          vehicle = {
+            ...bike,
+            category: 'e-bike',
+            fuel_type: 'Electric',
+            drivetrain: 'Electric',
+            body_seating: 'Bike',
+          };
+          error = null;
+        }
       }
     }
 
     if (error || !vehicle) {
-      // Vehicle not found
+      console.log('🔍 Final result: Vehicle not found in any table');
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
+    
+    console.log('🔍 Vehicle found successfully:', { 
+      id: vehicle.id, 
+      make: vehicle.make, 
+      model: vehicle.model,
+      seller_id: vehicle.seller_id,
+      seller_email: vehicle.seller_email
+    });
     
     // Vehicle found
 
