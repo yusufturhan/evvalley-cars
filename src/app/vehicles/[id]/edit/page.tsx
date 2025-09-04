@@ -14,33 +14,47 @@ export default function EditVehiclePage() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
+    console.log("MINIMAL EDIT PAGE: useEffect triggered");
     const fetchData = async () => {
+      console.log("MINIMAL EDIT PAGE: fetchData started", { isSignedIn, user: !!user });
+      
       if (!isSignedIn || !user) {
+        console.log("MINIMAL EDIT PAGE: not signed in or no user");
         setLoading(false);
-                return;
-              }
-              
+        return;
+      }
+
       try {
         // Get vehicle ID
         const id = routeParams?.id;
+        console.log("MINIMAL EDIT PAGE: vehicle ID", id);
+        
         if (!id) {
+          console.log("MINIMAL EDIT PAGE: no vehicle ID found");
           setError("Vehicle ID not found");
           setLoading(false);
           return;
         }
 
         // Fetch vehicle data
+        console.log("MINIMAL EDIT PAGE: fetching vehicle data");
         const response = await fetch(`/api/vehicles/${id}`);
+        console.log("MINIMAL EDIT PAGE: fetch response status", response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log("MINIMAL EDIT PAGE: vehicle data received", data);
           setVehicle(data.vehicle);
-      } else {
+        } else {
+          console.log("MINIMAL EDIT PAGE: vehicle not found");
           setError("Vehicle not found");
         }
       } catch (err) {
+        console.log("MINIMAL EDIT PAGE: error occurred", err);
         setError("Failed to load vehicle");
         console.error(err);
       } finally {
+        console.log("MINIMAL EDIT PAGE: setting loading to false");
         setLoading(false);
       }
     };
