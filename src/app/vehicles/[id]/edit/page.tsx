@@ -108,6 +108,7 @@ export default function EditVehiclePage() {
 
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('ev-car');
 
   useEffect(() => {
@@ -221,8 +222,10 @@ export default function EditVehiclePage() {
   };
 
   const removeImage = (index: number) => {
+    const deletedImage = imageUrls[index];
     const newUrls = imageUrls.filter((_, i) => i !== index);
     setImageUrls(newUrls);
+    setDeletedImages(prev => [...prev, deletedImage]);
   };
 
   const setCoverImage = (index: number) => {
@@ -238,6 +241,11 @@ export default function EditVehiclePage() {
     const movedImage = newUrls.splice(fromIndex, 1)[0];
     newUrls.splice(toIndex, 0, movedImage);
     setImageUrls(newUrls);
+  };
+
+  const restoreImage = (deletedImageUrl: string) => {
+    setImageUrls(prev => [...prev, deletedImageUrl]);
+    setDeletedImages(prev => prev.filter(url => url !== deletedImageUrl));
   };
 
   const validateForm = () => {
@@ -921,6 +929,55 @@ export default function EditVehiclePage() {
                   {/* Image Count */}
                   <p className="text-sm text-gray-500">
                     {imageUrls.length} of 12 images selected
+                  </p>
+                </div>
+              )}
+
+              {/* Deleted Images Section */}
+              {deletedImages.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-gray-700">Recently Deleted Images</h4>
+                    <p className="text-xs text-gray-500">Click to restore</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {deletedImages.map((deletedUrl, index) => {
+                      const url = `/api/image-proxy?url=${encodeURIComponent(deletedUrl)}`;
+                      return (
+                        <div key={`deleted-${index}`} className="relative group">
+                          <div className="relative w-full h-32 rounded-lg overflow-hidden border bg-gray-100 opacity-60">
+                            <img
+                              src={url}
+                              alt={`Deleted image ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onError={(e) => {
+                                console.log('Deleted image failed to load (proxy):', url);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                              onLoad={() => console.log('Deleted image loaded successfully (proxy):', url)}
+                            />
+                          </div>
+                          
+                          {/* Restore Button */}
+                          <button
+                            type="button"
+                            onClick={() => restoreImage(deletedUrl)}
+                            className="absolute inset-0 bg-green-500 bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 rounded-lg flex items-center justify-center"
+                            title="Restore this image"
+                          >
+                            <div className="opacity-0 group-hover:opacity-100 bg-green-600 text-white px-3 py-1 rounded text-sm font-medium">
+                              Restore
+                            </div>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <p className="text-xs text-gray-500">
+                    {deletedImages.length} deleted image{deletedImages.length !== 1 ? 's' : ''} - Click "Save Changes" to permanently delete
                   </p>
                 </div>
               )}
