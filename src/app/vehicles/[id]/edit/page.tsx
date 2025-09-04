@@ -833,7 +833,9 @@ export default function EditVehiclePage() {
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Current Images:</h4>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {imageUrls.map((url, index) => (
+                    {imageUrls.map((rawUrl, index) => {
+                      const url = `/api/image-proxy?url=${encodeURIComponent(rawUrl)}`;
+                      return (
                       <div key={index} className="relative group">
                         <div className="relative w-full h-24 rounded-lg overflow-hidden border bg-gray-100">
                           <img
@@ -842,10 +844,10 @@ export default function EditVehiclePage() {
                             className="w-full h-full object-cover"
                             loading="lazy"
                             onError={(e) => {
-                              console.log('Image failed to load:', url);
+                              console.log('Image failed to load (proxy):', url);
                               e.currentTarget.style.display = 'none';
                             }}
-                            onLoad={() => console.log('Image loaded successfully:', url)}
+                            onLoad={() => console.log('Image loaded successfully (proxy):', url)}
                           />
                         </div>
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
@@ -874,7 +876,8 @@ export default function EditVehiclePage() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
