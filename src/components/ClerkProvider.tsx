@@ -12,6 +12,7 @@ export default function ClerkProvider({
   return (
     <ClerkProviderBase
       publishableKey={publishableKey}
+      clerkJSUrl="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
       appearance={{
         elements: {
           formButtonPrimary: "bg-[#3AB0FF] hover:bg-[#2A8FE6]",
