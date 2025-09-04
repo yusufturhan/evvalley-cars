@@ -116,19 +116,22 @@ export default function EditVehiclePage() {
             // ID resolved successfully
             
             if (!id) {
-              // Wait for params to be ready; keep loading
+              console.warn('Edit page: missing vehicle id');
               return;
             }
             // Fetching vehicle data (absolute URL + no-cache)
             const baseUrl = typeof window !== 'undefined'
               ? window.location.origin
               : (process.env.NEXT_PUBLIC_SITE_URL || '');
-            const vehicleResponse = await fetch(`${baseUrl}/api/vehicles/${id}` , {
+            const apiUrl = `${baseUrl}/api/vehicles/${id}`;
+            console.log('Edit page: fetching', { id, apiUrl });
+            const vehicleResponse = await fetch(apiUrl , {
               cache: 'no-store',
               headers: {
                 'Cache-Control': 'no-store'
               }
             });
+            console.log('Edit page: fetch status', vehicleResponse.status);
             
             if (vehicleResponse.ok) {
               const vehicleData = await vehicleResponse.json();
