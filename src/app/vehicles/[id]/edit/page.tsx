@@ -105,11 +105,13 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
+            console.log('🔍 Edit page - ID resolution:', { idFromRoute, resolvedId, fallbackId: fallback.id, finalId: id });
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
               return;
             }
+            console.log('🔍 Edit page - Fetching vehicle with ID:', id);
             const vehicleResponse = await fetch(`/api/vehicles/${id}`);
             
             if (vehicleResponse.ok) {
@@ -171,6 +173,9 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 highlighted_features: vehicleInfo.highlighted_features || ""
               });
             } else {
+              console.log('❌ Edit page - Vehicle fetch failed:', vehicleResponse.status, vehicleResponse.statusText);
+              const errorData = await vehicleResponse.json().catch(() => ({}));
+              console.log('❌ Edit page - Error details:', errorData);
               alert("Vehicle not found");
               router.push("/profile");
             }
