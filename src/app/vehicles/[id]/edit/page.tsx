@@ -108,14 +108,21 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
               const vehicleInfo = vehicleData.vehicle;
               setVehicle(vehicleInfo);
 
-              // Check if user owns this vehicle
+              // Check if user owns this vehicle (by seller_id OR fallback to email)
+              const userEmail = user.emailAddresses[0]?.emailAddress || '';
+              const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
+              const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
+
               console.log('🔍 Ownership check:', {
                 vehicleSellerId: vehicleInfo.seller_id,
                 userSupabaseId: syncData.supabaseId,
-                match: vehicleInfo.seller_id === syncData.supabaseId
+                vehicleSellerEmail: vehicleInfo.seller_email,
+                userEmail,
+                ownsById,
+                ownsByEmail,
               });
-              
-              if (vehicleInfo.seller_id !== syncData.supabaseId) {
+
+              if (!ownsById && !ownsByEmail) {
                 console.log('❌ Access denied: User does not own this vehicle');
                 alert("You can only edit your own vehicles");
                 router.push("/profile");
