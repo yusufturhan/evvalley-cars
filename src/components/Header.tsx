@@ -80,12 +80,12 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <SignInButton mode="modal">
+                  <SignInButton mode="redirect" redirectUrl="/sign-in">
                     <button className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
                       Sign In
                     </button>
                   </SignInButton>
-                  <SignUpButton mode="modal">
+                  <SignUpButton mode="redirect" redirectUrl="/sign-up">
                     <button className="bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors">
                       Sign Up
                     </button>
@@ -117,12 +117,12 @@ export default function Header() {
                   </div>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <SignInButton mode="modal">
+                    <SignInButton mode="redirect" redirectUrl="/sign-in">
                       <button className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors text-sm">
                         Sign In
                       </button>
                     </SignInButton>
-                    <SignUpButton mode="modal">
+                    <SignUpButton mode="redirect" redirectUrl="/sign-up">
                       <button className="bg-[#1C1F4A] text-white px-3 py-1 rounded text-sm hover:bg-[#2A2F6B] transition-colors">
                         Sign Up
                       </button>
