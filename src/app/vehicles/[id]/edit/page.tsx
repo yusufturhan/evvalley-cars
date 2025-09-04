@@ -10,30 +10,30 @@ export default function EditVehiclePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("EDIT PAGE: Starting...");
-    console.log("EDIT PAGE: Params:", params);
+    console.log("SIMPLE EDIT PAGE: Starting...");
+    console.log("SIMPLE EDIT PAGE: Params:", params);
     
     const id = params?.id;
     if (id) {
-      console.log("EDIT PAGE: Vehicle ID:", id);
+      console.log("SIMPLE EDIT PAGE: Vehicle ID:", id);
       
       fetch(`/api/vehicles/${id}`)
         .then(res => {
-          console.log("EDIT PAGE: API Response Status:", res.status);
+          console.log("SIMPLE EDIT PAGE: API Response Status:", res.status);
           return res.json();
         })
         .then(data => {
-          console.log("EDIT PAGE: API Data:", data);
+          console.log("SIMPLE EDIT PAGE: API Data:", data);
           setData(data);
         })
         .catch(err => {
-          console.log("EDIT PAGE: API Error:", err);
+          console.log("SIMPLE EDIT PAGE: API Error:", err);
         })
         .finally(() => {
           setLoading(false);
         });
     } else {
-      console.log("EDIT PAGE: No vehicle ID found");
+      console.log("SIMPLE EDIT PAGE: No vehicle ID found");
       setLoading(false);
     }
   }, [params]);
@@ -55,7 +55,7 @@ export default function EditVehiclePage() {
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Edit Vehicle</h1>
+          <h1 className="text-3xl font-bold text-green-600 mb-6">✅ SIMPLE EDIT PAGE</h1>
           
           <div className="space-y-4">
             <p><strong>Vehicle ID:</strong> {params?.id}</p>
@@ -78,7 +78,7 @@ export default function EditVehiclePage() {
                 <button 
                   className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"
                   onClick={() => {
-                    console.log("EDIT PAGE: Edit button clicked");
+                    console.log("SIMPLE EDIT PAGE: Edit button clicked");
                     alert("Edit functionality will be implemented here");
                   }}
                 >
