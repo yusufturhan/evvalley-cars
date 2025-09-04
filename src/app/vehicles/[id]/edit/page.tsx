@@ -35,7 +35,7 @@ interface Vehicle {
   seller_type?: string;
 }
 
-export default function EditVehiclePage({ params }: { params: Promise<{ id: string }> }) {
+export default function EditVehiclePage() {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const routeParams = useParams<{ id: string }>();
@@ -100,9 +100,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
 
             // Then fetch vehicle data (prefer client route params)
             const idFromRoute = routeParams?.id;
-            const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
-            const fallback = await params; // keep SSR param as fallback
-            const id = resolvedId || fallback.id;
+            const id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             // ID resolution complete
             // ID resolved successfully
             
@@ -200,7 +198,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
     };
 
     fetchData();
-  }, [isSignedIn, user, params, routeParams, router]);
+  }, [isSignedIn, user, routeParams, router]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -281,9 +279,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
     setSaving(true);
     try {
       const idFromRoute = routeParams?.id;
-      const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
-      const fallback = await params;
-      const id = resolvedId || fallback.id;
+      const id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
       
       // Create FormData
       const submitFormData = new FormData();
