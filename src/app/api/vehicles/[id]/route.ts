@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    // API called
+    console.log('DEBUG: API called with ID:', id);
     const supabase = createServerSupabaseClient();
     
     // First try vehicles table
@@ -91,7 +91,7 @@ export async function GET(
     }
 
     if (error || !vehicle) {
-      // Vehicle not found
+      console.log('DEBUG: Vehicle not found in vehicles table, error:', error?.message);
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
     
