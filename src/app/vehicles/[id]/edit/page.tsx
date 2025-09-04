@@ -45,9 +45,7 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  console.log('EditVehiclePage loaded!');
-  console.log('isSignedIn:', isSignedIn);
-  console.log('user:', user?.emailAddresses?.[0]?.emailAddress);
+  // Debug logs removed
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -105,13 +103,13 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
-            console.log('Edit page ID resolution:', idFromRoute, resolvedId, fallback.id, id);
+            // ID resolution complete
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
               return;
             }
-            console.log('Edit page fetching vehicle with ID:', id);
+            // Fetching vehicle data
             const vehicleResponse = await fetch(`/api/vehicles/${id}`);
             
             if (vehicleResponse.ok) {
@@ -124,19 +122,18 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
               const ownsById = vehicleInfo.seller_id === syncData.supabaseId;
               const ownsByEmail = (vehicleInfo.seller_email || '').toLowerCase() === userEmail.toLowerCase();
 
-              console.log('Ownership check:', vehicleInfo.seller_id, syncData.supabaseId, vehicleInfo.seller_email, userEmail, ownsById, ownsByEmail);
+              // Ownership check complete
 
               if (!ownsById && !ownsByEmail) {
-                console.log('❌ Access denied: User does not own this vehicle');
+                // Access denied
                 alert("You can only edit your own vehicles");
                 router.push("/profile");
                 return;
               }
               
-              console.log('✅ Access granted: User owns this vehicle');
+              // Access granted
 
-              // Debug: Log vehicle data
-              console.log('🔍 Vehicle data from API:', vehicleInfo);
+              // Vehicle data loaded
               
               // Populate form with existing data
               setFormData({
@@ -166,9 +163,6 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 highlighted_features: vehicleInfo.highlighted_features || ""
               });
             } else {
-              console.log('❌ Edit page - Vehicle fetch failed:', vehicleResponse.status, vehicleResponse.statusText);
-              const errorData = await vehicleResponse.json().catch(() => ({}));
-              console.log('❌ Edit page - Error details:', errorData);
               alert("Vehicle not found");
               router.push("/profile");
             }

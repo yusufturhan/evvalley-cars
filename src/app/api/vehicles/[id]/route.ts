@@ -7,11 +7,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    console.log('API looking for vehicle ID:', id);
+    // API called
     const supabase = createServerSupabaseClient();
     
     // First try vehicles table
-    console.log('Searching in vehicles table for ID:', id);
+    // Searching vehicles table
     let { data: vehicle, error } = await supabase
       .from('vehicles')
       .select(`
@@ -34,7 +34,7 @@ export async function GET(
       .eq('id', id)
       .single();
     
-    console.log('Vehicles table result:', !!vehicle, error?.message || 'none');
+    // Vehicles table search complete
 
     // If not found in vehicles, try ev_scooters
     if (error || !vehicle) {
@@ -91,11 +91,11 @@ export async function GET(
     }
 
     if (error || !vehicle) {
-      console.log('Vehicle not found in any table. ID:', id, 'Error:', error?.message || 'Unknown');
+      // Vehicle not found
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
     
-    console.log('Vehicle found:', vehicle.id, vehicle.title, vehicle.category);
+    // Vehicle found
 
     return NextResponse.json({ vehicle });
   } catch (error) {
