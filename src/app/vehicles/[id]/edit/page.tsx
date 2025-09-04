@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, usePathname } from "next/navigation";
 import { Car, Upload, MapPin, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
@@ -39,6 +39,7 @@ export default function EditVehiclePage() {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
   const routeParams = useParams<{ id: string }>();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -100,13 +101,22 @@ export default function EditVehiclePage() {
 
             // Then fetch vehicle data (prefer client route params)
             const idFromRoute = routeParams?.id;
-            const id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+            let id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
+            if (!id && typeof window !== 'undefined') {
+              // Fallback: parse from URL path
+              const path = pathname || window.location.pathname;
+              const parts = path.split('/').filter(Boolean);
+              // Expecting /vehicles/:id/edit
+              const vehiclesIndex = parts.indexOf('vehicles');
+              if (vehiclesIndex !== -1 && parts.length > vehiclesIndex + 1) {
+                id = parts[vehiclesIndex + 1];
+              }
+            }
             // ID resolution complete
             // ID resolved successfully
             
             if (!id) {
-              console.warn('❌ Edit page: missing vehicle id from params');
-              setLoading(false);
+              // Wait for params to be ready; keep loading
               return;
             }
             // Fetching vehicle data (absolute URL + no-cache)
