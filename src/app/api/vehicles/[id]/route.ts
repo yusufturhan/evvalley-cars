@@ -7,11 +7,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    console.log('🔍 GET /api/vehicles/[id] - Looking for vehicle ID:', id);
+    console.log('🔍 GET /api/vehicles/[id] - Looking for vehicle ID: ' + id);
     const supabase = createServerSupabaseClient();
     
     // First try vehicles table
-    console.log('🔍 Searching in vehicles table for ID:', id);
+    console.log('🔍 Searching in vehicles table for ID: ' + id);
     let { data: vehicle, error } = await supabase
       .from('vehicles')
       .select(`
@@ -34,7 +34,10 @@ export async function GET(
       .eq('id', id)
       .single();
     
-    console.log('🔍 Vehicles table result:', { vehicle: !!vehicle, error: error?.message });
+    console.log('🔍 Vehicles table result:', {
+      vehicle: !!vehicle,
+      error: error?.message
+    });
 
     // If not found in vehicles, try ev_scooters
     if (error || !vehicle) {
@@ -91,11 +94,15 @@ export async function GET(
     }
 
     if (error || !vehicle) {
-      console.log('❌ Vehicle not found in any table. ID:', id, 'Error:', error?.message);
+      console.log('❌ Vehicle not found in any table. ID: ' + id + ', Error: ' + (error?.message || 'Unknown'));
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
     
-    console.log('✅ Vehicle found:', { id: vehicle.id, title: vehicle.title, category: vehicle.category });
+    console.log('✅ Vehicle found:', {
+      id: vehicle.id,
+      title: vehicle.title,
+      category: vehicle.category
+    });
 
     return NextResponse.json({ vehicle });
   } catch (error) {

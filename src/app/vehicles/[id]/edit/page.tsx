@@ -105,13 +105,18 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
             const resolvedId = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             const fallback = await params; // keep SSR param as fallback
             const id = resolvedId || fallback.id;
-            console.log('🔍 Edit page - ID resolution:', { idFromRoute, resolvedId, fallbackId: fallback.id, finalId: id });
+            console.log('🔍 Edit page - ID resolution:', {
+              idFromRoute: idFromRoute,
+              resolvedId: resolvedId,
+              fallbackId: fallback.id,
+              finalId: id
+            });
             if (!id) {
               console.warn('❌ Edit page: missing vehicle id from params');
               setLoading(false);
               return;
             }
-            console.log('🔍 Edit page - Fetching vehicle with ID:', id);
+            console.log('🔍 Edit page - Fetching vehicle with ID: ' + id);
             const vehicleResponse = await fetch(`/api/vehicles/${id}`);
             
             if (vehicleResponse.ok) {
@@ -128,9 +133,9 @@ export default function EditVehiclePage({ params }: { params: Promise<{ id: stri
                 vehicleSellerId: vehicleInfo.seller_id,
                 userSupabaseId: syncData.supabaseId,
                 vehicleSellerEmail: vehicleInfo.seller_email,
-                userEmail,
-                ownsById,
-                ownsByEmail,
+                userEmail: userEmail,
+                ownsById: ownsById,
+                ownsByEmail: ownsByEmail
               });
 
               if (!ownsById && !ownsByEmail) {
