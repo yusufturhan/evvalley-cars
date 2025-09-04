@@ -9,9 +9,6 @@ export default function ClerkProvider({
 }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
   
-  // Debug logging
-  console.log('ClerkProvider - publishableKey:', publishableKey ? 'Present' : 'Missing');
-  
   if (!publishableKey) {
     console.error('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is missing!');
     return <div>Error: Clerk configuration missing</div>;
