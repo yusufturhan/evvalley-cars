@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Search, Filter, Car, Zap, Battery, Bike, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function EVScootersPage() {
+function EVScootersContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -607,5 +607,23 @@ export default function EVScootersPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function EVScootersPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F5F9FF]">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading electric scooters...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <EVScootersContent />
+    </Suspense>
   );
 }
