@@ -100,16 +100,28 @@ export default function EditVehiclePage() {
             setUserSupabaseId(syncData.supabaseId);
 
             // Then fetch vehicle data (prefer client route params)
+            // Resolve vehicle id robustly
             const idFromRoute = routeParams?.id;
             let id = Array.isArray(idFromRoute) ? idFromRoute[0] : idFromRoute;
             if (!id && typeof window !== 'undefined') {
-              // Fallback: parse from URL path
               const path = pathname || window.location.pathname;
-              const parts = path.split('/').filter(Boolean);
-              // Expecting /vehicles/:id/edit
-              const vehiclesIndex = parts.indexOf('vehicles');
-              if (vehiclesIndex !== -1 && parts.length > vehiclesIndex + 1) {
-                id = parts[vehiclesIndex + 1];
+              // Try regex first
+              const match = path.match(/\/vehicles\/([A-Za-z0-9-]{10,})/);
+              if (match && match[1]) {
+                id = match[1];
+              } else {
+                const clean = path.split('?')[0];
+                const segments = clean.split('/').filter(Boolean);
+                const vehiclesIdx = segments.indexOf('vehicles');
+                if (vehiclesIdx !== -1) {
+                  const candidate = segments[vehiclesIdx + 1];
+                  if (candidate && candidate !== 'edit') {
+                    id = candidate;
+                  } else if (segments.length >= 2) {
+                    // If last segment is edit, take the one before
+                    id = segments[segments.length - 2];
+                  }
+                }
               }
             }
             // ID resolution complete
@@ -117,6 +129,8 @@ export default function EditVehiclePage() {
             
             if (!id) {
               console.warn('Edit page: missing vehicle id');
+              setLoading(false);
+              router.push('/profile');
               return;
             }
             // Fetching vehicle data (absolute URL + no-cache)
