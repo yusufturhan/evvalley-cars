@@ -146,13 +146,8 @@ export default function Header() {
             </div>
 
             {/* Mobile Navigation Menu - Always Visible */}
-            <div style={{ 
-              backgroundColor: '#EBF8FF', 
-              borderTop: '1px solid #90CDF4', 
-              padding: '12px 0',
-              marginTop: '8px'
-            }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+            <div className="pb-4">
+              <div className="flex flex-wrap gap-2">
                 <Link 
                   href="/" 
                   style={{
@@ -218,6 +213,22 @@ export default function Header() {
                   About Us
                 </Link>
                 <Link 
+                  href="/blog" 
+                  style={{
+                    padding: '8px 16px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#4A5568',
+                    backgroundColor: 'white',
+                    border: '1px solid #90CDF4',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    display: 'inline-block'
+                  }}
+                >
+                  Blog
+                </Link>
+                <Link 
                   href="/escrow" 
                   style={{
                     padding: '8px 16px',
@@ -238,10 +249,10 @@ export default function Header() {
                   style={{
                     padding: '8px 16px',
                     fontSize: '14px',
-                    fontWeight: '600',
-                    color: '#1C1F4A',
-                    backgroundColor: '#BEE3F8',
-                    border: '2px solid #3AB0FF',
+                    fontWeight: '500',
+                    color: '#4A5568',
+                    backgroundColor: 'white',
+                    border: '1px solid #90CDF4',
                     borderRadius: '8px',
                     textDecoration: 'none',
                     display: 'inline-block'
@@ -249,7 +260,6 @@ export default function Header() {
                 >
                   Sell Your EV
                 </Link>
-
                 {isSignedIn && (
                   <Link 
                     href="/favorites" 
@@ -262,11 +272,9 @@ export default function Header() {
                       border: '1px solid #90CDF4',
                       borderRadius: '8px',
                       textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center'
+                      display: 'inline-block'
                     }}
                   >
-                    <Heart style={{ width: '12px', height: '12px', marginRight: '4px' }} />
                     Favorites
                   </Link>
                 )}
@@ -295,4 +303,4 @@ export default function Header() {
       </header>
     </>
   );
-} 
+}
