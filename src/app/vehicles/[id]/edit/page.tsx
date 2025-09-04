@@ -850,7 +850,7 @@ export default function EditVehiclePage() {
                             onLoad={() => console.log('Image loaded successfully (proxy):', url)}
                           />
                         </div>
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
+                        <div className="absolute inset-0 pointer-events-none transition-all duration-200 rounded-lg flex items-center justify-center group-hover:bg-black/50">
                           <div className="opacity-0 group-hover:opacity-100 flex space-x-2">
                             {index === 0 && (
                               <div className="bg-yellow-500 text-white px-2 py-1 rounded text-xs">
