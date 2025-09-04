@@ -34,10 +34,7 @@ export async function GET(
       .eq('id', id)
       .single();
     
-    console.log('🔍 Vehicles table result:', {
-      vehicle: !!vehicle,
-      error: error?.message
-    });
+    console.log('🔍 Vehicles table result: vehicle=' + !!vehicle + ', error=' + (error?.message || 'none'));
 
     // If not found in vehicles, try ev_scooters
     if (error || !vehicle) {
@@ -98,11 +95,7 @@ export async function GET(
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
     
-    console.log('✅ Vehicle found:', {
-      id: vehicle.id,
-      title: vehicle.title,
-      category: vehicle.category
-    });
+    console.log('✅ Vehicle found: id=' + vehicle.id + ', title=' + vehicle.title + ', category=' + vehicle.category);
 
     return NextResponse.json({ vehicle });
   } catch (error) {
