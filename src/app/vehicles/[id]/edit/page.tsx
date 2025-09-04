@@ -836,14 +836,16 @@ export default function EditVehiclePage() {
                     {imageUrls.map((url, index) => (
                       <div key={index} className="relative group">
                         <div className="relative w-full h-24 rounded-lg overflow-hidden border bg-gray-100">
-                          <OptimizedImage
+                          <img
                             src={url}
                             alt={`Vehicle image ${index + 1}`}
-                            className="object-cover"
-                            priority={false}
-                            sizes="(max-width: 768px) 50vw, 25vw"
-                            fill
-                            unoptimized={false}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            onError={(e) => {
+                              console.log('Image failed to load:', url);
+                              e.currentTarget.style.display = 'none';
+                            }}
+                            onLoad={() => console.log('Image loaded successfully:', url)}
                           />
                         </div>
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
