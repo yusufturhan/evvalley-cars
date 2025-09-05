@@ -26,6 +26,40 @@ export async function GET(request: Request) {
 
     if (selectError) {
       console.error('❌ Auth sync: Error fetching user:', selectError);
+      
+      // If user not found, try to create them
+      if (selectError.code === 'PGRST116') {
+        console.log('🔄 Auth sync: User not found, creating new user...');
+        
+        // Get user info from Clerk (we'll need to implement this)
+        // For now, create with basic info
+        const clerkId = authHeader.replace('Bearer ', '');
+        const userEmail = `${clerkId}@evvalley.com`; // Fallback email
+        
+        const { data: newUser, error: insertError } = await adminClient
+          .from('users')
+          .insert({
+            clerk_id: clerkId,
+            email: userEmail,
+            first_name: 'User',
+            last_name: 'Name',
+            seller_type: 'private'
+          })
+          .select('id, email, first_name, last_name')
+          .single();
+
+        if (insertError) {
+          console.error('❌ Auth sync: Error creating user:', insertError);
+          return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+        }
+
+        console.log('✅ Auth sync: User created in Supabase:', newUser.id);
+        return NextResponse.json({ 
+          user: newUser,
+          message: 'User created and synced successfully'
+        });
+      }
+      
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
