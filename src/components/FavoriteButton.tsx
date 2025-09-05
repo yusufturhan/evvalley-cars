@@ -34,11 +34,16 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
       console.log('🔍 Checking favorite status for vehicle:', vehicleId);
       console.log('👤 User ID:', user?.id);
       
+      if (!user?.id) {
+        console.log('❌ No user ID available');
+        return;
+      }
+      
       // Get user's Supabase ID
       const userResponse = await fetch('/api/auth/sync', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${user?.id}`
+          'Authorization': `Bearer ${user.id}`
         }
       });
       
@@ -46,23 +51,32 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
       
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        const userId = userData.user.id;
-        console.log('✅ Got Supabase user ID:', userId);
+        console.log('📧 User data received:', userData);
         
-        // Check if vehicle is in favorites
-        const favoritesResponse = await fetch(`/api/favorites?user_id=${userId}&vehicle_id=${vehicleId}`);
-        console.log('📡 Favorites response status:', favoritesResponse.status);
-        
-        if (favoritesResponse.ok) {
-          const favoritesData = await favoritesResponse.json();
-          const isFav = favoritesData.favorites.length > 0;
-          console.log('❤️ Favorite status:', isFav, 'favorites found:', favoritesData.favorites.length);
-          setIsFavorited(isFav);
+        if (userData.user && userData.user.id) {
+          const userId = userData.user.id;
+          console.log('✅ Got Supabase user ID:', userId);
+          
+          // Check if vehicle is in favorites
+          const favoritesResponse = await fetch(`/api/favorites?user_id=${userId}&vehicle_id=${vehicleId}`);
+          console.log('📡 Favorites response status:', favoritesResponse.status);
+          
+          if (favoritesResponse.ok) {
+            const favoritesData = await favoritesResponse.json();
+            console.log('📋 Favorites data:', favoritesData);
+            const isFav = favoritesData.favorites && favoritesData.favorites.length > 0;
+            console.log('❤️ Favorite status:', isFav, 'favorites found:', favoritesData.favorites?.length || 0);
+            setIsFavorited(isFav);
+          } else {
+            const errorText = await favoritesResponse.text();
+            console.error('❌ Favorites API error:', errorText);
+          }
         } else {
-          console.error('❌ Favorites API error:', await favoritesResponse.text());
+          console.error('❌ No user ID in response:', userData);
         }
       } else {
-        console.error('❌ Auth sync error:', await userResponse.text());
+        const errorText = await userResponse.text();
+        console.error('❌ Auth sync error:', errorText);
       }
     } catch (error) {
       console.error('❌ Error checking favorite status:', error);
@@ -75,6 +89,11 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
       return;
     }
 
+    if (!user?.id) {
+      console.log('❌ No user ID available for toggle');
+      return;
+    }
+
     console.log('🔄 Toggling favorite for vehicle:', vehicleId, 'Current status:', isFavorited);
     setLoading(true);
     try {
@@ -82,7 +101,7 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
       const userResponse = await fetch('/api/auth/sync', {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${user?.id}`
+          'Authorization': `Bearer ${user.id}`
         }
       });
       
@@ -90,47 +109,56 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
       
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        const userId = userData.user.id;
-        console.log('✅ Got Supabase user ID:', userId);
+        console.log('📧 User data for toggle:', userData);
         
-        if (isFavorited) {
-          // Remove from favorites
-          console.log('🗑️ Removing from favorites...');
-          const response = await fetch(`/api/favorites?userId=${userId}&vehicleId=${vehicleId}`, {
-            method: 'DELETE'
-          });
-          console.log('📡 Delete response status:', response.status);
-          if (response.ok) {
-            setIsFavorited(false);
-            console.log('✅ Removed from favorites:', vehicleId);
+        if (userData.user && userData.user.id) {
+          const userId = userData.user.id;
+          console.log('✅ Got Supabase user ID for toggle:', userId);
+          
+          if (isFavorited) {
+            // Remove from favorites
+            console.log('🗑️ Removing from favorites...');
+            const response = await fetch(`/api/favorites?userId=${userId}&vehicleId=${vehicleId}`, {
+              method: 'DELETE'
+            });
+            console.log('📡 Delete response status:', response.status);
+            if (response.ok) {
+              setIsFavorited(false);
+              console.log('✅ Removed from favorites:', vehicleId);
+            } else {
+              const errorText = await response.text();
+              console.error('❌ Delete error:', errorText);
+            }
           } else {
-            console.error('❌ Delete error:', await response.text());
+            // Add to favorites
+            console.log('➕ Adding to favorites...');
+            const response = await fetch('/api/favorites', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                userId: userId,
+                vehicleId: vehicleId
+              })
+            });
+            console.log('📡 Add response status:', response.status);
+            if (response.ok) {
+              setIsFavorited(true);
+              console.log('✅ Added to favorites:', vehicleId);
+              // Track favorite event
+              trackVehicleFavorite(vehicleId, vehicleTitle);
+            } else {
+              const errorText = await response.text();
+              console.error('❌ Add error:', errorText);
+            }
           }
         } else {
-          // Add to favorites
-          console.log('➕ Adding to favorites...');
-          const response = await fetch('/api/favorites', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              userId: userId,
-              vehicleId: vehicleId
-            })
-          });
-          console.log('📡 Add response status:', response.status);
-          if (response.ok) {
-            setIsFavorited(true);
-            console.log('✅ Added to favorites:', vehicleId);
-            // Track favorite event
-            trackVehicleFavorite(vehicleId, vehicleTitle);
-          } else {
-            console.error('❌ Add error:', await response.text());
-          }
+          console.error('❌ No user ID in toggle response:', userData);
         }
       } else {
-        console.error('❌ Auth sync error:', await userResponse.text());
+        const errorText = await userResponse.text();
+        console.error('❌ Auth sync error in toggle:', errorText);
       }
     } catch (error) {
       console.error('❌ Error toggling favorite:', error);
