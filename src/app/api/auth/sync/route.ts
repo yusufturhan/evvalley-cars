@@ -47,9 +47,16 @@ export async function GET(request: Request) {
           let firstName = 'User';
           let lastName = 'Name';
 
+          console.log('📡 Clerk API response status:', clerkResponse.status);
+
           if (clerkResponse.ok) {
             const clerkUser = await clerkResponse.json();
-            console.log('📧 Clerk user data:', clerkUser);
+            console.log('📧 Clerk user data received:', {
+              id: clerkUser.id,
+              email_addresses: clerkUser.email_addresses?.length || 0,
+              first_name: clerkUser.first_name,
+              last_name: clerkUser.last_name
+            });
             
             // Extract email from primary email address
             if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
@@ -60,7 +67,9 @@ export async function GET(request: Request) {
             if (clerkUser.first_name) firstName = clerkUser.first_name;
             if (clerkUser.last_name) lastName = clerkUser.last_name;
           } else {
-            console.warn('⚠️ Could not fetch user from Clerk, using fallback data');
+            const errorText = await clerkResponse.text();
+            console.warn('⚠️ Could not fetch user from Clerk:', clerkResponse.status, errorText);
+            console.log('🔄 Using fallback data for user creation');
           }
 
           const { data: newUser, error: insertError } = await adminClient
