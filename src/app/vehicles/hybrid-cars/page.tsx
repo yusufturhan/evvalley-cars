@@ -60,6 +60,7 @@ function HybridCarsContent() {
         // Fetch hybrid cars
         const params = new URLSearchParams();
         params.append('category', 'hybrid-car');
+        params.append('limit', '100'); // Show all hybrid cars
         if (currentBrand !== 'all') params.append('brand', currentBrand);
         if (currentYear !== 'all') params.append('year', currentYear);
         if (currentMinPrice) params.append('minPrice', currentMinPrice);

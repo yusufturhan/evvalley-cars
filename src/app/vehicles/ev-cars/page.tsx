@@ -60,6 +60,7 @@ function EVCarsContent() {
         // Fetch EV cars
         const params = new URLSearchParams();
         params.append('category', 'ev-car');
+        params.append('limit', '100'); // Show all EV cars
         if (currentBrand !== 'all') params.append('brand', currentBrand);
         if (currentYear !== 'all') params.append('year', currentYear);
         if (currentMinPrice) params.append('minPrice', currentMinPrice);

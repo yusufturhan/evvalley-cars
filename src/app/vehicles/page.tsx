@@ -75,6 +75,7 @@ function VehiclesContent() {
         // Fetch from different endpoints based on category
         if (currentCategory === 'all' || currentCategory === 'ev-car' || currentCategory === 'hybrid-car') {
           const params = new URLSearchParams();
+          params.append('limit', '100'); // Show all vehicles
           if (currentCategory !== 'all') params.append('category', currentCategory);
           if (currentBrand !== 'all') params.append('brand', currentBrand);
           if (currentYear !== 'all') params.append('year', currentYear);
