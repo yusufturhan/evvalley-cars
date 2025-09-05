@@ -337,6 +337,17 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
               
               {/* Owner Actions - Only show to vehicle owner */}
+              {(() => {
+                console.log('🔍 Mark as Sold button visibility check:', {
+                  isSignedIn,
+                  hasVehicle: !!vehicle,
+                  vehicleSellerId: vehicle?.seller_id,
+                  userSupabaseId,
+                  isOwner: vehicle?.seller_id === userSupabaseId,
+                  shouldShow: isSignedIn && vehicle && vehicle.seller_id === userSupabaseId
+                });
+                return null;
+              })()}
               {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
                 <div className="mt-4 space-y-2">
                   <button
