@@ -72,6 +72,13 @@ export async function GET(request: Request) {
             console.log('🔄 Using fallback data for user creation');
           }
 
+          console.log('🔄 Auth sync: Creating user in Supabase with data:', {
+            clerk_id: clerkId,
+            email: userEmail,
+            first_name: firstName,
+            last_name: lastName
+          });
+
           const { data: newUser, error: insertError } = await adminClient
             .from('users')
             .insert({
@@ -86,7 +93,16 @@ export async function GET(request: Request) {
 
           if (insertError) {
             console.error('❌ Auth sync: Error creating user:', insertError);
-            return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+            console.error('❌ Insert error details:', {
+              code: insertError.code,
+              message: insertError.message,
+              details: insertError.details,
+              hint: insertError.hint
+            });
+            return NextResponse.json({ 
+              error: 'Failed to create user',
+              details: insertError.message 
+            }, { status: 500 });
           }
 
           console.log('✅ Auth sync: User created in Supabase:', newUser.id);
@@ -96,7 +112,15 @@ export async function GET(request: Request) {
           });
         } catch (clerkError) {
           console.error('❌ Auth sync: Error fetching from Clerk:', clerkError);
-          return NextResponse.json({ error: 'Failed to fetch user from Clerk' }, { status: 500 });
+          console.error('❌ Clerk error details:', {
+            message: clerkError.message,
+            stack: clerkError.stack,
+            clerkId: clerkId
+          });
+          return NextResponse.json({ 
+            error: 'Failed to fetch user from Clerk',
+            details: clerkError.message 
+          }, { status: 500 });
         }
       }
       
