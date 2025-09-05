@@ -50,21 +50,19 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
       if (isSignedIn && user) {
         try {
           const response = await fetch('/api/auth/sync', {
-            method: 'POST',
+            method: 'GET',
             headers: {
+              'Authorization': `Bearer ${user.id}`,
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              clerkId: user.id,
-              email: user.emailAddresses[0]?.emailAddress,
-              firstName: user.firstName,
-              lastName: user.lastName,
-            }),
           });
 
           if (response.ok) {
             const data = await response.json();
-            setUserSupabaseId(data.supabaseId);
+            console.log('🔍 User Supabase ID fetched:', data.user?.id);
+            setUserSupabaseId(data.user?.id);
+          } else {
+            console.error('❌ Failed to fetch user Supabase ID:', response.status);
           }
         } catch (error) {
           console.error('Error fetching user Supabase ID:', error);
