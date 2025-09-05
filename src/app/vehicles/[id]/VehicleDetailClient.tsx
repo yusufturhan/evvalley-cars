@@ -44,6 +44,19 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const [deleting, setDeleting] = useState(false);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
 
+  // Debug vehicle data on component mount (development only)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚗 Vehicle data loaded:', {
+        vehicleId: vehicle?.id,
+        vehicleTitle: vehicle?.title,
+        sellerId: vehicle?.seller_id,
+        sellerEmail: vehicle?.seller_email,
+        sold: vehicle?.sold
+      });
+    }
+  }, [vehicle]);
+
   // Fetch user's Supabase ID when component mounts
   useEffect(() => {
     const fetchUserSupabaseId = async () => {
@@ -59,10 +72,23 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
 
           if (response.ok) {
             const data = await response.json();
-            console.log('🔍 User Supabase ID fetched:', data.user?.id);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('🔍 User Supabase ID fetched:', {
+                userId: data.user?.id,
+                userEmail: data.user?.email,
+                fullResponse: data
+              });
+            }
             setUserSupabaseId(data.user?.id);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('✅ UserSupabaseId state updated to:', data.user?.id);
+            }
           } else {
-            console.error('❌ Failed to fetch user Supabase ID:', response.status);
+            if (process.env.NODE_ENV === 'development') {
+              console.error('❌ Failed to fetch user Supabase ID:', response.status);
+              const errorData = await response.json();
+              console.error('❌ Error details:', errorData);
+            }
           }
         } catch (error) {
           console.error('Error fetching user Supabase ID:', error);
@@ -72,6 +98,17 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
 
     fetchUserSupabaseId();
   }, [isSignedIn, user]);
+
+  // Debug when userSupabaseId changes (development only)
+  useEffect(() => {
+    if (userSupabaseId && process.env.NODE_ENV === 'development') {
+      console.log('🔄 UserSupabaseId changed:', {
+        userSupabaseId,
+        vehicleSellerId: vehicle?.seller_id,
+        isOwner: vehicle?.seller_id === userSupabaseId
+      });
+    }
+  }, [userSupabaseId, vehicle?.seller_id]);
 
   // Fetch seller information
   useEffect(() => {
@@ -139,8 +176,18 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const handleMarkAsSold = async () => {
     if (!vehicle || !isSignedIn) return;
     
-    const isOwner = vehicle.seller_id === userSupabaseId;
-    if (!isOwner) return;
+    const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || vehicle.seller_id === userSupabaseId;
+    if (!isOwner) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('❌ User is not the owner of this vehicle:', {
+          vehicleSellerId: vehicle.seller_id,
+          userSupabaseId,
+          vehicleSellerEmail: vehicle.seller_email,
+          userEmail: user?.emailAddresses[0]?.emailAddress
+        });
+      }
+      return;
+    }
 
     try {
       setMarkingAsSold(true);
@@ -178,8 +225,18 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const handleDelete = async () => {
     if (!vehicle || !isSignedIn) return;
     
-    const isOwner = vehicle.seller_id === userSupabaseId;
-    if (!isOwner) return;
+    const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || vehicle.seller_id === userSupabaseId;
+    if (!isOwner) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('❌ User is not the owner of this vehicle (delete):', {
+          vehicleSellerId: vehicle.seller_id,
+          userSupabaseId,
+          vehicleSellerEmail: vehicle.seller_email,
+          userEmail: user?.emailAddresses[0]?.emailAddress
+        });
+      }
+      return;
+    }
 
     // Confirm deletion
     const confirmed = window.confirm('Are you sure you want to delete this listing? This action cannot be undone.');
@@ -337,18 +394,65 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
               
               {/* Owner Actions - Only show to vehicle owner */}
-              {(() => {
+              {process.env.NODE_ENV === 'development' && (() => {
                 console.log('🔍 Mark Sold button visibility check:', {
                   isSignedIn,
                   hasVehicle: !!vehicle,
                   vehicleSellerId: vehicle?.seller_id,
                   userSupabaseId,
-                  isOwner: vehicle?.seller_id === userSupabaseId,
-                  shouldShow: isSignedIn && vehicle && vehicle.seller_id === userSupabaseId
+                  vehicleSellerEmail: vehicle?.seller_email,
+                  userEmail: user?.emailAddresses[0]?.emailAddress,
+                  isOwnerById: vehicle?.seller_id === userSupabaseId,
+                  isOwnerByEmail: user?.emailAddresses[0]?.emailAddress === vehicle?.seller_email,
+                  isOwner: vehicle?.seller_id === userSupabaseId || user?.emailAddresses[0]?.emailAddress === vehicle?.seller_email,
+                  shouldShow: isSignedIn && vehicle && (user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || vehicle.seller_id === userSupabaseId),
+                  vehicleId: vehicle?.id,
+                  vehicleTitle: vehicle?.title
                 });
                 return null;
               })()}
-              {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
+              
+              {/* Debug Button - Only show in development */}
+              {process.env.NODE_ENV === 'development' && isSignedIn && (
+                <div className="mt-2 space-x-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/debug/user-vehicle');
+                        const data = await response.json();
+                        console.log('🔍 Debug User-Vehicle Data:', data);
+                        alert(`Debug data logged to console. Check browser console for details.`);
+                      } catch (error) {
+                        console.error('Debug fetch error:', error);
+                        alert('Debug fetch failed. Check console for details.');
+                      }
+                    }}
+                    className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700"
+                  >
+                    Debug User-Vehicle
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/debug/vehicle-ownership');
+                        const data = await response.json();
+                        console.log('🔍 Debug Vehicle Ownership Data:', data);
+                        alert(`Ownership debug data logged to console. Check browser console for details.`);
+                      } catch (error) {
+                        console.error('Debug fetch error:', error);
+                        alert('Debug fetch failed. Check console for details.');
+                      }
+                    }}
+                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                  >
+                    Debug Ownership
+                  </button>
+                </div>
+              )}
+              {isSignedIn && vehicle && (
+                user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
+                vehicle.seller_id === userSupabaseId
+              ) && (
                 <div className="mt-4 space-y-2">
                   <button
                     onClick={handleMarkAsSold}

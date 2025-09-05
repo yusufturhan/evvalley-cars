@@ -152,7 +152,11 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log('✅ Auth sync: User found in Supabase:', user.id);
+    console.log('✅ Auth sync: User found in Supabase:', {
+      userId: user.id,
+      userEmail: user.email,
+      clerkId: authHeader.replace('Bearer ', '')
+    });
     return NextResponse.json({ 
       user: user,
       message: 'User synced successfully'
