@@ -1,13 +1,15 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
-import { Heart } from "lucide-react";
+import { Heart, Menu, X } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import Logo from "./Logo";
 
 export default function Header() {
   const { isSignedIn, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   console.log('Header - isLoaded:', isLoaded, 'isSignedIn:', isSignedIn);
   console.log('Header - Clerk publishableKey:', process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? 'Present' : 'Missing');
@@ -104,35 +106,136 @@ export default function Header() {
               <Logo />
             </Link>
             
-            {/* Mobile Auth Buttons */}
-            <div className="flex items-center space-x-2">
-              <SignedIn>
-                <div className="flex items-center space-x-2">
-                  <UserButton afterSignOutUrl="/" />
-                  <button
-                    onClick={handleSignOut}
-                    className="text-[#4A5568] hover:text-[#3AB0FF] text-sm transition-colors"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </SignedIn>
-              <SignedOut>
-                <div className="flex items-center space-x-2">
-                  <SignInButton mode="redirect">
-                    <button className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors text-sm">
-                      Sign In
-                    </button>
-                  </SignInButton>
-                  <SignUpButton mode="redirect">
-                    <button className="bg-[#1C1F4A] text-white px-3 py-1 rounded text-sm hover:bg-[#2A2F6B] transition-colors">
-                      Sign Up
-                    </button>
-                  </SignUpButton>
-                </div>
-              </SignedOut>
-            </div>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="bg-white border-t border-gray-100 shadow-lg">
+              <div className="px-4 py-4 space-y-4">
+                {/* Navigation Links */}
+                <div className="space-y-3">
+                  <Link 
+                    href="/" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    href="/vehicles" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    EVs & E-Mobility
+                  </Link>
+                  <Link 
+                    href="/community" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Community
+                  </Link>
+                  <Link 
+                    href="/about" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    About Us
+                  </Link>
+                  <Link 
+                    href="/blog" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Blog
+                  </Link>
+                  <Link 
+                    href="/escrow" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Escrow
+                  </Link>
+                  <Link 
+                    href="/sell" 
+                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors font-medium"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sell Your EV
+                  </Link>
+                </div>
+
+                {/* User-specific Links */}
+                {isSignedIn && (
+                  <div className="border-t border-gray-100 pt-4 space-y-3">
+                    <Link 
+                      href="/favorites" 
+                      className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors flex items-center"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Heart className="h-4 w-4 mr-2" />
+                      Favorites
+                    </Link>
+                    <Link 
+                      href="/profile" 
+                      className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                  </div>
+                )}
+
+                {/* Auth Buttons */}
+                <div className="border-t border-gray-100 pt-4">
+                  <SignedIn>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <UserButton afterSignOutUrl="/" />
+                        <span className="text-sm text-[#4A5568]">Account</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          handleSignOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="text-[#4A5568] hover:text-[#3AB0FF] text-sm transition-colors"
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  </SignedIn>
+                  <SignedOut>
+                    <div className="space-y-3">
+                      <SignInButton mode="redirect">
+                        <button 
+                          className="w-full text-left text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Sign In
+                        </button>
+                      </SignInButton>
+                      <SignUpButton mode="redirect">
+                        <button 
+                          className="w-full bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          Sign Up
+                        </button>
+                      </SignUpButton>
+                    </div>
+                  </SignedOut>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
