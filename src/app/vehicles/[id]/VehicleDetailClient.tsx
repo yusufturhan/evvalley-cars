@@ -338,7 +338,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               
               {/* Owner Actions - Only show to vehicle owner */}
               {(() => {
-                console.log('🔍 Mark as Sold button visibility check:', {
+                console.log('🔍 Mark Sold button visibility check:', {
                   isSignedIn,
                   hasVehicle: !!vehicle,
                   vehicleSellerId: vehicle?.seller_id,
