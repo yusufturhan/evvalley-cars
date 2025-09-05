@@ -35,40 +35,53 @@ export async function GET(request: Request) {
         const clerkId = authHeader.replace('Bearer ', '');
         
         try {
-          // Fetch user details from Clerk
-          const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
-            headers: {
-              'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
-              'Content-Type': 'application/json'
-            }
-          });
-
+          console.log('🔄 Auth sync: Attempting to fetch user from Clerk...');
+          
+          // Try to fetch user details from Clerk with timeout
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+          
           let userEmail = `${clerkId}@evvalley.com`; // Fallback email
           let firstName = 'User';
           let lastName = 'Name';
 
-          console.log('📡 Clerk API response status:', clerkResponse.status);
-
-          if (clerkResponse.ok) {
-            const clerkUser = await clerkResponse.json();
-            console.log('📧 Clerk user data received:', {
-              id: clerkUser.id,
-              email_addresses: clerkUser.email_addresses?.length || 0,
-              first_name: clerkUser.first_name,
-              last_name: clerkUser.last_name
+          try {
+            const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+              headers: {
+                'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              signal: controller.signal
             });
-            
-            // Extract email from primary email address
-            if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
-              userEmail = clerkUser.email_addresses[0].email_address;
+
+            clearTimeout(timeoutId);
+            console.log('📡 Clerk API response status:', clerkResponse.status);
+
+            if (clerkResponse.ok) {
+              const clerkUser = await clerkResponse.json();
+              console.log('📧 Clerk user data received:', {
+                id: clerkUser.id,
+                email_addresses: clerkUser.email_addresses?.length || 0,
+                first_name: clerkUser.first_name,
+                last_name: clerkUser.last_name
+              });
+              
+              // Extract email from primary email address
+              if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+                userEmail = clerkUser.email_addresses[0].email_address;
+              }
+              
+              // Extract name
+              if (clerkUser.first_name) firstName = clerkUser.first_name;
+              if (clerkUser.last_name) lastName = clerkUser.last_name;
+            } else {
+              const errorText = await clerkResponse.text();
+              console.warn('⚠️ Could not fetch user from Clerk:', clerkResponse.status, errorText);
+              console.log('🔄 Using fallback data for user creation');
             }
-            
-            // Extract name
-            if (clerkUser.first_name) firstName = clerkUser.first_name;
-            if (clerkUser.last_name) lastName = clerkUser.last_name;
-          } else {
-            const errorText = await clerkResponse.text();
-            console.warn('⚠️ Could not fetch user from Clerk:', clerkResponse.status, errorText);
+          } catch (fetchError) {
+            clearTimeout(timeoutId);
+            console.warn('⚠️ Clerk API fetch failed:', fetchError.message);
             console.log('🔄 Using fallback data for user creation');
           }
 
