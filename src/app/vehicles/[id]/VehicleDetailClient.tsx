@@ -177,9 +177,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     if (!vehicle || !isSignedIn) return;
     
     const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
-                    vehicle.seller_id === userSupabaseId ||
-                    // EMERGENCY FIX: Allow any signed in user temporarily
-                    (isSignedIn && process.env.NODE_ENV === 'production');
+                    vehicle.seller_id === userSupabaseId;
     if (!isOwner) {
       if (process.env.NODE_ENV === 'development') {
         console.log('❌ User is not the owner of this vehicle:', {
@@ -229,9 +227,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     if (!vehicle || !isSignedIn) return;
     
     const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
-                    vehicle.seller_id === userSupabaseId ||
-                    // EMERGENCY FIX: Allow any signed in user temporarily
-                    (isSignedIn && process.env.NODE_ENV === 'production');
+                    vehicle.seller_id === userSupabaseId;
     if (!isOwner) {
       if (process.env.NODE_ENV === 'development') {
         console.log('❌ User is not the owner of this vehicle (delete):', {
@@ -469,9 +465,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               )}
               {isSignedIn && vehicle && (
                 user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
-                vehicle.seller_id === userSupabaseId ||
-                // EMERGENCY FIX: Show button for any signed in user temporarily
-                (isSignedIn && process.env.NODE_ENV === 'production')
+                vehicle.seller_id === userSupabaseId
               ) && (
                 <div className="mt-4 space-y-2">
                   <button
