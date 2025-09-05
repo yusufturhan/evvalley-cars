@@ -214,7 +214,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Breadcrumb */}
         <div className="mb-6">
           <button 
@@ -226,7 +226,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
           {/* Vehicle Images */}
           <div className="space-y-4">
             {/* Main Image */}
@@ -320,7 +320,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           </div>
 
           {/* Vehicle Details */}
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -336,8 +336,13 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 </div>
                 <FavoriteButton vehicleId={vehicle.id} />
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
-              <p className="text-gray-600">{vehicle.description}</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
+              {vehicle.description && (
+                <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">Description</h3>
+                  <p className="text-gray-600 text-sm md:text-base leading-relaxed">{vehicle.description}</p>
+                </div>
+              )}
               
               {/* Owner Actions - Only show to vehicle owner */}
               {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
