@@ -13,6 +13,7 @@ export default function SellPage() {
   const [loading, setLoading] = useState(false);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showSuccess, setShowSuccess] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('ev-car');
   const [formData, setFormData] = useState({
     title: "",
@@ -348,8 +349,12 @@ export default function SellPage() {
       console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
-        alert("Vehicle listed successfully!");
-        router.push("/vehicles");
+        setShowSuccess(true);
+        // Auto-hide success message after 3 seconds
+        setTimeout(() => {
+          setShowSuccess(false);
+          router.push("/vehicles");
+        }, 3000);
       } else {
         const errorData = await response.json();
         console.error("❌ API Error:", errorData);
@@ -413,6 +418,29 @@ export default function SellPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+      
+      {/* Success Notification */}
+      {showSuccess && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4">
+          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium">
+                  Arabanız başarıyla yüklendi!
+                </p>
+                <p className="text-xs opacity-90">
+                  Sayfa yönlendiriliyor...
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-8">
