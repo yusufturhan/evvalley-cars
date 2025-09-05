@@ -18,10 +18,11 @@ export async function GET(request: Request) {
     console.log('🔄 Auth sync: Supabase client created');
 
     // Get user from Supabase using the provided user ID
+    const clerkId = authHeader.replace('Bearer ', '');
     const { data: user, error: selectError } = await adminClient
       .from('users')
-      .select('id, email, first_name, last_name')
-      .eq('clerk_id', authHeader.replace('Bearer ', ''))
+      .select('id, email, first_name, last_name, clerk_id')
+      .eq('clerk_id', clerkId)
       .single();
 
     if (selectError) {
@@ -31,18 +32,69 @@ export async function GET(request: Request) {
       if (selectError.code === 'PGRST116') {
         console.log('🔄 Auth sync: User not found, creating new user...');
         
-        // Get user info from Clerk
-        const clerkId = authHeader.replace('Bearer ', '');
-        
         try {
-          console.log('🔄 Auth sync: Creating user with fallback data (skipping Clerk API)...');
+          console.log('🔄 Auth sync: Fetching user info from Clerk...');
           
-          // Use fallback data directly - no Clerk API call to avoid hanging
-          const userEmail = `${clerkId}@evvalley.com`;
-          const firstName = 'User';
-          const lastName = 'Name';
+          // Get user info from Clerk
+          const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+            headers: {
+              'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          });
 
-          console.log('🔄 Auth sync: Creating user in Supabase with data:', {
+          let userEmail = `${clerkId}@evvalley.com`;
+          let firstName = 'User';
+          let lastName = 'Name';
+
+          if (clerkResponse.ok) {
+            const clerkUser = await clerkResponse.json();
+            console.log('📧 Clerk user data:', clerkUser);
+            
+            if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+              userEmail = clerkUser.email_addresses[0].email_address;
+            }
+            if (clerkUser.first_name) firstName = clerkUser.first_name;
+            if (clerkUser.last_name) lastName = clerkUser.last_name;
+          } else {
+            console.log('⚠️ Could not fetch from Clerk, using fallback data');
+          }
+
+          // Check if user with this email already exists
+          const { data: existingUserByEmail, error: emailCheckError } = await adminClient
+            .from('users')
+            .select('id, email, clerk_id')
+            .eq('email', userEmail)
+            .single();
+
+          if (existingUserByEmail && !emailCheckError) {
+            console.log('🔄 Auth sync: User with this email already exists, updating clerk_id...');
+            
+            // Update existing user with new clerk_id
+            const { data: updatedUser, error: updateError } = await adminClient
+              .from('users')
+              .update({
+                clerk_id: clerkId,
+                first_name: firstName,
+                last_name: lastName
+              })
+              .eq('id', existingUserByEmail.id)
+              .select('id, email, first_name, last_name')
+              .single();
+
+            if (updateError) {
+              console.error('❌ Auth sync: Error updating existing user:', updateError);
+              return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+            }
+
+            console.log('✅ Auth sync: Existing user updated with new clerk_id:', updatedUser.id);
+            return NextResponse.json({ 
+              user: updatedUser,
+              message: 'User updated and synced successfully'
+            });
+          }
+
+          console.log('🔄 Auth sync: Creating new user in Supabase with data:', {
             clerk_id: clerkId,
             email: userEmail,
             first_name: firstName,
@@ -187,10 +239,10 @@ export async function POST(request: Request) {
     const adminClient = createServerSupabaseClient();
     console.log('🔄 Auth sync: Supabase client created');
 
-    // Check if user already exists
+    // Check if user already exists by clerk_id
     const { data: existingUser, error: selectError } = await adminClient
       .from('users')
-      .select('id, email, first_name, last_name')
+      .select('id, email, first_name, last_name, clerk_id')
       .eq('clerk_id', clerkId)
       .single();
 
@@ -222,6 +274,40 @@ export async function POST(request: Request) {
         supabaseId: existingUser.id,
         message: 'User synced successfully'
       });
+    }
+
+    // If user not found by clerk_id, check by email
+    if (email) {
+      const { data: existingUserByEmail, error: emailCheckError } = await adminClient
+        .from('users')
+        .select('id, email, first_name, last_name, clerk_id')
+        .eq('email', email)
+        .single();
+
+      if (existingUserByEmail && !emailCheckError) {
+        console.log('🔄 Auth sync: User with this email already exists, updating clerk_id...');
+        
+        // Update existing user with new clerk_id
+        const { error: updateError } = await adminClient
+          .from('users')
+          .update({
+            clerk_id: clerkId,
+            first_name: firstName || existingUserByEmail.first_name,
+            last_name: lastName || existingUserByEmail.last_name
+          })
+          .eq('id', existingUserByEmail.id);
+
+        if (updateError) {
+          console.error('❌ Auth sync: Error updating existing user:', updateError);
+          return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
+        }
+
+        console.log('✅ Auth sync: Existing user updated with new clerk_id:', existingUserByEmail.id);
+        return NextResponse.json({ 
+          supabaseId: existingUserByEmail.id,
+          message: 'User updated and synced successfully'
+        });
+      }
     }
 
     console.log('🔄 Auth sync: Creating new user in Supabase...');
