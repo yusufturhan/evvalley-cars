@@ -394,8 +394,8 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
               
               {/* Owner Actions - Only show to vehicle owner */}
-              {process.env.NODE_ENV === 'development' && (() => {
-                console.log('🔍 Mark Sold button visibility check:', {
+              {(() => {
+                const debugInfo = {
                   isSignedIn,
                   hasVehicle: !!vehicle,
                   vehicleSellerId: vehicle?.seller_id,
@@ -408,12 +408,21 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   shouldShow: isSignedIn && vehicle && (user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || vehicle.seller_id === userSupabaseId),
                   vehicleId: vehicle?.id,
                   vehicleTitle: vehicle?.title
-                });
+                };
+                
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('🔍 Mark Sold button visibility check:', debugInfo);
+                } else {
+                  // Production debug - show alert if user is signed in but button not showing
+                  if (isSignedIn && vehicle && !debugInfo.shouldShow) {
+                    console.log('🚨 PRODUCTION DEBUG - Button not showing:', debugInfo);
+                  }
+                }
                 return null;
               })()}
               
-              {/* Debug Button - Only show in development */}
-              {process.env.NODE_ENV === 'development' && isSignedIn && (
+              {/* Debug Button - Show in both development and production temporarily */}
+              {isSignedIn && (
                 <div className="mt-2 space-x-2">
                   <button
                     onClick={async () => {
