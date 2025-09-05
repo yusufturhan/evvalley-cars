@@ -210,10 +210,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
 
   const hasImages = vehicle.images && vehicle.images.length > 0;
 
-  // Debug: Log vehicle description
-  console.log('🔍 Vehicle description:', vehicle.description);
-  console.log('🔍 Vehicle object:', vehicle);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -341,12 +337,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 <FavoriteButton vehicleId={vehicle.id} />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
-              <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-600 text-sm md:text-base leading-relaxed">
-                  {vehicle.description || 'No description provided.'}
-                </p>
-              </div>
               
               {/* Owner Actions - Only show to vehicle owner */}
               {isSignedIn && vehicle && vehicle.seller_id === userSupabaseId && (
@@ -517,6 +507,14 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Description */}
+            <div className="bg-white rounded-lg p-6 border">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Description</h3>
+              <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                {vehicle.description || 'No description provided.'}
+              </p>
             </div>
 
             {/* Seller Information */}
