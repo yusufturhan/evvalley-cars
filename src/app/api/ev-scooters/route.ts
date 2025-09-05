@@ -20,8 +20,9 @@ export async function GET(request: Request) {
       .select('*')
       .order('created_at', { ascending: false });
 
-    // Only show unsold scooters by default, unless includeSold is true
-    if (!includeSold) {
+    // Show all scooters by default (including sold ones)
+    // Only filter out sold scooters if explicitly requested
+    if (includeSold === 'false') {
       query = query.eq('sold', false);
     }
 

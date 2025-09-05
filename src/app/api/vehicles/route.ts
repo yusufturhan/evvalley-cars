@@ -27,8 +27,9 @@ export async function GET(request: Request) {
       .select('*')
       .order('created_at', { ascending: false });
 
-    // Only show unsold vehicles by default, unless includeSold is true
-    if (!includeSold) {
+    // Show all vehicles by default (including sold ones)
+    // Only filter out sold vehicles if explicitly requested
+    if (includeSold === 'false') {
       query = query.eq('sold', false);
     }
 
@@ -113,8 +114,7 @@ export async function GET(request: Request) {
     try {
       const { count, error: countError } = await supabase
         .from('vehicles')
-        .select('*', { count: 'exact', head: true })
-        .eq('sold', false);
+        .select('*', { count: 'exact', head: true });
       
       if (countError) {
         console.error('Error getting total count:', countError);

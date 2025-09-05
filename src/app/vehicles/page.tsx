@@ -22,7 +22,7 @@ function VehiclesContent() {
     minPrice: '',
     maxPrice: ''
   });
-  const [showSoldVehicles, setShowSoldVehicles] = useState(false);
+  const [showSoldVehicles, setShowSoldVehicles] = useState(true);
 
   // Sync filters state with URL params for UI
   useEffect(() => {
