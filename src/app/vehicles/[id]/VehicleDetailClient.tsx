@@ -179,7 +179,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
                     vehicle.seller_id === userSupabaseId ||
                     // EMERGENCY FIX: Allow any signed in user temporarily
-                    (user?.id && process.env.NODE_ENV === 'production');
+                    (isSignedIn && process.env.NODE_ENV === 'production');
     if (!isOwner) {
       if (process.env.NODE_ENV === 'development') {
         console.log('❌ User is not the owner of this vehicle:', {
@@ -231,7 +231,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     const isOwner = user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
                     vehicle.seller_id === userSupabaseId ||
                     // EMERGENCY FIX: Allow any signed in user temporarily
-                    (user?.id && process.env.NODE_ENV === 'production');
+                    (isSignedIn && process.env.NODE_ENV === 'production');
     if (!isOwner) {
       if (process.env.NODE_ENV === 'development') {
         console.log('❌ User is not the owner of this vehicle (delete):', {
@@ -430,8 +430,8 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 return null;
               })()}
               
-              {/* Debug Button - Show in both development and production temporarily */}
-              {isSignedIn && (
+              {/* Debug Button - Only show in development */}
+              {process.env.NODE_ENV === 'development' && isSignedIn && (
                 <div className="mt-2 space-x-2">
                   <button
                     onClick={async () => {
@@ -471,7 +471,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
                 vehicle.seller_id === userSupabaseId ||
                 // EMERGENCY FIX: Show button for any signed in user temporarily
-                (user?.id && process.env.NODE_ENV === 'production')
+                (isSignedIn && process.env.NODE_ENV === 'production')
               ) && (
                 <div className="mt-4 space-y-2">
                   <button

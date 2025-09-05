@@ -4,10 +4,10 @@ import { auth } from '@clerk/nextjs/server';
 
 export async function GET(request: Request) {
   try {
-    // Temporarily allow in production for debugging
-    // if (process.env.NODE_ENV !== 'development') {
-    //   return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
-    // }
+    // Only allow in development
+    if (process.env.NODE_ENV !== 'development') {
+      return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
+    }
 
     const { userId } = await auth();
     
