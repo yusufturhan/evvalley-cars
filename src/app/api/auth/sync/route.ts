@@ -31,36 +31,122 @@ export async function GET(request: Request) {
       if (selectError.code === 'PGRST116') {
         console.log('🔄 Auth sync: User not found, creating new user...');
         
-        // Get user info from Clerk (we'll need to implement this)
-        // For now, create with basic info
+        // Get user info from Clerk
         const clerkId = authHeader.replace('Bearer ', '');
-        const userEmail = `${clerkId}@evvalley.com`; // Fallback email
         
-        const { data: newUser, error: insertError } = await adminClient
-          .from('users')
-          .insert({
-            clerk_id: clerkId,
-            email: userEmail,
-            first_name: 'User',
-            last_name: 'Name',
-            seller_type: 'private'
-          })
-          .select('id, email, first_name, last_name')
-          .single();
+        try {
+          // Fetch user details from Clerk
+          const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+            headers: {
+              'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          });
 
-        if (insertError) {
-          console.error('❌ Auth sync: Error creating user:', insertError);
-          return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+          let userEmail = `${clerkId}@evvalley.com`; // Fallback email
+          let firstName = 'User';
+          let lastName = 'Name';
+
+          if (clerkResponse.ok) {
+            const clerkUser = await clerkResponse.json();
+            console.log('📧 Clerk user data:', clerkUser);
+            
+            // Extract email from primary email address
+            if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+              userEmail = clerkUser.email_addresses[0].email_address;
+            }
+            
+            // Extract name
+            if (clerkUser.first_name) firstName = clerkUser.first_name;
+            if (clerkUser.last_name) lastName = clerkUser.last_name;
+          } else {
+            console.warn('⚠️ Could not fetch user from Clerk, using fallback data');
+          }
+
+          const { data: newUser, error: insertError } = await adminClient
+            .from('users')
+            .insert({
+              clerk_id: clerkId,
+              email: userEmail,
+              first_name: firstName,
+              last_name: lastName,
+              seller_type: 'private'
+            })
+            .select('id, email, first_name, last_name')
+            .single();
+
+          if (insertError) {
+            console.error('❌ Auth sync: Error creating user:', insertError);
+            return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
+          }
+
+          console.log('✅ Auth sync: User created in Supabase:', newUser.id);
+          return NextResponse.json({ 
+            user: newUser,
+            message: 'User created and synced successfully'
+          });
+        } catch (clerkError) {
+          console.error('❌ Auth sync: Error fetching from Clerk:', clerkError);
+          return NextResponse.json({ error: 'Failed to fetch user from Clerk' }, { status: 500 });
         }
-
-        console.log('✅ Auth sync: User created in Supabase:', newUser.id);
-        return NextResponse.json({ 
-          user: newUser,
-          message: 'User created and synced successfully'
-        });
       }
       
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Check if user has placeholder email and update it
+    if (user.email && user.email.includes('@evvalley.com') && user.email.startsWith('user_')) {
+      console.log('🔄 Auth sync: Updating placeholder email for user:', user.id);
+      
+      try {
+        // Fetch user details from Clerk
+        const clerkId = authHeader.replace('Bearer ', '');
+        const clerkResponse = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
+          headers: {
+            'Authorization': `Bearer ${process.env.CLERK_SECRET_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (clerkResponse.ok) {
+          const clerkUser = await clerkResponse.json();
+          console.log('📧 Updating user with Clerk data:', clerkUser);
+          
+          // Extract real email and name
+          let realEmail = user.email; // Keep current if no real email found
+          let firstName = user.first_name || 'User';
+          let lastName = user.last_name || 'Name';
+          
+          if (clerkUser.email_addresses && clerkUser.email_addresses.length > 0) {
+            realEmail = clerkUser.email_addresses[0].email_address;
+          }
+          if (clerkUser.first_name) firstName = clerkUser.first_name;
+          if (clerkUser.last_name) lastName = clerkUser.last_name;
+
+          // Update user in Supabase
+          const { data: updatedUser, error: updateError } = await adminClient
+            .from('users')
+            .update({
+              email: realEmail,
+              first_name: firstName,
+              last_name: lastName
+            })
+            .eq('id', user.id)
+            .select('id, email, first_name, last_name')
+            .single();
+
+          if (!updateError && updatedUser) {
+            console.log('✅ Auth sync: User email updated:', updatedUser.email);
+            return NextResponse.json({ 
+              user: updatedUser,
+              message: 'User synced and updated successfully'
+            });
+          }
+        }
+      } catch (updateError) {
+        console.error('❌ Auth sync: Error updating user:', updateError);
+        // Continue with original user data if update fails
+      }
     }
 
     console.log('✅ Auth sync: User found in Supabase:', user.id);
