@@ -33,6 +33,7 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
     try {
       // Get user's Supabase ID
       const userResponse = await fetch('/api/auth/sync', {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${user?.id}`
         }
@@ -64,6 +65,7 @@ export default function FavoriteButton({ vehicleId, vehicleTitle, className = ""
     try {
       // Get user's Supabase ID
       const userResponse = await fetch('/api/auth/sync', {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${user?.id}`
         }
