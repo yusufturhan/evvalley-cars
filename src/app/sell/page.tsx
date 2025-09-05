@@ -431,10 +431,10 @@ export default function SellPage() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium">
-                  Arabanız başarıyla yüklendi!
+                  Vehicle listed successfully!
                 </p>
                 <p className="text-xs opacity-90">
-                  Sayfa yönlendiriliyor...
+                  Redirecting...
                 </p>
               </div>
             </div>
