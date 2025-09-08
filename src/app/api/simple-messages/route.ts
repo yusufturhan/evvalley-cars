@@ -104,7 +104,7 @@ async function sendEmailNotification(
                   </p>
                   <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
                     <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                      © 2024 Evvalley. All rights reserved.
+                      © 2025 Evvalley. All rights reserved.
                     </p>
                   </div>
                 </div>
@@ -128,7 +128,7 @@ Reply to this message: ${process.env.NEXT_PUBLIC_APP_URL || 'https://evvalley.co
 ---
 Evvalley - Your trusted EV marketplace
 Manage your messages and browse more vehicles on our website.
-© 2024 Evvalley. All rights reserved.
+© 2025 Evvalley. All rights reserved.
         `
       })
     });

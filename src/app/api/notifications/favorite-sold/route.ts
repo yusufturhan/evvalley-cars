@@ -76,7 +76,7 @@ export async function POST(request: Request) {
             
             <div style="text-align: center; margin-top: 20px;">
               <p style="color: #999; font-size: 12px;">
-                © 2024 Evvalley. All rights reserved.
+                © 2025 Evvalley. All rights reserved.
               </p>
             </div>
           </div>

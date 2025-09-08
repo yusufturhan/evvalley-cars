@@ -126,7 +126,7 @@ export async function POST(request: Request) {
                   </p>
                   <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
                     <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                      © 2024 Evvalley. All rights reserved.
+                      © 2025 Evvalley. All rights reserved.
                     </p>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export async function POST(request: Request) {
                   </p>
                   <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
                     <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                      © 2024 Evvalley. All rights reserved.
+                      © 2025 Evvalley. All rights reserved.
                     </p>
                   </div>
                 </div>

@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
                 </div>
                 
                 <div style="background: #1C1F4A; color: white; padding: 20px; text-align: center; font-size: 14px;">
-                  <p style="margin: 0;">© 2024 Evvalley. All rights reserved.</p>
+                  <p style="margin: 0;">© 2025 Evvalley. All rights reserved.</p>
                   <p style="margin: 5px 0 0 0; opacity: 0.8;">Electric Vehicle & E-Mobility Marketplace</p>
                 </div>
               </div>
