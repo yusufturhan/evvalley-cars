@@ -391,7 +391,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                     </span>
                   )}
                 </div>
-                <FavoriteButton vehicleId={vehicle.id} />
+                <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} />
               </div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{vehicle.title}</h1>
               
@@ -716,10 +716,10 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
             "@context": "https://schema.org",
             "@type": "Product",
             "name": vehicle.title,
-            "description": `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''} - ${vehicle.category}`,
+            "description": `${vehicle.year} ${vehicle.brand} ${vehicle.model} - ${vehicle.category}`,
             "brand": {
               "@type": "Brand",
-              "name": vehicle.make
+              "name": vehicle.brand
             },
             "model": vehicle.model,
             "category": vehicle.category,

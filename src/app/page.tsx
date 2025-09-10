@@ -716,10 +716,10 @@ export default function Home() {
                 "item": {
                   "@type": "Product",
                   "name": vehicle.title,
-                  "description": `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''} - ${vehicle.category}`,
+                  "description": `${vehicle.year} ${vehicle.brand} ${vehicle.model} - ${vehicle.category}`,
                   "brand": {
                     "@type": "Brand",
-                    "name": vehicle.make
+                    "name": vehicle.brand
                   },
                   "model": vehicle.model,
                   "category": vehicle.category,
