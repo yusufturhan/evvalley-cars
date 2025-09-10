@@ -1687,21 +1687,57 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Price, range, charging, cargo, software and total cost of ownership compared side by side.',
     content: `
       <h1>Tesla Model Y vs Hyundai Ioniq 5 (2025)</h1>
-      <p>Two of the most popular family EVs compared in detail.</p>
-      <h2>Key Specs</h2>
+      <p>Two best‑selling family EVs, two philosophies. We compare <strong>range</strong>, <strong>charging</strong>, <strong>space</strong>, <strong>software</strong> and <strong>total cost of ownership</strong> to help you choose the right one for 2025.</p>
+
+      <h2>1) Range & Efficiency</h2>
       <ul>
-        <li>Range: Model Y LR ~330 mi vs Ioniq 5 SE ~303 mi</li>
-        <li>Charging: Tesla Supercharger vs 800V ultra-fast DC</li>
-        <li>Software: Tesla OTA & App ecosystem vs Hyundai Bluelink</li>
+        <li><strong>Model Y Long Range (AWD):</strong> ~330 miles EPA; very efficient on highway.</li>
+        <li><strong>Ioniq 5 SE/SEL (RWD/AWD):</strong> ~303 miles max; excellent city efficiency.</li>
       </ul>
-      <p>See real listings for both models on <a href="/vehicles">Evvalley</a>.</p>
+
+      <h2>2) Fast Charging</h2>
+      <ul>
+        <li><strong>Model Y:</strong> Access to Tesla’s Supercharger network; 250 kW peak, dense coverage.</li>
+        <li><strong>Ioniq 5:</strong> 800V architecture; 10→80% in ~18 min at 350 kW stations (availability varies).</li>
+      </ul>
+
+      <h2>3) Cabin & Cargo</h2>
+      <ul>
+        <li><strong>Model Y:</strong> More cargo with under‑floor storage + frunk; minimalist interior.</li>
+        <li><strong>Ioniq 5:</strong> Sliding rear seats, lounge‑style cabin, flat floor comfort.</li>
+      </ul>
+
+      <h2>4) Software & Driver Assistance</h2>
+      <ul>
+        <li><strong>Tesla:</strong> Best‑in‑class OTA updates, navigation with charger pre‑conditioning, robust mobile app.</li>
+        <li><strong>Hyundai:</strong> Bluelink features, solid ADAS; fewer OTA feature drops.</li>
+      </ul>
+
+      <h2>5) Ownership Costs (Illustrative)</h2>
+      <p>Assuming 12,000 mi/year, $0.15/kWh, home‑first charging:</p>
+      <ul>
+        <li><strong>Energy:</strong> ~$400–$550/yr both models (usage splits differ).</li>
+        <li><strong>Maintenance:</strong> ~$300–$450/yr typical EV service.</li>
+        <li><strong>Insurance:</strong> varies by trim and location; check quotes.</li>
+      </ul>
+
+      <h2>Verdict: Which One For Whom?</h2>
+      <ul>
+        <li><strong>Choose Model Y</strong> if you road‑trip often, want the largest charging network and maximum resale value.</li>
+        <li><strong>Choose Ioniq 5</strong> if you prioritize cabin comfort, ultra‑fast peak charging and distinctive design.</li>
+      </ul>
+
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Compare live deals</strong> for both models.</p>
+        <p style="margin:0;"><a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">See real listings</a></p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2025-09-10',
     updatedAt: '2025-09-10',
     category: 'EV Guide',
     tags: ['Model Y vs Ioniq 5', 'Tesla comparison', 'Hyundai Ioniq 5 2025'],
-    readTime: 6,
+    readTime: 10,
     featuredImage: '/blog-images/complete-guide-buying-electric-vehicles-2024.jpg',
     metaDescription: 'Tesla Model Y vs Hyundai Ioniq 5 2025 comparison: range, charging, software, cargo and value.',
     keywords: ['Model Y vs Ioniq 5 2025', 'Tesla Model Y comparison', 'Hyundai Ioniq 5 comparison']
@@ -1713,20 +1749,33 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'The most affordable EVs you can buy in 2025 with pros/cons and real‑world costs.',
     content: `
       <h1>Best Electric Cars Under $25,000 (2025)</h1>
-      <p>Looking for an affordable EV? These models deliver value without breaking the bank.</p>
+      <p>Great EVs don’t have to be expensive. Below are reliable options you can find under <strong>$25k</strong> with running‑cost notes and what to check before buying.</p>
+      <h2>Top Picks</h2>
       <ul>
-        <li>Nissan Leaf (2019–2022)</li>
-        <li>Chevy Bolt/Bolt EUV (2020–2023)</li>
-        <li>Hyundai Ioniq Electric (2019–2020)</li>
+        <li><strong>Nissan Leaf (2019–2022):</strong> $8k–$16k — Perfect city EV, low maintenance; CHAdeMO limits road trips.</li>
+        <li><strong>Chevy Bolt EUV (2022–2023):</strong> $14k–$22k — Spacious, fast enough DC charging; confirm battery recall replacement.</li>
+        <li><strong>Hyundai Ioniq Electric (2019–2020):</strong> $13k–$18k — Efficient, compact; verify battery warranty and DC charging speeds.</li>
       </ul>
-      <p>Filter by price on <a href="/vehicles">Evvalley</a> to find deals near you.</p>
+      <h2>Real‑World Costs</h2>
+      <ul>
+        <li>Home charging: ~$30–$50 per 1,000 miles at $0.15/kWh.</li>
+        <li>Maintenance: tires + cabin filter mostly; brakes last longer with regen.</li>
+        <li>Insurance: varies; older EVs often cheaper to insure than new ones.</li>
+      </ul>
+      <h2>What to Check</h2>
+      <ul>
+        <li>Battery health and fast‑charge compatibility.</li>
+        <li>Software/recall history and included charging accessories.</li>
+        <li>Winter range expectations for your climate.</li>
+      </ul>
+      <p>Find sub‑$25k deals now: <a href="/vehicles?maxPrice=25000">browse filtered listings</a>.</p>
     `,
     author: 'EvValley Team',
     publishedAt: '2025-09-10',
     updatedAt: '2025-09-10',
     category: 'Buying/Selling Tips',
     tags: ['cheap electric cars', 'under 25000', 'budget EV 2025'],
-    readTime: 5,
+    readTime: 9,
     featuredImage: '/blog-images/best-electric-cars-2024.jpg',
     metaDescription: 'Best electric cars under $25,000 in 2025: models, pros/cons and ownership costs.',
     keywords: ['best electric cars under 25000 2025', 'cheap EV 2025', 'budget electric cars']
@@ -1738,21 +1787,36 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Federal point‑of‑sale credits, state rebates and eligibility rules for new and used EVs in 2025.',
     content: `
       <h1>EV Incentives 2025</h1>
-      <p>Understand <strong>EV incentives</strong> for 2025 including federal dealer credits and major state programs.</p>
-      <h2>Quick Facts</h2>
+      <p>This guide summarizes <strong>federal point‑of‑sale credits</strong>, <strong>used EV credits</strong> and the <strong>largest state rebates</strong> for 2025, with eligibility checkpoints you can follow in minutes.</p>
+      <h2>Federal Credits</h2>
       <ul>
-        <li>New EVs: up to $7,500 if eligible</li>
-        <li>Used EVs: up to $4,000 (price < $25,000)</li>
-        <li>Many states offer additional rebates or tax credits</li>
+        <li><strong>New EV:</strong> Up to $7,500 at the dealership if battery sourcing/assembly rules pass.</li>
+        <li><strong>Used EV:</strong> Up to $4,000 (vehicle ≥2 years old, price &lt; $25,000, income caps apply).</li>
+        <li><strong>Leases:</strong> Credit flows to lessor and is usually passed to you as a discount.</li>
       </ul>
-      <p>See eligible listings on <a href="/vehicles">Evvalley</a>.</p>
+      <h2>State Highlights</h2>
+      <ul>
+        <li><strong>CA:</strong> CVRP up to $7,500 for qualifying buyers.</li>
+        <li><strong>CO:</strong> $2,000–$5,000 point‑of‑sale credits (trim dependent).</li>
+        <li><strong>NY:</strong> Drive Clean Rebate up to $2,000.</li>
+      </ul>
+      <h2>Eligibility Checklist</h2>
+      <ol>
+        <li>Confirm model trim on IRS qualified list.</li>
+        <li>Verify income and MSRP caps.</li>
+        <li>Keep purchase docs + VIN + compliance certificate.</li>
+      </ol>
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;">Browse <strong>credit‑eligible listings</strong> and estimate your net price.</p>
+        <p style="margin:0;"><a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">See eligible vehicles</a></p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2025-09-10',
     updatedAt: '2025-09-10',
     category: 'Buying/Selling Tips',
     tags: ['EV incentives 2025', 'tax credit 2025', 'rebates'],
-    readTime: 6,
+    readTime: 10,
     featuredImage: '/blog-images/electric-vehicle-cost-analysis.jpg',
     metaDescription: 'EV incentives 2025: federal $7,500/$4,000 credits and top state rebates explained.',
     keywords: ['EV incentives 2025', 'EV tax credit 2025', 'state EV rebates 2025']
