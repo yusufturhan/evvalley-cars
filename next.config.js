@@ -207,6 +207,17 @@ const nextConfig = {
         destination: '/vehicles/e-bikes',
         permanent: true,
       },
+      // Normalize trailing slashes on blog posts and categories
+      {
+        source: '/blog/:slug*/',
+        destination: '/blog/:slug*',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/:category*/',
+        destination: '/blog/category/:category*',
+        permanent: true,
+      },
     ];
   },
 }
