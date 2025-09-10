@@ -585,7 +585,7 @@ function HybridCarsContent() {
                       </div>
                     </div>
                     <div className="absolute top-2 right-2">
-                      <FavoriteButton vehicleId={vehicle.id} size="sm" />
+                      <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
                   <div className="p-6">
