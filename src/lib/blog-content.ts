@@ -1605,6 +1605,116 @@ export const blogPosts: BlogPost[] = [
     metaDescription: 'Complete safety guide for electric vehicle owners. Learn about EV safety features, charging safety, driving tips, battery protection, and emergency procedures.',
     keywords: ['Electric Vehicle Safety Guide', 'EV safety', 'electric car safety', 'EV safety tips', 'electric vehicle safety features']
   }
+  ,
+  {
+    id: '11',
+    slug: 'used-ev-prices-2025-guide',
+    title: 'Used EV Prices 2025: Complete Buyer Guide',
+    excerpt: 'Current market prices, depreciation, battery health tips and negotiation checklist for buying a used EV in 2025.',
+    content: `
+      <h1>Used EV Prices 2025: Complete Buyer Guide</h1>
+      <p>This practical guide summarizes how to evaluate <strong>used EV prices</strong> in 2025, what affects value (battery health, software, fast‑charging), and how to negotiate.</p>
+      <h2>Typical Price Ranges</h2>
+      <ul>
+        <li>Tesla Model 3 (2019–2021): $18k–$28k</li>
+        <li>Nissan Leaf (2019–2022): $8k–$16k</li>
+        <li>Chevy Bolt EUV (2022–2023): $14k–$22k</li>
+      </ul>
+      <h2>Checklist</h2>
+      <ul>
+        <li>Verify fast‑charging compatibility and adapter support</li>
+        <li>Ask for battery state-of-health or recent range data</li>
+        <li>Check software updates and recall history</li>
+      </ul>
+      <p>Ready to shop? <a href="/vehicles">Browse verified listings</a> on Evvalley.</p>
+    `,
+    author: 'EvValley Team',
+    publishedAt: '2025-09-10',
+    updatedAt: '2025-09-10',
+    category: 'EV Guide',
+    tags: ['used ev prices 2025', 'battery health', 'ev depreciation'],
+    readTime: 7,
+    featuredImage: '/blog-images/ev-charging-station-guide.jpg',
+    metaDescription: 'Used EV prices 2025: market ranges, battery health tips, negotiation checklist. Learn how to buy a used electric car smartly.',
+    keywords: ['used EV prices 2025', 'buy used electric car', 'EV depreciation 2025']
+  },
+  {
+    id: '12',
+    slug: 'model-y-vs-ioniq-5-2025-comparison',
+    title: 'Tesla Model Y vs Hyundai Ioniq 5 (2025): Detailed Comparison',
+    excerpt: 'Price, range, charging, cargo, software and total cost of ownership compared side by side.',
+    content: `
+      <h1>Tesla Model Y vs Hyundai Ioniq 5 (2025)</h1>
+      <p>Two of the most popular family EVs compared in detail.</p>
+      <h2>Key Specs</h2>
+      <ul>
+        <li>Range: Model Y LR ~330 mi vs Ioniq 5 SE ~303 mi</li>
+        <li>Charging: Tesla Supercharger vs 800V ultra-fast DC</li>
+        <li>Software: Tesla OTA & App ecosystem vs Hyundai Bluelink</li>
+      </ul>
+      <p>See real listings for both models on <a href="/vehicles">Evvalley</a>.</p>
+    `,
+    author: 'EvValley Team',
+    publishedAt: '2025-09-10',
+    updatedAt: '2025-09-10',
+    category: 'EV Guide',
+    tags: ['Model Y vs Ioniq 5', 'Tesla comparison', 'Hyundai Ioniq 5 2025'],
+    readTime: 6,
+    featuredImage: '/blog-images/complete-guide-buying-electric-vehicles-2024.jpg',
+    metaDescription: 'Tesla Model Y vs Hyundai Ioniq 5 2025 comparison: range, charging, software, cargo and value.',
+    keywords: ['Model Y vs Ioniq 5 2025', 'Tesla Model Y comparison', 'Hyundai Ioniq 5 comparison']
+  },
+  {
+    id: '13',
+    slug: 'best-electric-cars-under-25000-2025',
+    title: 'Best Electric Cars Under $25,000 (2025)',
+    excerpt: 'The most affordable EVs you can buy in 2025 with pros/cons and real‑world costs.',
+    content: `
+      <h1>Best Electric Cars Under $25,000 (2025)</h1>
+      <p>Looking for an affordable EV? These models deliver value without breaking the bank.</p>
+      <ul>
+        <li>Nissan Leaf (2019–2022)</li>
+        <li>Chevy Bolt/Bolt EUV (2020–2023)</li>
+        <li>Hyundai Ioniq Electric (2019–2020)</li>
+      </ul>
+      <p>Filter by price on <a href="/vehicles">Evvalley</a> to find deals near you.</p>
+    `,
+    author: 'EvValley Team',
+    publishedAt: '2025-09-10',
+    updatedAt: '2025-09-10',
+    category: 'Buying/Selling Tips',
+    tags: ['cheap electric cars', 'under 25000', 'budget EV 2025'],
+    readTime: 5,
+    featuredImage: '/blog-images/best-electric-cars-2024.jpg',
+    metaDescription: 'Best electric cars under $25,000 in 2025: models, pros/cons and ownership costs.',
+    keywords: ['best electric cars under 25000 2025', 'cheap EV 2025', 'budget electric cars']
+  },
+  {
+    id: '14',
+    slug: 'ev-incentives-2025-complete-guide',
+    title: 'EV Incentives 2025: Complete Guide to Credits and Rebates',
+    excerpt: 'Federal point‑of‑sale credits, state rebates and eligibility rules for new and used EVs in 2025.',
+    content: `
+      <h1>EV Incentives 2025</h1>
+      <p>Understand <strong>EV incentives</strong> for 2025 including federal dealer credits and major state programs.</p>
+      <h2>Quick Facts</h2>
+      <ul>
+        <li>New EVs: up to $7,500 if eligible</li>
+        <li>Used EVs: up to $4,000 (price < $25,000)</li>
+        <li>Many states offer additional rebates or tax credits</li>
+      </ul>
+      <p>See eligible listings on <a href="/vehicles">Evvalley</a>.</p>
+    `,
+    author: 'EvValley Team',
+    publishedAt: '2025-09-10',
+    updatedAt: '2025-09-10',
+    category: 'Buying/Selling Tips',
+    tags: ['EV incentives 2025', 'tax credit 2025', 'rebates'],
+    readTime: 6,
+    featuredImage: '/blog-images/electric-vehicle-cost-analysis.jpg',
+    metaDescription: 'EV incentives 2025: federal $7,500/$4,000 credits and top state rebates explained.',
+    keywords: ['EV incentives 2025', 'EV tax credit 2025', 'state EV rebates 2025']
+  }
 ];
 
 export const categories = [

@@ -33,5 +33,21 @@ export const metadata: Metadata = {
 };
 
 export default function BlogPage() {
-  return <BlogPageClient />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        // ItemList of latest blog posts (client renders list; this is static hint)
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "EV & E‑Mobility Blog",
+            itemListOrder: "Descending"
+          })
+        }}
+      />
+      <BlogPageClient />
+    </>
+  );
 }

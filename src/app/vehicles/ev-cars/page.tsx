@@ -7,6 +7,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
+import Head from "next/head";
 
 function EVCarsContent() {
   const searchParams = useSearchParams();
@@ -158,6 +159,29 @@ function EVCarsContent() {
 
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
+      <Head>
+        {(() => {
+          const brand = filters.brand && filters.brand !== 'all' ? filters.brand : '';
+          const loc = (locationQuery || '').trim();
+          const title = `${brand ? brand + ' ' : ''}Electric Cars for Sale${loc ? ' in ' + loc : ''} | Evvalley`;
+          const desc = `Browse ${brand ? brand + ' ' : ''}electric cars${loc ? ' in ' + loc : ''}. Filter by price and year. Verified EV listings on Evvalley.`;
+          return (
+            <>
+              <title>{title}</title>
+              <meta name="description" content={desc} />
+              <link rel="canonical" href="https://www.evvalley.com/vehicles/ev-cars" />
+              {(
+                (filters.brand && filters.brand !== 'all') ||
+                (filters.year && filters.year !== 'all') ||
+                (filters.minPrice && filters.minPrice !== '') ||
+                (filters.maxPrice && filters.maxPrice !== '') ||
+                (searchQuery && searchQuery.trim() !== '') ||
+                (locationQuery && locationQuery.trim() !== '')
+              ) ? <meta name="robots" content="noindex,follow" /> : null}
+            </>
+          );
+        })()}
+      </Head>
       <Header />
 
       {/* Hero Section */}

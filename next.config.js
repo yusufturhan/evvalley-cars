@@ -109,6 +109,104 @@ const nextConfig = {
         destination: '/favicon.svg?v=14',
         permanent: true,
       },
+      // Legacy car detail slugs → vehicles listing with search term
+      {
+        source: '/car',
+        destination: '/vehicles/ev-cars',
+        permanent: true,
+      },
+      {
+        source: '/car/:slug*',
+        destination: '/vehicles?search=:slug*',
+        permanent: true,
+      },
+      // Brand pages → filter on vehicles list
+      {
+        source: '/vehicles/brand/:brand',
+        destination: '/vehicles?brand=:brand',
+        permanent: true,
+      },
+      {
+        source: '/vehicles/brand/:brand/',
+        destination: '/vehicles?brand=:brand',
+        permanent: true,
+      },
+      // Old blog slugs → new slugs
+      {
+        source: '/blog/ev-buying-guide-2024',
+        destination: '/blog/complete-guide-to-buying-electric-vehicles',
+        permanent: true,
+      },
+      {
+        source: '/blog/ev-buying-guide-2024/',
+        destination: '/blog/complete-guide-to-buying-electric-vehicles',
+        permanent: true,
+      },
+      {
+        source: '/blog/tesla-home-charging-setup',
+        destination: '/blog/how-to-charge-tesla-at-home',
+        permanent: true,
+      },
+      {
+        source: '/blog/tesla-home-charging-setup/',
+        destination: '/blog/how-to-charge-tesla-at-home',
+        permanent: true,
+      },
+      // Maintenance guide slug no longer exists → best matching evergreen article
+      {
+        source: '/blog/ev-maintenance-guide',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/ev-maintenance-guide/',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      // Old category paths → blog hub (we can add query later)
+      {
+        source: '/blog/category/:category',
+        destination: '/blog',
+        permanent: true,
+      },
+      {
+        source: '/blog/category/:category/',
+        destination: '/blog',
+        permanent: true,
+      },
+      // Canonicalize vehicles category query params to clean category paths
+      {
+        source: '/vehicles',
+        has: [
+          { type: 'query', key: 'category', value: 'ev-car' },
+        ],
+        destination: '/vehicles/ev-cars',
+        permanent: true,
+      },
+      {
+        source: '/vehicles',
+        has: [
+          { type: 'query', key: 'category', value: 'hybrid-car' },
+        ],
+        destination: '/vehicles/hybrid-cars',
+        permanent: true,
+      },
+      {
+        source: '/vehicles',
+        has: [
+          { type: 'query', key: 'category', value: 'ev-scooter' },
+        ],
+        destination: '/vehicles/ev-scooters',
+        permanent: true,
+      },
+      {
+        source: '/vehicles',
+        has: [
+          { type: 'query', key: 'category', value: 'e-bike' },
+        ],
+        destination: '/vehicles/e-bikes',
+        permanent: true,
+      },
     ];
   },
 }

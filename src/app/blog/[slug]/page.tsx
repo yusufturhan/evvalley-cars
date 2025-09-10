@@ -84,6 +84,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* SEO: BreadcrumbList JSON-LD for Blog Post */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.evvalley.com/" },
+                { "@type": "ListItem", position: 2, name: "Blog", item: "https://www.evvalley.com/blog" },
+                { "@type": "ListItem", position: 3, name: post.title, item: `https://www.evvalley.com/blog/${post.slug}` }
+              ]
+            })
+          }}
+        />
         {/* Header */}
         <div className="mb-8">
           <nav className="text-sm text-gray-600 mb-4">

@@ -7,6 +7,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
+import Head from "next/head";
 
 function VehiclesContent() {
   const searchParams = useSearchParams();
@@ -208,6 +209,39 @@ function VehiclesContent() {
 
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
+      {/* Canonical for vehicles listing; query param variations are redirected or noindexed */}
+      <Head>
+        {(() => {
+          const category = filters.category || 'all';
+          const brand = filters.brand && filters.brand !== 'all' ? filters.brand : '';
+          const loc = (locationQuery || '').trim();
+          const humanCategory = category === 'ev-car' ? 'Electric Cars' : category === 'hybrid-car' ? 'Hybrid Cars' : category === 'ev-scooter' ? 'Electric Scooters' : category === 'e-bike' ? 'Electric Bikes' : 'Electric Vehicles';
+          const parts = [brand, humanCategory, loc ? `in ${loc}` : ''].filter(Boolean);
+          const title = parts.length ? `${parts.join(' ')} for Sale | Evvalley` : 'Buy & Sell Electric Vehicles | Evvalley';
+          const desc = `Browse ${brand ? brand + ' ' : ''}${humanCategory.toLowerCase()}${loc ? ' in ' + loc : ''}. Filter by price, year and brand. Verified listings on Evvalley.`;
+          return (
+            <>
+              <title>{title}</title>
+              <meta name="description" content={desc} />
+            </>
+          );
+        })()}
+        <link rel="canonical" href="https://www.evvalley.com/vehicles" />
+        {(() => {
+          const hasNonCanonicalFilters = (
+            (filters.brand && filters.brand !== 'all') ||
+            (filters.year && filters.year !== 'all') ||
+            (filters.minPrice && filters.minPrice !== '') ||
+            (filters.maxPrice && filters.maxPrice !== '') ||
+            (searchQuery && searchQuery.trim() !== '') ||
+            (locationQuery && locationQuery.trim() !== '')
+          );
+          return hasNonCanonicalFilters ? (
+            <meta name="robots" content="noindex,follow" />
+          ) : null;
+        })()}
+      </Head>
+
       <Header />
 
       {/* Hero Section */}
@@ -685,6 +719,55 @@ function VehiclesContent() {
           )}
         </div>
       </section>
+
+      {/* SEO: BreadcrumbList and ItemList JSON-LD (does not affect UI) */}
+      {(() => {
+        try {
+          const category = filters.category || 'all';
+          const humanCategory = category === 'ev-car' ? 'Electric Cars' : category === 'hybrid-car' ? 'Hybrid Cars' : category === 'ev-scooter' ? 'E‑Scooters' : category === 'e-bike' ? 'E‑Bikes' : 'All Vehicles';
+          const breadcrumb = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://www.evvalley.com/" },
+              { "@type": "ListItem", position: 2, name: "Vehicles", item: "https://www.evvalley.com/vehicles" },
+              ...(category && category !== 'all' ? [{ "@type": "ListItem", position: 3, name: humanCategory, item: `https://www.evvalley.com/vehicles` }] : [])
+            ]
+          };
+          const itemList = {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: `${humanCategory} on Evvalley`,
+            numberOfItems: Array.isArray(vehicles) ? vehicles.length : 0,
+            itemListElement: (Array.isArray(vehicles) ? vehicles : []).slice(0, 30).map((v: any, idx: number) => ({
+              "@type": "ListItem",
+              position: idx + 1,
+              item: {
+                "@type": "Product",
+                name: v.title,
+                brand: { "@type": "Brand", name: v.brand || v.make },
+                model: v.model,
+                image: v.images && v.images.length > 0 ? v.images[0] : undefined,
+                url: `https://www.evvalley.com/vehicles/${v.id}`,
+                offers: {
+                  "@type": "Offer",
+                  price: v.price,
+                  priceCurrency: "USD",
+                  availability: v.sold ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"
+                }
+              }
+            }))
+          };
+          return (
+            <>
+              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
+            </>
+          );
+        } catch (e) {
+          return null;
+        }
+      })()}
     </div>
   );
 }
