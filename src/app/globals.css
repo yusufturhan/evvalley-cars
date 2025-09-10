@@ -69,3 +69,8 @@ body {
 .prose pre {
   @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
 }
+
+/* Make links clearly clickable: brand color + underline on hover */
+.prose a {
+  @apply text-[#1C7ED6] font-medium underline decoration-[#1C7ED6]/30 hover:decoration-[#1C7ED6] hover:text-[#155FA2] transition-colors;
+}

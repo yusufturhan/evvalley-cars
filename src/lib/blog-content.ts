@@ -1613,29 +1613,71 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Current market prices, depreciation, battery health tips and negotiation checklist for buying a used EV in 2025.',
     content: `
       <h1>Used EV Prices 2025: Complete Buyer Guide</h1>
-      <p>This practical guide summarizes how to evaluate <strong>used EV prices</strong> in 2025, what affects value (battery health, software, fast‑charging), and how to negotiate.</p>
-      <h2>Typical Price Ranges</h2>
+      <p>Thinking about a used electric car? This in‑depth guide explains how to evaluate <strong>used EV prices</strong> in 2025, which models offer the best value, how battery health impacts price, and a step‑by‑step negotiation playbook. You’ll also find cost‑of‑ownership examples so you can compare a used EV vs. gas car with confidence.</p>
+
+      <h2>How the Market Moved in 2024 → 2025</h2>
+      <p>In 2024, price cuts on new EVs pulled used prices down. By mid‑2025, the market stabilized. Models with fast DC charging and strong software support now command a premium, while slow‑charging or discontinued models trade at a discount.</p>
+
+      <h2>Typical Price Ranges (Good Condition, Clean Title)</h2>
       <ul>
-        <li>Tesla Model 3 (2019–2021): $18k–$28k</li>
-        <li>Nissan Leaf (2019–2022): $8k–$16k</li>
-        <li>Chevy Bolt EUV (2022–2023): $14k–$22k</li>
+        <li><strong>Tesla Model 3 (2019–2021):</strong> $18k–$28k — strong software, access to Supercharger network, wide parts availability.</li>
+        <li><strong>Nissan Leaf (2019–2022):</strong> $8k–$16k — excellent city car; CHAdeMO fast‑charging may limit road‑trip value.</li>
+        <li><strong>Chevy Bolt/Bolt EUV (2020–2023):</strong> $14k–$22k — great value; verify battery recall status and pack replacement.</li>
+        <li><strong>Hyundai Kona Electric (2019–2022):</strong> $15k–$23k — efficient, compact; check DC charging performance and warranty terms.</li>
+        <li><strong>Kia Niro EV (2019–2022):</strong> $16k–$24k — practical crossover; review infotainment/ADAS updates.</li>
       </ul>
-      <h2>Checklist</h2>
+
+      <h2>Battery Health: What Really Matters</h2>
+      <p>Price correlates strongly with usable battery capacity. Ask for:</p>
       <ul>
-        <li>Verify fast‑charging compatibility and adapter support</li>
-        <li>Ask for battery state-of-health or recent range data</li>
-        <li>Check software updates and recall history</li>
+        <li>Recent range numbers at 100% charge (trip computer or app screenshot).</li>
+        <li>Any available <em>state‑of‑health</em> (SoH) report from service history or third‑party tools.</li>
+        <li>Warranty coverage (many packs have 8y/100k mi warranties).</li>
       </ul>
-      <p>Ready to shop? <a href="/vehicles">Browse verified listings</a> on Evvalley.</p>
+
+      <h2>Ownership Costs vs. Gas Car</h2>
+      <p>At $0.15/kWh and 3.5 mi/kWh efficiency, 1,000 miles costs about <strong>$43</strong> in electricity. A 30 mpg gas car at $3.75/gal costs about <strong>$125</strong>. Over 12,000 miles/year, that’s ~$996 EV vs. ~$1,500 gas — you save ~$500 annually, plus lower maintenance.</p>
+
+      <h2>Inspection & Test‑Drive Checklist</h2>
+      <ul>
+        <li>Fast‑charging compatibility and peak kW verified at a public DC station.</li>
+        <li>Software version up‑to‑date; confirm OTA updates and app access.</li>
+        <li>Service/recall history (battery, charging port, drive unit, infotainment).</li>
+        <li>Tire wear, brake condition (regen = genelde düşük aşınma), suspension sesi.</li>
+        <li>Şarj kabloları ve aksesuarlar dahil mi?</li>
+      </ul>
+
+      <h2>Negotiation Playbook</h2>
+      <ol>
+        <li>Karşılaştırma listesi hazırlayın: 3–5 benzer ilanın fiyatı ve km.</li>
+        <li>Pilin durumuna göre ~%5–10 pazarlık payı ekleyin.</li>
+        <li>Hızlı sonuç için: “Bugün banka transferiyle kapatırım” yaklaşımı.</li>
+      </ol>
+
+      <h2>Which Models To Shortlist</h2>
+      <ul>
+        <li><strong>En iyi yazılım & ağ:</strong> Tesla Model 3/Y.</li>
+        <li><strong>Fiyat/performans:</strong> Chevy Bolt EUV, Hyundai Kona Electric.</li>
+        <li><strong>Şehir içi:</strong> Nissan Leaf (uygun fiyat, sınırlı uzun yol).</li>
+      </ul>
+
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;"><strong>Hazır mısınız?</strong> Doğrulanmış ilanları inceleyin ve fiyat/menzil/markaya göre filtreleyin.</p>
+        <p style="margin:0;">
+          <a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">Browse verified listings</a>
+          ·
+          <a href="/sell" style="color:#0ea5e9;text-decoration:underline;">Sell your EV</a>
+        </p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2025-09-10',
     updatedAt: '2025-09-10',
     category: 'EV Guide',
     tags: ['used ev prices 2025', 'battery health', 'ev depreciation'],
-    readTime: 7,
+    readTime: 12,
     featuredImage: '/blog-images/ev-charging-station-guide.jpg',
-    metaDescription: 'Used EV prices 2025: market ranges, battery health tips, negotiation checklist. Learn how to buy a used electric car smartly.',
+    metaDescription: 'Used EV prices 2025: market ranges, battery health, TCO and negotiation steps. Buy a used electric car with confidence.',
     keywords: ['used EV prices 2025', 'buy used electric car', 'EV depreciation 2025']
   },
   {
