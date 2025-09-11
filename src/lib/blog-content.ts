@@ -1017,6 +1017,23 @@ export const blogPosts: BlogPost[] = [
 
       <h2>Shop Smart: Compare Real-World EV Deals</h2>
       <p>Ready to run the numbers on actual cars? Browse Evvalley Marketplace to compare listings, filter by budget, and find incentive-eligible EVs that fit your life and your bottom line.</p>
+
+      <h2>FAQs</h2>
+      <p><strong>Q:</strong> How much does an EV battery replacement cost?<br/>
+      <strong>A:</strong> It varies widely by model; many are covered by 8y/100k mi warranties. Always check warranty status and degradation before purchase.</p>
+      <p><strong>Q:</strong> What mix of home vs. DC fast charging should I plan for?<br/>
+      <strong>A:</strong> Most owners charge 70–90% at home and use DC fast charging for trips. Home‑first charging keeps TCO low.</p>
+
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;">Run your own TCO. Start with live prices and filter by brand/range.</p>
+        <p style="margin:0;">
+          <a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">Explore listings</a>
+          ·
+          <a href="/incentives" style="color:#0ea5e9;text-decoration:underline;">See incentives</a>
+          ·
+          <a href="/safety" style="color:#0ea5e9;text-decoration:underline;">EV safety tips</a>
+        </p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2024-03-28',
@@ -1164,6 +1181,14 @@ export const blogPosts: BlogPost[] = [
 
       <h2>Find Your Perfect E-Bike on Evvalley Marketplace</h2>
       <p>Ready to start riding? Browse Evvalley Marketplace to explore top <strong>e-bike models</strong> and discover which electric bicycle fits your lifestyle best.</p>
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;">Compare e-bikes by brand and price, or see safety tips.</p>
+        <p style="margin:0;">
+          <a href="/vehicles/e-bikes" style="color:#0ea5e9;text-decoration:underline;">Browse electric bikes</a>
+          ·
+          <a href="/safety" style="color:#0ea5e9;text-decoration:underline;">Safety guidelines</a>
+        </p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2024-03-27',
@@ -1360,6 +1385,14 @@ export const blogPosts: BlogPost[] = [
 
       <h2>Ready to Sell Your EV?</h2>
       <p>List it today on <strong>Evvalley Marketplace</strong> — the go-to platform for <strong>electric vehicle resale</strong>. Get started with our easy listing process and connect with serious EV buyers.</p>
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;">Sell faster with a standout listing.</p>
+        <p style="margin:0;">
+          <a href="/sell" style="color:#0ea5e9;text-decoration:underline;">Create your listing</a>
+          ·
+          <a href="/vehicles" style="color:#0ea5e9;text-decoration:underline;">See market prices</a>
+        </p>
+      </div>
     `,
     author: 'EvValley Team',
     publishedAt: '2024-03-30',
