@@ -163,6 +163,17 @@ const nextConfig = {
         destination: '/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
+      // Old informational article → relevant evergreen guide
+      {
+        source: '/blog/what-are-electric-vehicles-and-how-do-they-work',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/what-are-electric-vehicles-and-how-do-they-work/',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
       // Old category paths → blog hub (we can add query later)
       {
         source: '/blog/category/:category',
