@@ -824,6 +824,11 @@ export const blogPosts: BlogPost[] = [
       <h2>Final Thoughts</h2>
       <p>Mastering <strong>how to charge Tesla at home</strong> ensures convenience, efficiency, and cost savings. The <strong>Tesla Wall Connector</strong> is the best long-term solution, but Mobile Connectors work for backup or travel. With proper setup, charging at home is cheaper than gas, safer, and more convenient than public chargers.</p>
 
+      <div style="margin:16px 0;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;">
+        <p style="margin:0 0 8px 0;">New to EV safety? Read our site-wide safety guidelines.</p>
+        <p style="margin:0;"><a href="/safety" style="color:#0ea5e9;text-decoration:underline;">EV & E‑Mobility Safety Guidelines</a></p>
+      </div>
+
       <h2>Find Your Tesla Today</h2>
       <p>Looking for a Tesla to pair with your home charging setup? Visit Evvalley Marketplace to explore new and used Tesla listings and start your EV journey today.</p>
     `,

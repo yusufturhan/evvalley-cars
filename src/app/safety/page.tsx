@@ -1,5 +1,18 @@
 import { Shield, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Safety Guidelines - Evvalley',
+  description:
+    'Essential safety tips for electric vehicles, e-scooters and e-bikes. Battery safety, charging, traffic rules and emergency readiness on Evvalley.',
+  alternates: { canonical: 'https://www.evvalley.com/safety' },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+};
 
 export default function SafetyPage() {
   return (
