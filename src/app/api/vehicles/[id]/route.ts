@@ -147,6 +147,7 @@ export async function PUT(
     let updateData: any = {};
     let newImages: File[] = [];
     let deletedImages: number[] = [];
+    let finalImages: string[] = [];
     
     if (contentType?.includes('multipart/form-data')) {
       // Handle FormData
@@ -221,8 +222,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
 
-    // Handle image updates (deleted images and/or new images)
-    let finalImages: string[] = Array.isArray(currentVehicle.images) ? [...currentVehicle.images] : [];
+    // Initialize finalImages with current images if not already set
+    if (finalImages.length === 0) {
+      finalImages = Array.isArray(currentVehicle.images) ? [...currentVehicle.images] : [];
+    }
 
     // Apply deletions first
     if (deletedImages.length > 0) {
