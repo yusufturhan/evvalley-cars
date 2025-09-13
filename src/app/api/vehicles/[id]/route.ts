@@ -197,24 +197,13 @@ export async function PUT(
         }
       }
 
-      // If existingImages provided, compute deletions from current images
+      // If existingImages provided, use them as the new order (excluding deleted ones)
       const existingImagesRaw = formData.getAll('existingImages');
       if (existingImagesRaw && existingImagesRaw.length > 0) {
         const existingImages = existingImagesRaw.map(v => String(v));
-        // Load current images to diff
-        const { data: currentForDiff } = await supabase
-          .from('vehicles')
-          .select('images')
-          .eq('id', id)
-          .single();
-        const currentList: string[] = Array.isArray(currentForDiff?.images) ? currentForDiff.images : [];
-        const toDelete: number[] = [];
-        currentList.forEach((url, idx) => {
-          if (!existingImages.includes(url)) toDelete.push(idx);
-        });
-        if (toDelete.length > 0) {
-          deletedImages = Array.from(new Set([...(deletedImages || []), ...toDelete]));
-        }
+        // Use the existing images in the new order as the base for finalImages
+        finalImages = existingImages;
+        console.log('📸 Using existing images in new order:', finalImages.length);
       }
     } else {
       // Handle JSON

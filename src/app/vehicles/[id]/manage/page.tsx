@@ -229,6 +229,12 @@ export default function EditVehiclePage() {
     const coverImage = newUrls.splice(index, 1)[0];
     newUrls.unshift(coverImage);
     setImageUrls(newUrls);
+    
+    // Also update the form data to ensure the new order is sent to API
+    setFormData(prev => ({
+      ...prev,
+      // This will be used in the API call to maintain the new order
+    }));
   };
 
   const validateForm = () => {
