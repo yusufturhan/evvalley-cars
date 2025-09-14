@@ -26,14 +26,14 @@ export default function ClerkProvider({
       localization={{
         signIn: {
           start: {
-            title: "Evvalley'e Hoş Geldiniz",
-            subtitle: "Hesabınıza giriş yapın",
+            title: "Welcome to Evvalley",
+            subtitle: "Sign in to your account",
           },
         },
         signUp: {
           start: {
-            title: "Evvalley'e Katılın",
-            subtitle: "Hesabınızı oluşturun",
+            title: "Join Evvalley",
+            subtitle: "Create your account",
           },
         },
       }}

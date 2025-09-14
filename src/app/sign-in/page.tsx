@@ -13,7 +13,7 @@ export default function SignInPage() {
           <p className="text-gray-600">Sign in to your Evvalley account</p>
         </div>
         
-        {/* Google Sign-in Uyarısı */}
+        {/* Google Sign-in Warning */}
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex items-start">
             <div className="flex-shrink-0">
@@ -23,14 +23,14 @@ export default function SignInPage() {
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-yellow-800">
-                Google ile Giriş Sorunu Yaşıyorsanız
+                Having Google Sign-in Issues?
               </h3>
               <div className="mt-2 text-sm text-yellow-700">
-                <p>Eğer Google ile giriş yaparken hata alıyorsanız:</p>
+                <p>If you're experiencing issues with Google sign-in:</p>
                 <ul className="mt-2 list-disc list-inside space-y-1">
-                  <li>Normal web tarayıcısından (Chrome, Safari) deneyin</li>
-                  <li>Mobil tarayıcıda evvalley.com'u açın</li>
-                  <li>Uygulama içi tarayıcı yerine dış tarayıcı kullanın</li>
+                  <li>Try using a regular web browser (Chrome, Safari)</li>
+                  <li>Open evvalley.com in your mobile browser</li>
+                  <li>Use external browser instead of in-app browser</li>
                 </ul>
               </div>
             </div>
