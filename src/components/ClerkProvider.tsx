@@ -21,6 +21,22 @@ export default function ClerkProvider({
       }}
       afterSignInUrl="/"
       afterSignUpUrl="/"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+      localization={{
+        signIn: {
+          start: {
+            title: "Evvalley'e Hoş Geldiniz",
+            subtitle: "Hesabınıza giriş yapın",
+          },
+        },
+        signUp: {
+          start: {
+            title: "Evvalley'e Katılın",
+            subtitle: "Hesabınızı oluşturun",
+          },
+        },
+      }}
     >
       {children}
     </ClerkProviderBase>
