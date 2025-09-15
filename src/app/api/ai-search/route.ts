@@ -53,6 +53,59 @@ const toParams = (p: Parsed) => {
   return params.toString()
 }
 
+const applyFiltersToVehicles = (vehicles: any[], filters: Parsed) => {
+  return vehicles.filter(vehicle => {
+    // Brand filter
+    if (filters.brand && vehicle.brand) {
+      if (!vehicle.brand.toLowerCase().includes(filters.brand.toLowerCase())) {
+        return false
+      }
+    }
+    
+    // Model filter
+    if (filters.model && vehicle.model) {
+      if (!vehicle.model.toLowerCase().includes(filters.model.toLowerCase())) {
+        return false
+      }
+    }
+    
+    // Color filter
+    if (filters.color) {
+      const vehicleColor = (vehicle.color || vehicle.exterior_color || '').toLowerCase()
+      if (!vehicleColor.includes(filters.color.toLowerCase())) {
+        return false
+      }
+    }
+    
+    // Location filter (exact city match)
+    if (filters.city && vehicle.location) {
+      const vehicleCity = vehicle.location.split(',')[0].trim().toLowerCase()
+      const filterCity = filters.city.toLowerCase()
+      if (vehicleCity !== filterCity) {
+        return false
+      }
+    }
+    
+    // Price filter
+    if (typeof filters.maxPrice === 'number' && vehicle.price) {
+      const maxPrice = filters.maxPrice < 1000 ? filters.maxPrice * 1000 : filters.maxPrice
+      if (vehicle.price > maxPrice) {
+        return false
+      }
+    }
+    
+    // Mileage filter
+    if (typeof filters.maxMileage === 'number' && vehicle.mileage) {
+      const maxMileage = filters.maxMileage < 1000 ? filters.maxMileage * 1000 : filters.maxMileage
+      if (vehicle.mileage > maxMileage) {
+        return false
+      }
+    }
+    
+    return true
+  })
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}))
@@ -74,29 +127,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ params: data?.params || '' })
     }
 
-    // First try semantic search for better results
-    try {
-      const semanticRes = await fetch(new URL('/api/semantic-search', req.url), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ q }),
-      })
-      
-      if (semanticRes.ok) {
-        const semanticData = await semanticRes.json()
-        if (semanticData.vehicles && semanticData.vehicles.length > 0) {
-          return NextResponse.json({ 
-            params: semanticData.params,
-            semantic: true,
-            vehicleCount: semanticData.vehicles.length
-          })
-        }
-      }
-    } catch (semanticError) {
-      console.log('Semantic search failed, falling back to structured parsing:', semanticError)
-    }
-
-    // Call OpenAI chat completions with JSON schema output
+    // First parse the query to extract filters
     const completion = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -118,27 +149,71 @@ export async function POST(req: Request) {
       }),
     })
 
-    if (!completion.ok) {
-      // Fallback to deterministic
-      const res = await fetch(new URL('/api/search', req.url), {
+    let parsed: Parsed = {}
+    if (completion.ok) {
+      const json: any = await completion.json()
+      const content = json?.choices?.[0]?.message?.content
+      try {
+        parsed = JSON.parse(content)
+      } catch {
+        parsed = {}
+      }
+    }
+
+    // Try semantic search with parsed filters
+    try {
+      const semanticRes = await fetch(new URL('/api/semantic-search', req.url), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q }),
       })
-      const data = await res.json().catch(() => ({ params: '' }))
-      return NextResponse.json({ params: data?.params || '' })
+      
+      if (semanticRes.ok) {
+        const semanticData = await semanticRes.json()
+        if (semanticData.vehicles && semanticData.vehicles.length > 0) {
+          // Apply additional filtering to semantic results
+          const filteredVehicles = applyFiltersToVehicles(semanticData.vehicles, parsed)
+          
+          if (filteredVehicles.length > 0) {
+            // Build params with actual filters found
+            const params = new URLSearchParams()
+            if (parsed.brand) params.set('brand', parsed.brand.toLowerCase())
+            if (parsed.model) {
+              params.set('model', parsed.model.toLowerCase())
+              params.set('search', parsed.model.toLowerCase())
+            }
+            if (parsed.color) params.set('color', parsed.color.toLowerCase())
+            if (parsed.city) params.set('location', parsed.city)
+            if (typeof parsed.maxPrice === 'number') {
+              const usd = parsed.maxPrice < 1000 ? parsed.maxPrice * 1000 : parsed.maxPrice
+              params.set('maxPrice', String(Math.round(usd)))
+            }
+            if (typeof parsed.maxMileage === 'number') {
+              const miles = parsed.maxMileage < 1000 ? parsed.maxMileage * 1000 : parsed.maxMileage
+              params.set('maxMileage', String(Math.round(miles)))
+            }
+            
+            return NextResponse.json({ 
+              params: params.toString(),
+              semantic: true,
+              vehicleCount: filteredVehicles.length,
+              vehicles: filteredVehicles
+            })
+          }
+        }
+      }
+    } catch (semanticError) {
+      console.log('Semantic search failed, falling back to structured parsing:', semanticError)
     }
 
-    const json: any = await completion.json()
-    const content = json?.choices?.[0]?.message?.content
-    let parsed: Parsed = {}
-    try {
-      parsed = JSON.parse(content)
-    } catch {
-      parsed = {}
-    }
-
-    return NextResponse.json({ params: toParams(parsed) })
+    // Fallback to deterministic parsing if semantic search failed
+    const res = await fetch(new URL('/api/search', req.url), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q }),
+    })
+    const data = await res.json().catch(() => ({ params: '' }))
+    return NextResponse.json({ params: data?.params || '' })
   } catch (e) {
     return NextResponse.json({ params: '' })
   }
