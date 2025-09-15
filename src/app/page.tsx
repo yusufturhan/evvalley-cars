@@ -202,10 +202,20 @@ export default function Home() {
   };
 
   const handleSmartSearch = () => {
-    const parsed = parseNaturalLanguageQuery(smartQuery);
-    const params = buildVehiclesSearchParams(parsed);
-    const url = `/vehicles?${params.toString()}`;
-    router.push(url);
+    (async () => {
+      try {
+        const res = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+        const data = await res.json();
+        const qs = data?.params || '';
+        const url = `/vehicles${qs ? `?${qs}` : ''}`;
+        router.push(url);
+      } catch {
+        const parsed = parseNaturalLanguageQuery(smartQuery);
+        const params = buildVehiclesSearchParams(parsed);
+        const url = `/vehicles?${params.toString()}`;
+        router.push(url);
+      }
+    })();
   };
 
   const handleCategorySelect = (category: string) => {

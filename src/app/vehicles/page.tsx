@@ -51,12 +51,21 @@ function VehiclesContent() {
 
   const handleSmartSearch = () => {
     if (!smartQuery.trim()) return;
-    const parsed = parseNaturalLanguageQuery(smartQuery);
-    const params = buildVehiclesSearchParams(parsed);
-    // Preserve existing params that make sense
-    if (showSoldVehicles) params.set('includeSold', 'true');
-    const url = `/vehicles?${params.toString()}`;
-    router.push(url);
+    (async () => {
+      try {
+        const res = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+        const data = await res.json();
+        const qs = data?.params || '';
+        const url = `/vehicles${qs ? `?${qs}` : ''}`;
+        router.push(url);
+      } catch {
+        // Fallback to local parser
+        const parsed = parseNaturalLanguageQuery(smartQuery);
+        const params = buildVehiclesSearchParams(parsed);
+        const url = `/vehicles?${params.toString()}`;
+        router.push(url);
+      }
+    })();
   };
 
   // Fetch vehicles when URL params change
