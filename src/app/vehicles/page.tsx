@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
+import { parseNaturalLanguageQuery, buildVehiclesSearchParams } from "@/lib/nlSearch";
 import { useSearchParams, useRouter } from "next/navigation";
 import Head from "next/head";
 
@@ -24,6 +25,7 @@ function VehiclesContent() {
     maxPrice: ''
   });
   const [showSoldVehicles, setShowSoldVehicles] = useState(true);
+  const [smartQuery, setSmartQuery] = useState<string>("");
 
   // Sync filters state with URL params for UI
   useEffect(() => {
@@ -46,6 +48,16 @@ function VehiclesContent() {
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
   }, [searchParams]);
+
+  const handleSmartSearch = () => {
+    if (!smartQuery.trim()) return;
+    const parsed = parseNaturalLanguageQuery(smartQuery);
+    const params = buildVehiclesSearchParams(parsed);
+    // Preserve existing params that make sense
+    if (showSoldVehicles) params.set('includeSold', 'true');
+    const url = `/vehicles?${params.toString()}`;
+    router.push(url);
+  };
 
   // Fetch vehicles when URL params change
   useEffect(() => {
@@ -269,6 +281,20 @@ function VehiclesContent() {
                         placeholder="Search EV, Hybrid, Scooter, or E-Bike..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                      />
+                    </div>
+                  </div>
+                  {/* Smart natural language search */}
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={smartQuery}
+                        onChange={(e) => setSmartQuery(e.target.value)}
+                        placeholder="e.g. Tesla Model 3 Palo Alto under 30k under 20k miles"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
                       />
                     </div>
                   </div>

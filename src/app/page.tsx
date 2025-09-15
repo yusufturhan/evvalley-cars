@@ -8,6 +8,7 @@ import OptimizedImage from "@/components/OptimizedImage";
 import AuthSync from "@/components/AuthSync";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
+import { parseNaturalLanguageQuery, buildVehiclesSearchParams } from "@/lib/nlSearch";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { trackEvent, trackSearch, trackCategoryView, trackClick, trackScrollDepth, trackSocialMediaClick } from "@/lib/analytics";
@@ -22,6 +23,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [smartQuery, setSmartQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -197,6 +199,13 @@ export default function Home() {
     } catch (searchError) {
       console.error('Error handling search:', searchError);
     }
+  };
+
+  const handleSmartSearch = () => {
+    const parsed = parseNaturalLanguageQuery(smartQuery);
+    const params = buildVehiclesSearchParams(parsed);
+    const url = `/vehicles?${params.toString()}`;
+    router.push(url);
   };
 
   const handleCategorySelect = (category: string) => {
@@ -443,6 +452,21 @@ export default function Home() {
                       />
                     </div>
                   </div>
+                  {/* Smart natural language search */}
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                      <input
+                        type="text"
+                        value={smartQuery}
+                        onChange={(e) => setSmartQuery(e.target.value)}
+                        placeholder="e.g. Tesla Model 3 Palo Alto under 30k under 20k miles"
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                        onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
+                      />
+                    </div>
+                  </div>
+
                   <button 
                     onClick={handleSearch}
                     className="bg-[#1C1F4A] text-white px-8 py-3 rounded-lg hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
