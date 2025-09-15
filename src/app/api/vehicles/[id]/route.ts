@@ -481,6 +481,23 @@ The Evvalley Team
       console.log('🔔 No price change detected');
     }
 
+    // Re-index the updated vehicle for semantic search
+    try {
+      const indexResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/index-vehicle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleId: id })
+      })
+      
+      if (!indexResponse.ok) {
+        console.warn('Failed to re-index vehicle for semantic search:', await indexResponse.text())
+      } else {
+        console.log('Vehicle re-indexed successfully for semantic search')
+      }
+    } catch (indexError) {
+      console.warn('Error re-indexing vehicle for semantic search:', indexError)
+    }
+
     return NextResponse.json({ vehicle });
   } catch (error) {
     console.error('PUT /api/vehicles/[id] error:', error);

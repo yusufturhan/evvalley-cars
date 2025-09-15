@@ -457,6 +457,23 @@ export async function POST(request: Request) {
       updated_at: vehicle.updated_at?.toString()
     };
 
+    // Index the new vehicle for semantic search
+    try {
+      const indexResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/index-vehicle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicleId: serializedVehicle.id })
+      })
+      
+      if (!indexResponse.ok) {
+        console.warn('Failed to index vehicle for semantic search:', await indexResponse.text())
+      } else {
+        console.log('Vehicle indexed successfully for semantic search')
+      }
+    } catch (indexError) {
+      console.warn('Error indexing vehicle for semantic search:', indexError)
+    }
+
     return NextResponse.json({ vehicle: serializedVehicle }, { status: 201 });
   } catch (error) {
     console.error('API error:', error);
