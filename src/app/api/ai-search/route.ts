@@ -206,6 +206,16 @@ export async function POST(req: Request) {
       console.log('Semantic search failed, falling back to structured parsing:', semanticError)
     }
 
+    // If semantic search didn't work or returned no results, use parsed filters directly
+    if (Object.keys(parsed).length > 0) {
+      const params = toParams(parsed)
+      return NextResponse.json({ 
+        params: params,
+        semantic: false,
+        vehicleCount: 0
+      })
+    }
+
     // Fallback to deterministic parsing if semantic search failed
     const res = await fetch(new URL('/api/search', req.url), {
       method: 'POST',
