@@ -148,8 +148,15 @@ function VehiclesContent() {
           }
         }
 
-        // No need for client-side filtering since API handles it
+        // Client-side safety filter for location to avoid substring false positives
         let filteredVehicles = allVehicles;
+        if (currentLocation) {
+          const loc = currentLocation.trim().toLowerCase();
+          filteredVehicles = filteredVehicles.filter((v: any) => {
+            const lv = (v.location || '').trim().toLowerCase();
+            return lv.startsWith(loc);
+          });
+        }
         
         console.log('🔍 Total vehicles from API:', allVehicles.length);
         console.log('🔍 Search query:', currentSearch);
