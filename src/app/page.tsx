@@ -204,16 +204,24 @@ export default function Home() {
   const handleSmartSearch = () => {
     (async () => {
       try {
-        const res = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+        const res = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
         const data = await res.json();
         const qs = data?.params || '';
         const url = `/vehicles${qs ? `?${qs}` : ''}`;
         router.push(url);
       } catch {
-        const parsed = parseNaturalLanguageQuery(smartQuery);
-        const params = buildVehiclesSearchParams(parsed);
-        const url = `/vehicles?${params.toString()}`;
-        router.push(url);
+        try {
+          const det = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+          const data = await det.json();
+          const qs = data?.params || '';
+          const url = `/vehicles${qs ? `?${qs}` : ''}`;
+          router.push(url);
+        } catch {
+          const parsed = parseNaturalLanguageQuery(smartQuery);
+          const params = buildVehiclesSearchParams(parsed);
+          const url = `/vehicles?${params.toString()}`;
+          router.push(url);
+        }
       }
     })();
   };

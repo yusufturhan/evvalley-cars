@@ -56,17 +56,27 @@ function VehiclesContent() {
     if (!smartQuery.trim()) return;
     (async () => {
       try {
-        const res = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+        // First try AI parser
+        const res = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
         const data = await res.json();
         const qs = data?.params || '';
         const url = `/vehicles${qs ? `?${qs}` : ''}`;
         router.push(url);
       } catch {
-        // Fallback to local parser
-        const parsed = parseNaturalLanguageQuery(smartQuery);
-        const params = buildVehiclesSearchParams(parsed);
-        const url = `/vehicles?${params.toString()}`;
-        router.push(url);
+        try {
+          // Deterministic fallback
+          const det = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
+          const data = await det.json();
+          const qs = data?.params || '';
+          const url = `/vehicles${qs ? `?${qs}` : ''}`;
+          router.push(url);
+        } catch {
+          // Local parser last resort
+          const parsed = parseNaturalLanguageQuery(smartQuery);
+          const params = buildVehiclesSearchParams(parsed);
+          const url = `/vehicles?${params.toString()}`;
+          router.push(url);
+        }
       }
     })();
   };
