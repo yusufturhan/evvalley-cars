@@ -43,42 +43,87 @@ export async function POST(req: Request) {
     const embeddingData = await embeddingResponse.json()
     const queryEmbedding = embeddingData.data[0].embedding
 
-    // Search using pgvector cosine similarity
-    const { data: searchResults, error } = await supabase.rpc('search_vehicles_semantic', {
-      query_embedding: queryEmbedding,
-      match_threshold: 0.7,
-      match_count: 20
-    })
+    // Try semantic search with pgvector first
+    try {
+      const { data: searchResults, error } = await supabase.rpc('search_vehicles_semantic', {
+        query_embedding: queryEmbedding,
+        match_threshold: 0.7,
+        match_count: 20
+      })
 
-    if (error) {
-      console.error('Semantic search error:', error)
-      return NextResponse.json({ vehicles: [], params: '' })
+      if (!error && searchResults && searchResults.length > 0) {
+        // Extract vehicle IDs and build params
+        const vehicleIds = searchResults.map((r: any) => r.vehicle_id)
+        
+        // Get full vehicle data with optional category filter
+        let vehicleQuery = supabase
+          .from('vehicles')
+          .select('*')
+          .in('id', vehicleIds)
+          .eq('sold', false)
+        
+        if (category) {
+          vehicleQuery = vehicleQuery.eq('category', category)
+        }
+        
+        const { data: vehicles, error: vehiclesError } = await vehicleQuery
+
+        if (!vehiclesError && vehicles && vehicles.length > 0) {
+          return NextResponse.json({ 
+            vehicles: vehicles, 
+            params: params.toString(),
+            semantic: true 
+          })
+        }
+      }
+    } catch (semanticError) {
+      console.log('Semantic search failed, falling back to regular search:', semanticError)
     }
 
-    // Extract vehicle IDs and build params
-    const vehicleIds = searchResults?.map((r: any) => r.vehicle_id) || []
+    // Fallback to regular search using appropriate endpoints
+    const allVehicles: any[] = []
     
-    if (vehicleIds.length === 0) {
-      return NextResponse.json({ vehicles: [], params: '' })
+    if (!category || category === 'ev-car' || category === 'hybrid-car') {
+      // Search EV cars and hybrid cars
+      const params = new URLSearchParams()
+      if (category) params.set('category', category)
+      params.set('search', query)
+      params.set('limit', '20')
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/vehicles?${params.toString()}`)
+      const data = await response.json()
+      if (data.vehicles) {
+        allVehicles.push(...data.vehicles)
+      }
+    }
+    
+    if (!category || category === 'ev-scooter') {
+      // Search E-scooters
+      const params = new URLSearchParams()
+      params.set('search', query)
+      params.set('limit', '20')
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/ev-scooters?${params.toString()}`)
+      const data = await response.json()
+      if (data.scooters) {
+        allVehicles.push(...data.scooters)
+      }
+    }
+    
+    if (!category || category === 'e-bike') {
+      // Search E-bikes
+      const params = new URLSearchParams()
+      params.set('search', query)
+      params.set('limit', '20')
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/e-bikes?${params.toString()}`)
+      const data = await response.json()
+      if (data.bikes) {
+        allVehicles.push(...data.bikes)
+      }
     }
 
-    // Get full vehicle data with optional category filter
-    let vehicleQuery = supabase
-      .from('vehicles')
-      .select('*')
-      .in('id', vehicleIds)
-      .eq('sold', false)
-    
-    if (category) {
-      vehicleQuery = vehicleQuery.eq('category', category)
-    }
-    
-    const { data: vehicles, error: vehiclesError } = await vehicleQuery
-
-    if (vehiclesError) {
-      console.error('Vehicles fetch error:', vehiclesError)
-      return NextResponse.json({ vehicles: [], params: '' })
-    }
+    const vehicles = allVehicles
 
     // Build search params for the frontend
     const params = new URLSearchParams()
