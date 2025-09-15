@@ -58,13 +58,16 @@ export async function GET(request: Request) {
     // Model exact match if provided via query param
     const modelParam = searchParams.get('model');
     if (modelParam && modelParam.trim().length > 0) {
-      query = query.ilike('model', modelParam.trim());
+      const pattern = `%${modelParam.trim()}%`;
+      query = query.ilike('model', pattern);
     }
 
     // Color exact-ish match (stores may have mixed case)
     const colorParam = searchParams.get('color');
     if (colorParam && colorParam.trim().length > 0) {
-      query = query.ilike('color', colorParam.trim());
+      const c = `%${colorParam.trim()}%`;
+      // Match either color or exterior_color columns
+      query = query.or(`color.ilike.${c},exterior_color.ilike.${c}`);
     }
 
     if (minPrice) {
