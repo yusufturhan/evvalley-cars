@@ -25,8 +25,7 @@ const KNOWN_MODELS = [
 ];
 
 const KNOWN_COLORS = [
-  'black','white','red','blue','silver','gray','grey','green','yellow','orange',
-  'siyah','beyaz','kirmizi','mavi','gri','yesil','sari','turuncu','gumus'
+  'black','white','red','blue','silver','gray','grey','green','yellow','orange'
 ];
 
 function normalizeNumber(token: string): number | undefined {
@@ -62,11 +61,10 @@ export function parseNaturalLanguageQuery(inputRaw: string): ParsedFilters {
   }
   if (foundModel) result.model = foundModel;
 
-  // Color detection (basic)
+  // Color detection (English only)
   for (const c of KNOWN_COLORS) {
     if (lower.includes(c)) {
-      const map: Record<string,string> = { siyah:'black', beyaz:'white', kirmizi:'red', mavi:'blue', gri:'gray', yesil:'green', sari:'yellow', turuncu:'orange', gumus:'silver' };
-      result.color = map[c] || c;
+      result.color = c;
       break;
     }
   }

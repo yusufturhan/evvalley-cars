@@ -14,18 +14,17 @@ const MODEL_ALIASES: Record<string, string> = {
 };
 
 const COLOR_ALIASES: Record<string, string> = {
-  // english
-  black: 'black', white: 'white', red: 'red', blue: 'blue', gray: 'gray', grey: 'gray', silver: 'silver',
+  // English only (explicit request)
+  black: 'black', white: 'white', red: 'red', blue: 'blue', gray: 'gray', grey: 'gray', silver: 'silver', green: 'green',
   // common paint names → canonical
   'midnight black': 'black', 'obsidian black': 'black', 'pearl white': 'white',
-  'midnight silver metallic': 'gray', 'midnight silver': 'gray', 'silver metallic': 'silver',
-  // turkish
-  siyah: 'black', beyaz: 'white', kirmizi: 'red', mavi: 'blue', gri: 'gray', gumus: 'silver', yesil: 'green'
+  'midnight silver metallic': 'gray', 'midnight silver': 'gray', 'silver metallic': 'silver'
 };
 
 const CITY_ALIASES: Record<string, string> = {
   sf: 'San Francisco', 's.f.': 'San Francisco', 'san fran': 'San Francisco',
-  'san francisco': 'San Francisco', 'santa clara': 'Santa Clara', 'san jose': 'San Jose',
+  'san francisco': 'San Francisco',
+  'santa clara': 'Santa Clara', 'san jose': 'San Jose', 'santa cruz': 'Santa Cruz'
 };
 
 function canonicalizeBrand(input: string): string | undefined {
