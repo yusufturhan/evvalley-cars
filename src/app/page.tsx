@@ -452,20 +452,7 @@ export default function Home() {
                       />
                     </div>
                   </div>
-                  {/* Smart natural language search */}
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        value={smartQuery}
-                        onChange={(e) => setSmartQuery(e.target.value)}
-                        placeholder="Search with EvValley AI"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
-                        onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
-                      />
-                    </div>
-                  </div>
+                  
 
                   <button 
                     onClick={handleSearch}
@@ -476,6 +463,38 @@ export default function Home() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Search - separate section */}
+      <section className="py-6 bg-[#F5F9FF]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">Search with EvValley AI</h3>
+            </div>
+            <div className="flex flex-col md:flex-row gap-3">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    value={smartQuery}
+                    onChange={(e) => setSmartQuery(e.target.value)}
+                    placeholder="Search with EvValley AI"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
+                    onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleSmartSearch}
+                className="bg-[#3AB0FF] text-white px-6 py-3 rounded-lg hover:bg-[#2A8FE6] transition-colors"
+              >
+                Try AI Search
+              </button>
             </div>
           </div>
         </div>
