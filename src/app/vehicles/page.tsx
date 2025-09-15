@@ -95,16 +95,46 @@ function VehiclesContent() {
         const semanticQuery = searchParams.get('query');
 
         if (isSemantic && semanticQuery) {
-          // Handle semantic search results
+          // Handle semantic search results - search across all categories
           console.log('🔍 Semantic search query:', semanticQuery);
-          const response = await fetch('/api/semantic-search', {
+          
+          // Fetch from all vehicle categories
+          const allSemanticVehicles: any[] = [];
+          
+          // Fetch EV cars and hybrid cars
+          const evResponse = await fetch('/api/semantic-search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ q: semanticQuery })
+            body: JSON.stringify({ q: semanticQuery, category: 'ev-car' })
           });
+          const evData = await evResponse.json();
+          if (evData.vehicles) {
+            allSemanticVehicles.push(...evData.vehicles);
+          }
           
-          const data = await response.json();
-          setSemanticResults(data.vehicles || []);
+          // Fetch E-scooters
+          const scooterResponse = await fetch('/api/semantic-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ q: semanticQuery, category: 'ev-scooter' })
+          });
+          const scooterData = await scooterResponse.json();
+          if (scooterData.vehicles) {
+            allSemanticVehicles.push(...scooterData.vehicles);
+          }
+          
+          // Fetch E-bikes
+          const bikeResponse = await fetch('/api/semantic-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ q: semanticQuery, category: 'e-bike' })
+          });
+          const bikeData = await bikeResponse.json();
+          if (bikeData.vehicles) {
+            allSemanticVehicles.push(...bikeData.vehicles);
+          }
+          
+          setSemanticResults(allSemanticVehicles);
           setIsSemanticSearch(true);
           setVehicles([]);
           setLoading(false);

@@ -10,6 +10,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}))
     const query: string = (body?.q || '').toString().trim()
+    const category: string = (body?.category || '').toString().trim()
 
     if (!query) {
       return NextResponse.json({ vehicles: [], params: '' })
@@ -61,12 +62,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ vehicles: [], params: '' })
     }
 
-    // Get full vehicle data
-    const { data: vehicles, error: vehiclesError } = await supabase
+    // Get full vehicle data with optional category filter
+    let query = supabase
       .from('vehicles')
       .select('*')
       .in('id', vehicleIds)
       .eq('sold', false)
+    
+    if (category) {
+      query = query.eq('category', category)
+    }
+    
+    const { data: vehicles, error: vehiclesError } = await query
 
     if (vehiclesError) {
       console.error('Vehicles fetch error:', vehiclesError)
@@ -75,7 +82,7 @@ export async function POST(req: Request) {
 
     // Build search params for the frontend
     const params = new URLSearchParams()
-    params.set('category', 'ev-car')
+    // Don't set category to allow searching across all categories
     params.set('semantic', 'true')
     params.set('query', query)
 

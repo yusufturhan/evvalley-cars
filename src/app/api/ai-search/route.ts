@@ -33,7 +33,7 @@ const jsonSchema = {
 
 const toParams = (p: Parsed) => {
   const params = new URLSearchParams()
-  params.set('category', 'ev-car')
+  // Don't set category to allow searching across all categories
   if (p.brand) params.set('brand', p.brand.toLowerCase())
   if (p.model) {
     params.set('model', p.model.toLowerCase())
