@@ -292,7 +292,7 @@ function VehiclesContent() {
                         type="text"
                         value={smartQuery}
                         onChange={(e) => setSmartQuery(e.target.value)}
-                        placeholder="e.g. Tesla Model 3 Palo Alto under 30k under 20k miles"
+                        placeholder="Search with EvValley AI"
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
                         onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
                       />
@@ -705,7 +705,7 @@ function VehiclesContent() {
                     )}
                     
                     <div className="absolute top-2 right-2">
-                      <FavoriteButton vehicleId={vehicle.id} size="sm" />
+                      <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
                   <div className="p-6">
