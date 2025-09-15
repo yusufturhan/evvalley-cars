@@ -26,6 +26,8 @@ function VehiclesContent() {
   });
   const [showSoldVehicles, setShowSoldVehicles] = useState(true);
   const [smartQuery, setSmartQuery] = useState<string>("");
+  const [semanticResults, setSemanticResults] = useState<Vehicle[]>([]);
+  const [isSemanticSearch, setIsSemanticSearch] = useState(false);
 
   // Sync filters state with URL params for UI
   useEffect(() => {
@@ -87,6 +89,31 @@ function VehiclesContent() {
       try {
         setLoading(true);
         let allVehicles: any[] = [];
+
+        // Check if this is a semantic search
+        const isSemantic = searchParams.get('semantic') === 'true';
+        const semanticQuery = searchParams.get('query');
+
+        if (isSemantic && semanticQuery) {
+          // Handle semantic search results
+          console.log('🔍 Semantic search query:', semanticQuery);
+          const response = await fetch('/api/semantic-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ q: semanticQuery })
+          });
+          
+          const data = await response.json();
+          setSemanticResults(data.vehicles || []);
+          setIsSemanticSearch(true);
+          setVehicles([]);
+          setLoading(false);
+          return;
+        }
+
+        // Regular search
+        setIsSemanticSearch(false);
+        setSemanticResults([]);
 
         // Get current filters from URL params
         const currentCategory = searchParams.get('category') || 'all';
@@ -692,7 +719,11 @@ function VehiclesContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900">
-              {loading ? 'Loading...' : `${vehicles.length} Vehicles Found`}
+              {loading ? 'Loading...' : 
+                isSemanticSearch 
+                  ? `${semanticResults.length} AI Search Results` 
+                  : `${vehicles.length} Vehicles Found`
+              }
             </h2>
           </div>
           
@@ -713,15 +744,22 @@ function VehiclesContent() {
                 </div>
               ))}
             </div>
-          ) : vehicles.length === 0 ? (
+          ) : (isSemanticSearch ? semanticResults : vehicles).length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">🚗</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No vehicles found</h3>
-              <p className="text-gray-600">Try adjusting your filters or check back later.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {isSemanticSearch ? 'No matching vehicles found' : 'No vehicles found'}
+              </h3>
+              <p className="text-gray-600">
+                {isSemanticSearch 
+                  ? 'Try a different search term or use the filters below.' 
+                  : 'Try adjusting your filters or check back later.'
+                }
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {vehicles.map((vehicle) => (
+              {(isSemanticSearch ? semanticResults : vehicles).map((vehicle) => (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">

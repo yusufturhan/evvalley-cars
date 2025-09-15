@@ -1,4 +1,10 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 type Parsed = {
   brand?: string
@@ -50,7 +56,11 @@ const toParams = (p: Parsed) => {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}))
-    const q: string = (body?.q || '').toString()
+    const q: string = (body?.q || '').toString().trim()
+
+    if (!q) {
+      return NextResponse.json({ params: '' })
+    }
 
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
@@ -62,6 +72,28 @@ export async function POST(req: Request) {
       })
       const data = await res.json().catch(() => ({ params: '' }))
       return NextResponse.json({ params: data?.params || '' })
+    }
+
+    // First try semantic search for better results
+    try {
+      const semanticRes = await fetch(new URL('/api/semantic-search', req.url), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q }),
+      })
+      
+      if (semanticRes.ok) {
+        const semanticData = await semanticRes.json()
+        if (semanticData.vehicles && semanticData.vehicles.length > 0) {
+          return NextResponse.json({ 
+            params: semanticData.params,
+            semantic: true,
+            vehicleCount: semanticData.vehicles.length
+          })
+        }
+      }
+    } catch (semanticError) {
+      console.log('Semantic search failed, falling back to structured parsing:', semanticError)
     }
 
     // Call OpenAI chat completions with JSON schema output
