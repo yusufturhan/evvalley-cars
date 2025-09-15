@@ -38,7 +38,8 @@ export async function GET(request: Request) {
     }
 
     if (brand && brand !== 'all') {
-      query = query.eq('brand', brand);
+      // Case-insensitive brand match (e.g., "tesla" vs "Tesla")
+      query = query.ilike('brand', brand);
     }
 
     if (seller_id) {
