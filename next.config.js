@@ -229,6 +229,57 @@ const nextConfig = {
         destination: '/favorites',
         permanent: true,
       },
+      // Missing blog posts redirects (from 404 errors) - redirect to existing relevant content
+      {
+        source: '/blog/electric-scooter-buying-guide-2024',
+        destination: '/blog/e-bike-buying-guide-2024',
+        permanent: true,
+      },
+      {
+        source: '/blog/electric-scooter-buying-guide-2024/',
+        destination: '/blog/e-bike-buying-guide-2024',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-advantages-of-using-electric-vehicles-on-uber-and-lyft',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-advantages-of-using-electric-vehicles-on-uber-and-lyft/',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/ev-charging-station-guide-2024',
+        destination: '/blog/how-to-charge-tesla-at-home',
+        permanent: true,
+      },
+      {
+        source: '/blog/ev-charging-station-guide-2024/',
+        destination: '/blog/how-to-charge-tesla-at-home',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-future-of-electric-vehicles-where-are-we-headed',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/the-future-of-electric-vehicles-where-are-we-headed/',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/advantages-of-electric-vehicles-over-internal-combustion-engine-cars',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
+      {
+        source: '/blog/advantages-of-electric-vehicles-over-internal-combustion-engine-cars/',
+        destination: '/blog/electric-vehicle-cost-analysis',
+        permanent: true,
+      },
       // Normalize trailing slashes on blog posts and categories
       {
         source: '/blog/:slug*/',
