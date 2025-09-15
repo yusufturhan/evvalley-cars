@@ -218,6 +218,14 @@ const nextConfig = {
         destination: '/vehicles/e-bikes',
         permanent: true,
       },
+      {
+        source: '/vehicles',
+        has: [
+          { type: 'query', key: 'category', value: 'all' },
+        ],
+        destination: '/vehicles',
+        permanent: true,
+      },
       // Redirect old bookmarks page
       {
         source: '/bookmarks',
