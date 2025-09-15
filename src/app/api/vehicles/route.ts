@@ -100,13 +100,14 @@ export async function GET(request: Request) {
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
-      const variants = [
+      // Exact city (before comma) by patterns: "City", "City,", "City ", "City, ST"
+      const patterns = [
         `location.eq.${cityOnly}`,
-        `location.ilike.${cityOnly}%`,
-        `location.ilike.%${cityOnly},%`,
+        `location.ilike.${cityOnly},%`,
         `location.ilike.${cityOnly} %`,
+        `location.ilike.${cityOnly}`,
       ];
-      query = query.or(variants.join(','));
+      query = query.or(patterns.join(','));
     }
 
     // Get total count first with error handling

@@ -162,13 +162,13 @@ function VehiclesContent() {
           }
         }
 
-        // Client-side safety filter for location to avoid substring false positives
+        // Client-side safety filter for location: exact city match (before comma)
         let filteredVehicles = allVehicles;
         if (currentLocation) {
-          const loc = currentLocation.trim().toLowerCase();
+          const locCity = currentLocation.split(',')[0].trim().toLowerCase();
           filteredVehicles = filteredVehicles.filter((v: any) => {
-            const lv = (v.location || '').trim().toLowerCase();
-            return lv.startsWith(loc);
+            const lvCity = (v.location || '').split(',')[0].trim().toLowerCase();
+            return lvCity === locCity;
           });
         }
         
