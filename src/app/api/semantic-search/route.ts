@@ -63,17 +63,17 @@ export async function POST(req: Request) {
     }
 
     // Get full vehicle data with optional category filter
-    let query = supabase
+    let vehicleQuery = supabase
       .from('vehicles')
       .select('*')
       .in('id', vehicleIds)
       .eq('sold', false)
     
     if (category) {
-      query = query.eq('category', category)
+      vehicleQuery = vehicleQuery.eq('category', category)
     }
     
-    const { data: vehicles, error: vehiclesError } = await query
+    const { data: vehicles, error: vehiclesError } = await vehicleQuery
 
     if (vehiclesError) {
       console.error('Vehicles fetch error:', vehiclesError)
