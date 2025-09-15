@@ -96,40 +96,17 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - exact city/area matching with strict exclusions
+    // Location search - robust city matching
     if (location && location.trim().length > 0) {
-      const locationQuery = location.trim().toLowerCase().substring(0, 100); // Limit location length
-      
-      // For San Francisco searches, use strict "starts with" matching and exclude nearby cities
-      if (locationQuery.includes('san francisco')) {
-        // Match typical formats: "San Francisco", "San Francisco, CA", "San Francisco CA"
-        query = query.or(
-          'location.ilike.San Francisco%',
-          'location.ilike.san francisco%'
-        );
-        // Strictly exclude nearby cities
-        query = query.not('location', 'ilike', '%santa clara%');
-        query = query.not('location', 'ilike', '%san jose%');
-        query = query.not('location', 'ilike', '%palo alto%');
-        query = query.not('location', 'ilike', '%sunnyvale%');
-        query = query.not('location', 'ilike', '%mountain view%');
-        // Exclude broad region labels
-        query = query.not('location', 'ilike', '%bay area%');
-      }
-      // For Santa Clara searches, use strict matching
-      else if (locationQuery.includes('santa clara')) {
-        query = query.or(
-          'location.ilike.%Santa Clara%',
-          'location.ilike.%santa clara%'
-        );
-        // Exclude San Francisco
-        query = query.not('location', 'ilike', '%san francisco%');
-        query = query.not('location', 'ilike', '%SF%');
-      }
-      // For other locations, prefer "starts with" to avoid substring false-positives
-      else {
-        query = query.ilike('location', `${locationQuery}%`);
-      }
+      const raw = location.trim().substring(0, 100);
+      const cityOnly = raw.split(',')[0].trim();
+      const variants = [
+        `location.eq.${cityOnly}`,
+        `location.ilike.${cityOnly}%`,
+        `location.ilike.%${cityOnly},%`,
+        `location.ilike.${cityOnly} %`,
+      ];
+      query = query.or(variants.join(','));
     }
 
     // Get total count first with error handling
