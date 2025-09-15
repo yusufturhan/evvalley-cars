@@ -10,6 +10,7 @@ export type ParsedFilters = {
   maxMileage?: number;
   location?: string;
   category?: string; // ev-car | hybrid-car | ev-scooter | e-bike
+  color?: string;
 };
 
 const KNOWN_BRANDS = [
@@ -21,6 +22,11 @@ const KNOWN_BRANDS = [
 const KNOWN_MODELS = [
   'model 3', 'model y', 'model s', 'model x',
   'prius', 'ioniq 5', 'ioniq5', 'ioniq', 'ev6', 'leaf', 'bolt', 'mach-e'
+];
+
+const KNOWN_COLORS = [
+  'black','white','red','blue','silver','gray','grey','green','yellow','orange',
+  'siyah','beyaz','kirmizi','mavi','gri','yesil','sari','turuncu','gumus'
 ];
 
 function normalizeNumber(token: string): number | undefined {
@@ -55,6 +61,15 @@ export function parseNaturalLanguageQuery(inputRaw: string): ParsedFilters {
     }
   }
   if (foundModel) result.model = foundModel;
+
+  // Color detection (basic)
+  for (const c of KNOWN_COLORS) {
+    if (lower.includes(c)) {
+      const map: Record<string,string> = { siyah:'black', beyaz:'white', kirmizi:'red', mavi:'blue', gri:'gray', yesil:'green', sari:'yellow', turuncu:'orange', gumus:'silver' };
+      result.color = map[c] || c;
+      break;
+    }
+  }
 
   // Price max: look for phrases like "altı/alta/under/below/<="
   // Capture preceding number token
@@ -103,7 +118,8 @@ export function buildVehiclesSearchParams(parsed: ParsedFilters): URLSearchParam
   const p = new URLSearchParams();
   if (parsed.category) p.set('category', parsed.category);
   if (parsed.brand) p.set('brand', parsed.brand);
-  if (parsed.model) p.set('search', parsed.model);
+  if (parsed.model) { p.set('model', parsed.model); p.set('search', parsed.model); }
+  if (parsed.color) p.set('color', parsed.color);
   if (parsed.maxPrice) p.set('maxPrice', String(parsed.maxPrice));
   if (parsed.minPrice) p.set('minPrice', String(parsed.minPrice));
   if (parsed.maxMileage) p.set('maxMileage', String(parsed.maxMileage));
