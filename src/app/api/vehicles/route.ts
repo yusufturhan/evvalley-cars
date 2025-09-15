@@ -66,9 +66,14 @@ export async function GET(request: Request) {
     // Color exact-ish match (stores may have mixed case)
     const colorParam = searchParams.get('color');
     if (colorParam && colorParam.trim().length > 0) {
-      const c = `%${colorParam.trim()}%`;
-      // Match either color or exterior_color columns
-      query = query.or(`color.ilike.${c},exterior_color.ilike.${c}`);
+      const c = colorParam.trim();
+      // Normalize a few known paint names to canonical colors server-side
+      const map: Record<string,string> = {
+        'midnight silver metallic': 'gray', 'midnight silver': 'gray', 'obsidian black': 'black', 'pearl white': 'white'
+      };
+      const canonical = map[c.toLowerCase()] || c;
+      const like = `%${canonical}%`;
+      query = query.or(`color.ilike.${like},exterior_color.ilike.${like}`);
     }
 
     if (minPrice) {

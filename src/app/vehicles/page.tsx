@@ -36,6 +36,7 @@ function VehiclesContent() {
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
     const searchFromUrl = searchParams.get('search') || '';
     const locationFromUrl = searchParams.get('location') || '';
+    const colorFromUrl = searchParams.get('color') || '';
     
     setFilters({
       category: categoryFromUrl,
@@ -47,6 +48,8 @@ function VehiclesContent() {
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
+    // Store color in URL-only state (we don't have a dedicated UI control yet)
+    (window as any).__evvalley_color = colorFromUrl;
   }, [searchParams]);
 
   const handleSmartSearch = () => {
@@ -83,6 +86,7 @@ function VehiclesContent() {
         const currentMaxPrice = searchParams.get('maxPrice') || '';
         const currentSearch = searchParams.get('search') || '';
         const currentLocation = searchParams.get('location') || '';
+        const currentColor = (searchParams.get('color') || (typeof window !== 'undefined' ? (window as any).__evvalley_color : '')) || '';
 
         console.log('🔍 Current URL params:', {
           category: currentCategory,
@@ -104,6 +108,7 @@ function VehiclesContent() {
           if (currentMinPrice) params.append('minPrice', currentMinPrice);
           if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
           if (currentSearch) params.append('search', currentSearch);
+          if (currentColor) params.append('color', currentColor);
           if (currentLocation) params.append('location', currentLocation);
           if (showSoldVehicles) params.append('includeSold', 'true');
 
