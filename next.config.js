@@ -218,6 +218,17 @@ const nextConfig = {
         destination: '/vehicles/e-bikes',
         permanent: true,
       },
+      // Redirect old bookmarks page
+      {
+        source: '/bookmarks',
+        destination: '/favorites',
+        permanent: true,
+      },
+      {
+        source: '/bookmarks/',
+        destination: '/favorites',
+        permanent: true,
+      },
       // Normalize trailing slashes on blog posts and categories
       {
         source: '/blog/:slug*/',
