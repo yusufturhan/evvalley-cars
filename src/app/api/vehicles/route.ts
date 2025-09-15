@@ -79,12 +79,12 @@ export async function GET(request: Request) {
     if (location && location.trim().length > 0) {
       const locationQuery = location.trim().toLowerCase().substring(0, 100); // Limit location length
       
-      // For San Francisco searches, use strict matching and exclude nearby cities
+      // For San Francisco searches, use strict "starts with" matching and exclude nearby cities
       if (locationQuery.includes('san francisco')) {
+        // Match typical formats: "San Francisco", "San Francisco, CA", "San Francisco CA"
         query = query.or(
-          'location.ilike.%San Francisco%',
-          'location.ilike.%san francisco%',
-          'location.ilike.%SF%'
+          'location.ilike.San Francisco%',
+          'location.ilike.san francisco%'
         );
         // Strictly exclude nearby cities
         query = query.not('location', 'ilike', '%santa clara%');
@@ -92,6 +92,8 @@ export async function GET(request: Request) {
         query = query.not('location', 'ilike', '%palo alto%');
         query = query.not('location', 'ilike', '%sunnyvale%');
         query = query.not('location', 'ilike', '%mountain view%');
+        // Exclude broad region labels
+        query = query.not('location', 'ilike', '%bay area%');
       }
       // For Santa Clara searches, use strict matching
       else if (locationQuery.includes('santa clara')) {
@@ -103,9 +105,9 @@ export async function GET(request: Request) {
         query = query.not('location', 'ilike', '%san francisco%');
         query = query.not('location', 'ilike', '%SF%');
       }
-      // For other locations, use standard matching
+      // For other locations, prefer "starts with" to avoid substring false-positives
       else {
-        query = query.ilike('location', `%${locationQuery}%`);
+        query = query.ilike('location', `${locationQuery}%`);
       }
     }
 
