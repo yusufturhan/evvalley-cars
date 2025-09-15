@@ -35,8 +35,15 @@ const toParams = (p: Parsed) => {
   }
   if (p.color) params.set('color', p.color.toLowerCase())
   if (p.city) params.set('location', p.city)
-  if (p.maxPrice) params.set('maxPrice', String(Math.round(p.maxPrice)))
-  if (p.maxMileage) params.set('maxMileage', String(Math.round(p.maxMileage)))
+  // Normalize units: treat numbers < 1000 as thousands
+  if (typeof p.maxPrice === 'number') {
+    const usd = p.maxPrice < 1000 ? p.maxPrice * 1000 : p.maxPrice
+    params.set('maxPrice', String(Math.round(usd)))
+  }
+  if (typeof p.maxMileage === 'number') {
+    const miles = p.maxMileage < 1000 ? p.maxMileage * 1000 : p.maxMileage
+    params.set('maxMileage', String(Math.round(miles)))
+  }
   return params.toString()
 }
 
