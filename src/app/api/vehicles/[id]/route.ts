@@ -152,30 +152,50 @@ export async function PUT(
     if (contentType?.includes('multipart/form-data')) {
       // Handle FormData
       const formData = await request.formData();
+      // Parse form data with proper validation
+      const getString = (key: string) => {
+        const value = formData.get(key) as string;
+        return value && value.trim() !== '' ? value.trim() : undefined;
+      };
+      
+      const getNumber = (key: string) => {
+        const value = formData.get(key) as string;
+        if (!value || value.trim() === '') return undefined;
+        const num = parseFloat(value);
+        return isNaN(num) ? undefined : num;
+      };
+      
+      const getInt = (key: string) => {
+        const value = formData.get(key) as string;
+        if (!value || value.trim() === '') return undefined;
+        const num = parseInt(value);
+        return isNaN(num) ? undefined : num;
+      };
+
       updateData = {
-        title: formData.get('title') as string,
-        description: formData.get('description') as string,
-        price: formData.get('price') ? parseFloat(formData.get('price') as string) : undefined,
-        year: formData.get('year') ? parseInt(formData.get('year') as string) : undefined,
-        mileage: formData.get('mileage') ? parseInt(formData.get('mileage') as string) : undefined,
-        fuel_type: formData.get('fuel_type') as string,
-        brand: formData.get('brand') as string,
-        model: formData.get('model') as string,
-        category: formData.get('category') as string,
-        range_miles: formData.get('range_miles') ? parseInt(formData.get('range_miles') as string) : undefined,
-        max_speed: formData.get('max_speed') ? parseInt(formData.get('max_speed') as string) : undefined,
-        battery_capacity: formData.get('battery_capacity') as string,
-        location: formData.get('location') as string,
-        interior_color: formData.get('interior_color') as string,
-        exterior_color: formData.get('exterior_color') as string,
-        body_seating: formData.get('body_seating') as string,
-        combined_fuel_economy: formData.get('combined_fuel_economy') as string,
-        horsepower: formData.get('horsepower') ? parseInt(formData.get('horsepower') as string) : undefined,
-        electric_mile_range: formData.get('electric_mile_range') ? parseInt(formData.get('electric_mile_range') as string) : undefined,
-        battery_warranty: formData.get('battery_warranty') as string,
-        drivetrain: formData.get('drivetrain') as string,
-        vin: formData.get('vin') as string,
-        highlighted_features: formData.get('highlighted_features') as string,
+        title: getString('title'),
+        description: getString('description'),
+        price: getNumber('price'),
+        year: getInt('year'),
+        mileage: getInt('mileage'),
+        fuel_type: getString('fuel_type'),
+        brand: getString('brand'),
+        model: getString('model'),
+        category: getString('category'),
+        range_miles: getInt('range_miles'),
+        max_speed: getInt('max_speed'),
+        battery_capacity: getString('battery_capacity'),
+        location: getString('location'),
+        interior_color: getString('interior_color'),
+        exterior_color: getString('exterior_color'),
+        body_seating: getString('body_seating'),
+        combined_fuel_economy: getString('combined_fuel_economy'),
+        horsepower: getInt('horsepower'),
+        electric_mile_range: getInt('electric_mile_range'),
+        battery_warranty: getString('battery_warranty'),
+        drivetrain: getString('drivetrain'),
+        vin: getString('vin'),
+        highlighted_features: getString('highlighted_features'),
       };
 
       // Extract new images from FormData
@@ -284,13 +304,26 @@ export async function PUT(
     updateData.images = finalImages;
     console.log('📸 Final images count:', finalImages.length);
 
-    // Update vehicle
-    console.log('🔄 Updating vehicle with data:', JSON.stringify(updateData, null, 2));
+    // Clean up updateData - remove undefined/null values and ensure proper types
+    const cleanedUpdateData: any = {};
+    Object.keys(updateData).forEach(key => {
+      const value = updateData[key];
+      if (value !== undefined && value !== null && value !== '') {
+        cleanedUpdateData[key] = value;
+      }
+    });
+
+    // Ensure images is always an array
+    if (finalImages && finalImages.length > 0) {
+      cleanedUpdateData.images = finalImages;
+    }
+
+    console.log('🔄 Updating vehicle with cleaned data:', JSON.stringify(cleanedUpdateData, null, 2));
     console.log('🔄 Vehicle ID:', id);
     
     const { data: vehicle, error } = await supabase
       .from('vehicles')
-      .update(updateData)
+      .update(cleanedUpdateData)
       .eq('id', id)
       .select()
       .single();
