@@ -322,10 +322,12 @@ export default function EditVehiclePage() {
         router.push('/profile');
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Failed to update vehicle');
+        console.error('❌ Update vehicle error:', errorData);
+        setError(errorData.details || errorData.error || 'Failed to update vehicle');
       }
     } catch (err) {
-      setError('Failed to update vehicle');
+      console.error('❌ Update vehicle catch error:', err);
+      setError('Failed to update vehicle: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setSaving(false);
     }

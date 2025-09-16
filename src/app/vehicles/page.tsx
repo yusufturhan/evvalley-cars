@@ -106,7 +106,41 @@ function VehiclesContent() {
           });
           
           const data = await response.json();
-          setSemanticResults(data.vehicles || []);
+
+          // Apply client-side filters to semantic results using URL params
+          const brand = (searchParams.get('brand') || '').toLowerCase();
+          const modelSearch = (searchParams.get('search') || '').toLowerCase();
+          const color = (searchParams.get('color') || '').toLowerCase();
+          const loc = (searchParams.get('location') || '').toLowerCase();
+          const maxPriceParam = searchParams.get('maxPrice');
+          const maxMileageParam = searchParams.get('maxMileage');
+          const maxPrice = maxPriceParam ? parseInt(maxPriceParam) : undefined;
+          const maxMileage = maxMileageParam ? parseInt(maxMileageParam) : undefined;
+
+          let results = (data.vehicles || []) as any[];
+          results = results.filter((v: any) => {
+            // brand
+            if (brand && v.brand && !v.brand.toLowerCase().includes(brand)) return false;
+            // model via search param
+            if (modelSearch && v.model && !v.model.toLowerCase().includes(modelSearch)) return false;
+            // color
+            if (color) {
+              const vc = (v.color || v.exterior_color || '').toLowerCase();
+              if (!vc.includes(color)) return false;
+            }
+            // location exact city before comma
+            if (loc) {
+              const city = (v.location || '').split(',')[0].trim().toLowerCase();
+              if (city !== loc) return false;
+            }
+            // price
+            if (typeof maxPrice === 'number' && v.price && v.price > maxPrice) return false;
+            // mileage
+            if (typeof maxMileage === 'number' && v.mileage && v.mileage > maxMileage) return false;
+            return true;
+          });
+
+          setSemanticResults(results);
           setIsSemanticSearch(true);
           setVehicles([]);
           setLoading(false);

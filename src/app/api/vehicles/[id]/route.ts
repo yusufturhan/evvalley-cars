@@ -285,6 +285,9 @@ export async function PUT(
     console.log('📸 Final images count:', finalImages.length);
 
     // Update vehicle
+    console.log('🔄 Updating vehicle with data:', JSON.stringify(updateData, null, 2));
+    console.log('🔄 Vehicle ID:', id);
+    
     const { data: vehicle, error } = await supabase
       .from('vehicles')
       .update(updateData)
@@ -293,9 +296,16 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error('PUT /api/vehicles/[id] error:', error);
-      return NextResponse.json({ error: 'Failed to update vehicle' }, { status: 500 });
+      console.error('❌ PUT /api/vehicles/[id] error:', error);
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
+      console.error('❌ Update data that failed:', JSON.stringify(updateData, null, 2));
+      return NextResponse.json({ 
+        error: 'Failed to update vehicle',
+        details: error.message || 'Unknown database error'
+      }, { status: 500 });
     }
+
+    console.log('✅ Vehicle updated successfully:', vehicle?.id);
 
     // Check if price changed and send notifications to favorite users
     if (updateData.price && updateData.price !== currentVehicle.price) {

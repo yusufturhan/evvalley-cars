@@ -11,6 +11,14 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}))
     const query: string = (body?.q || '').toString().trim()
     const category: string = (body?.category || '').toString().trim()
+    const filters = (body?.filters || {}) as {
+      brand?: string
+      model?: string
+      color?: string
+      city?: string
+      maxPrice?: number
+      maxMileage?: number
+    }
 
     if (!query) {
       return NextResponse.json({ vehicles: [], params: '' })
@@ -20,7 +28,7 @@ export async function POST(req: Request) {
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       // Fallback to regular search if no OpenAI key
-      return NextResponse.json({ vehicles: [], params: '' })
+      return NextResponse.json({ vehicles: [], params: '', error: 'missing_openai_key' })
     }
 
     // Get embedding for the query
@@ -37,7 +45,8 @@ export async function POST(req: Request) {
     })
 
     if (!embeddingResponse.ok) {
-      return NextResponse.json({ vehicles: [], params: '' })
+      const errText = await embeddingResponse.text().catch(() => '')
+      return NextResponse.json({ vehicles: [], params: '', error: 'embedding_failed', details: errText })
     }
 
     const embeddingData = await embeddingResponse.json()
@@ -47,13 +56,17 @@ export async function POST(req: Request) {
     try {
       const { data: searchResults, error } = await supabase.rpc('search_vehicles_semantic', {
         query_embedding: queryEmbedding,
-        match_threshold: 0.7,
-        match_count: 20
+        match_threshold: 0.3,
+        match_count: 30
       })
 
       if (!error && searchResults && searchResults.length > 0) {
-        // Extract vehicle IDs and build params
+        // Extract vehicle IDs and similarity map
         const vehicleIds = searchResults.map((r: any) => r.vehicle_id)
+        const similarityById: Record<string, number> = {}
+        for (const r of searchResults as any[]) {
+          similarityById[r.vehicle_id] = typeof r.similarity === 'number' ? r.similarity : 0
+        }
         
         // Get full vehicle data with optional category filter
         let vehicleQuery = supabase
@@ -65,15 +78,37 @@ export async function POST(req: Request) {
         if (category) {
           vehicleQuery = vehicleQuery.eq('category', category)
         }
+        // Apply strict filters server-side if provided
+        if (filters.brand) {
+          vehicleQuery = vehicleQuery.ilike('brand', `%${filters.brand}%`)
+        }
+        if (filters.model) {
+          vehicleQuery = vehicleQuery.ilike('model', `%${filters.model}%`)
+        }
+        if (filters.color) {
+          vehicleQuery = vehicleQuery.or(
+            `color.ilike.%${filters.color}%,exterior_color.ilike.%${filters.color}%`
+          )
+        }
+        if (filters.city) {
+          const city = filters.city.toLowerCase()
+          vehicleQuery = vehicleQuery.ilike('location', `${city}%`)
+        }
+        if (typeof filters.maxPrice === 'number') {
+          vehicleQuery = vehicleQuery.lte('price', filters.maxPrice)
+        }
+        if (typeof filters.maxMileage === 'number') {
+          vehicleQuery = vehicleQuery.lte('mileage', filters.maxMileage)
+        }
         
         const { data: vehicles, error: vehiclesError } = await vehicleQuery
 
         if (!vehiclesError && vehicles && vehicles.length > 0) {
-          return NextResponse.json({ 
-            vehicles: vehicles, 
-            params: params.toString(),
-            semantic: true 
-          })
+          // Attach similarity and sort by it
+          const vehiclesWithSim = vehicles.map((v: any) => ({ ...v, _similarity: similarityById[v.id] || 0 }))
+            .sort((a: any, b: any) => (b._similarity || 0) - (a._similarity || 0))
+
+          return NextResponse.json({ vehicles: vehiclesWithSim, semantic: true })
         }
       }
     } catch (semanticError) {
@@ -88,7 +123,7 @@ export async function POST(req: Request) {
       const params = new URLSearchParams()
       if (category) params.set('category', category)
       params.set('search', query)
-      params.set('limit', '20')
+      params.set('limit', '30')
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/vehicles?${params.toString()}`)
       const data = await response.json()
@@ -101,7 +136,7 @@ export async function POST(req: Request) {
       // Search E-scooters
       const params = new URLSearchParams()
       params.set('search', query)
-      params.set('limit', '20')
+      params.set('limit', '30')
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/ev-scooters?${params.toString()}`)
       const data = await response.json()
@@ -114,7 +149,7 @@ export async function POST(req: Request) {
       // Search E-bikes
       const params = new URLSearchParams()
       params.set('search', query)
-      params.set('limit', '20')
+      params.set('limit', '30')
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/e-bikes?${params.toString()}`)
       const data = await response.json()
@@ -134,11 +169,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ 
       vehicles: vehicles || [], 
       params: params.toString(),
-      semantic: true 
+      semantic: true,
+      debug: { threshold: 0.3 }
     })
 
   } catch (error) {
     console.error('Semantic search error:', error)
     return NextResponse.json({ vehicles: [], params: '' })
   }
+}
+
+export async function GET() {
+  return NextResponse.json({
+    error: 'method_not_allowed',
+    message: 'Use POST with JSON body { "q": "your query" } to call this endpoint.'
+  }, { status: 405 })
 }
