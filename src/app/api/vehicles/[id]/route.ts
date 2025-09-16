@@ -225,6 +225,7 @@ export async function PUT(
         // Use the existing images in the new order as the base for finalImages
         finalImages = existingImages;
         console.log('📸 Using existing images in new order:', finalImages.length);
+        console.log('📸 Existing images URLs:', existingImages);
       }
     } else {
       // Handle JSON
@@ -242,9 +243,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Vehicle not found' }, { status: 404 });
     }
 
-    // Initialize finalImages with current images if not already set
+    // Initialize finalImages with current images if not already set from existingImages
     if (finalImages.length === 0) {
       finalImages = Array.isArray(currentVehicle.images) ? [...currentVehicle.images] : [];
+      console.log('📸 Using current vehicle images as base:', finalImages.length);
     }
 
     // Apply deletions first
@@ -300,10 +302,6 @@ export async function PUT(
       console.log('📸 Total images after uploads:', finalImages.length);
     }
 
-    // Update the images field
-    updateData.images = finalImages;
-    console.log('📸 Final images count:', finalImages.length);
-
     // Clean up updateData - remove undefined/null values and ensure proper types
     const cleanedUpdateData: any = {};
     Object.keys(updateData).forEach(key => {
@@ -313,10 +311,10 @@ export async function PUT(
       }
     });
 
-    // Ensure images is always an array
-    if (finalImages && finalImages.length > 0) {
-      cleanedUpdateData.images = finalImages;
-    }
+    // Always set images field with finalImages
+    cleanedUpdateData.images = finalImages;
+    console.log('📸 Final images count:', finalImages.length);
+    console.log('📸 Final images URLs:', finalImages);
 
     console.log('🔄 Updating vehicle with cleaned data:', JSON.stringify(cleanedUpdateData, null, 2));
     console.log('🔄 Vehicle ID:', id);
