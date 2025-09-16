@@ -331,11 +331,19 @@ export async function PUT(
     if (error) {
       console.error('❌ PUT /api/vehicles/[id] error:', error);
       console.error('❌ Error details:', JSON.stringify(error, null, 2));
-      console.error('❌ Update data that failed:', JSON.stringify(updateData, null, 2));
+      console.error('❌ Update data that failed:', JSON.stringify(cleanedUpdateData, null, 2));
+      
+      // Return a safe JSON response
       return NextResponse.json({ 
         error: 'Failed to update vehicle',
-        details: error.message || 'Unknown database error'
-      }, { status: 500 });
+        details: error.message || 'Database update failed',
+        code: error.code || 'UNKNOWN_ERROR'
+      }, { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     }
 
     console.log('✅ Vehicle updated successfully:', vehicle?.id);
@@ -543,8 +551,19 @@ The Evvalley Team
 
     return NextResponse.json({ vehicle });
   } catch (error) {
-    console.error('PUT /api/vehicles/[id] error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('❌ PUT /api/vehicles/[id] catch error:', error);
+    console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack');
+    
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error occurred',
+      code: 'INTERNAL_ERROR'
+    }, { 
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }
 }
 

@@ -321,9 +321,18 @@ export default function EditVehiclePage() {
       if (response.ok) {
         router.push('/profile');
       } else {
-        const errorData = await response.json();
-        console.error('❌ Update vehicle error:', errorData);
-        setError(errorData.details || errorData.error || 'Failed to update vehicle');
+        let errorMessage = 'Failed to update vehicle';
+        try {
+          const errorData = await response.json();
+          console.error('❌ Update vehicle error:', errorData);
+          errorMessage = errorData.details || errorData.error || errorMessage;
+        } catch (jsonError) {
+          // If response is not JSON, get text content
+          const errorText = await response.text();
+          console.error('❌ Update vehicle error (non-JSON):', errorText);
+          errorMessage = `Server error: ${response.status} - ${errorText.substring(0, 100)}`;
+        }
+        setError(errorMessage);
       }
     } catch (err) {
       console.error('❌ Update vehicle catch error:', err);
