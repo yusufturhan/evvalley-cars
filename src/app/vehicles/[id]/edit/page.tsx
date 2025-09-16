@@ -320,6 +320,10 @@ export default function EditVehiclePage() {
       const response = await fetch(`/api/vehicles/${vehicle.id}`, {
         method: 'PUT',
         body: formDataToSend,
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
       });
 
       if (response.ok) {
