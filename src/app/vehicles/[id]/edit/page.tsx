@@ -196,10 +196,10 @@ export default function EditVehiclePage() {
           vin: vehicleInfo.vin || ""
         });
 
-        // Set existing images
-        if (vehicleInfo.images && vehicleInfo.images.length > 0) {
-          setImageUrls(vehicleInfo.images);
-        }
+        // Set existing images - ensure it's always an array
+        const existingImages = Array.isArray(vehicleInfo.images) ? vehicleInfo.images : [];
+        setImageUrls(existingImages);
+        console.log('📸 Loaded existing images:', existingImages.length, existingImages);
 
       } catch (err: any) {
         console.error('Error in fetchData:', err);
@@ -307,9 +307,13 @@ export default function EditVehiclePage() {
       });
 
       // Add existing image URLs (excluding deleted ones)
+      console.log('📸 Sending existing images:', imageUrls.length, imageUrls);
+      console.log('📸 Deleted indexes:', deletedImageIndexes);
+      
       imageUrls.forEach((url, index) => {
-        if (!deletedImageIndexes.includes(index)) {
+        if (!deletedImageIndexes.includes(index) && url && url.trim() !== '') {
           formDataToSend.append('existingImages', url);
+          console.log('📸 Adding existing image:', url);
         }
       });
 
