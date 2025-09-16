@@ -323,14 +323,21 @@ export default function EditVehiclePage() {
       } else {
         let errorMessage = 'Failed to update vehicle';
         try {
-          const errorData = await response.json();
+          // Clone the response to avoid "body stream already read" error
+          const responseClone = response.clone();
+          const errorData = await responseClone.json();
           console.error('❌ Update vehicle error:', errorData);
           errorMessage = errorData.details || errorData.error || errorMessage;
         } catch (jsonError) {
           // If response is not JSON, get text content
-          const errorText = await response.text();
-          console.error('❌ Update vehicle error (non-JSON):', errorText);
-          errorMessage = `Server error: ${response.status} - ${errorText.substring(0, 100)}`;
+          try {
+            const errorText = await response.text();
+            console.error('❌ Update vehicle error (non-JSON):', errorText);
+            errorMessage = `Server error: ${response.status} - ${errorText.substring(0, 100)}`;
+          } catch (textError) {
+            console.error('❌ Error reading response as text:', textError);
+            errorMessage = `Server error: ${response.status} - Unable to read error details`;
+          }
         }
         setError(errorMessage);
       }
