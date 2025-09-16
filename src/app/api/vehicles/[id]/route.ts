@@ -315,6 +315,7 @@ export async function PUT(
     cleanedUpdateData.images = finalImages;
     console.log('📸 Final images count:', finalImages.length);
     console.log('📸 Final images URLs:', finalImages);
+    console.log('📸 Update data before cleaning:', JSON.stringify(updateData, null, 2));
 
     console.log('🔄 Updating vehicle with cleaned data:', JSON.stringify(cleanedUpdateData, null, 2));
     console.log('🔄 Vehicle ID:', id);
