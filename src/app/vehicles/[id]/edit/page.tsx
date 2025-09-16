@@ -63,6 +63,51 @@ export default function EditVehiclePage() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Image compression function
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 1920px width, maintain aspect ratio)
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        if (height > maxHeight) {
+          width = (width * maxHeight) / height;
+          height = maxHeight;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            console.log(`📸 Compressed: ${file.size} → ${compressedFile.size} bytes`);
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        }, 'image/jpeg', 0.8); // 80% quality
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   // Form state
   const [formData, setFormData] = useState({
     title: "",
@@ -301,10 +346,18 @@ export default function EditVehiclePage() {
         if (value) formDataToSend.append(key, value);
       });
 
-      // Add images
-      images.forEach((image, index) => {
-        formDataToSend.append('images', image);
-      });
+      // Add images with compression
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        // Compress image if it's too large (>2MB)
+        if (image.size > 2 * 1024 * 1024) {
+          console.log(`📸 Compressing large image: ${image.name} (${Math.round(image.size / 1024 / 1024)}MB)`);
+          const compressedImage = await compressImage(image);
+          formDataToSend.append('images', compressedImage, image.name);
+        } else {
+          formDataToSend.append('images', image);
+        }
+      }
 
       // Add existing image URLs (excluding deleted ones)
       console.log('📸 Sending existing images:', imageUrls.length, imageUrls);
