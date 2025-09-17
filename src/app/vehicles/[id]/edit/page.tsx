@@ -347,17 +347,22 @@ export default function EditVehiclePage() {
         if (value) formDataToSend.append(key, value);
       });
 
-      // Add images with compression (fallback - prefer uploadedUrls)
-      for (let i = 0; i < images.length; i++) {
-        const image = images[i];
-        // Compress image if it's too large (>2MB)
-        if (image.size > 2 * 1024 * 1024) {
-          console.log(`📸 Compressing large image: ${image.name} (${Math.round(image.size / 1024 / 1024)}MB)`);
-          const compressedImage = await compressImage(image);
-          formDataToSend.append('images', compressedImage, image.name);
-        } else {
-          formDataToSend.append('images', image);
+      // Images: If we already uploaded to Storage (uploadedUrls), DO NOT send raw files to API
+      if (!uploadedUrls || uploadedUrls.length === 0) {
+        // Fallback path: legacy direct upload through API (kept for backward compatibility)
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          // Compress image if it's too large (>2MB)
+          if (image.size > 2 * 1024 * 1024) {
+            console.log(`📸 Compressing large image: ${image.name} (${Math.round(image.size / 1024 / 1024)}MB)`);
+            const compressedImage = await compressImage(image);
+            formDataToSend.append('images', compressedImage, image.name);
+          } else {
+            formDataToSend.append('images', image);
+          }
         }
+      } else {
+        console.log('📸 Skipping raw file upload; using uploaded URLs instead');
       }
 
       // Add URLs uploaded directly to Storage from ImageUpload (preferred)
