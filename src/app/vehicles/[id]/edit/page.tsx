@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Car, Zap, Battery, Bike, Upload, MapPin, Trash2, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
+import VideoUpload from "@/components/VideoUpload";
 import OptimizedImage from "@/components/OptimizedImage";
 
 interface Vehicle {
@@ -63,6 +64,7 @@ export default function EditVehiclePage() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   // Image compression function
   const compressImage = (file: File): Promise<File> => {
@@ -370,6 +372,11 @@ export default function EditVehiclePage() {
         uploadedUrls.forEach((url) => {
           if (url && url.trim() !== '') formDataToSend.append('existingImages', url);
         });
+      }
+
+      // Attach video URL if present
+      if (videoUrl) {
+        formDataToSend.append('video_url', videoUrl);
       }
 
       // Add existing image URLs (excluding deleted ones)
@@ -1060,6 +1067,12 @@ export default function EditVehiclePage() {
                 maxImages={15} 
               />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+
+      {/* Optional Short Video */}
+      <div className="mt-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Optional Video (≤ 60s)</label>
+        <VideoUpload value={videoUrl} onChange={setVideoUrl} />
+      </div>
             </div>
 
             {/* Description */}

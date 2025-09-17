@@ -196,6 +196,7 @@ export async function PUT(
         drivetrain: getString('drivetrain'),
         vin: getString('vin'),
         highlighted_features: getString('highlighted_features'),
+        video_url: getString('video_url'),
       };
 
       // Extract new images from FormData

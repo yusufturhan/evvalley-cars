@@ -111,3 +111,30 @@ export const deleteImage = async (filePath: string) => {
     throw error;
   }
 }; 
+
+// Upload video to a temporary folder before the listing is saved
+// Path: vehicle-videos/temp/{tempId}/{filename}
+export const uploadTempVideo = async (
+  file: File,
+  tempId: string
+) => {
+  const fileExt = (file.name.split('.').pop() || 'mp4').toLowerCase();
+  const safeName = `${Date.now()}.${fileExt}`;
+  const filePath = `temp/${tempId}/${safeName}`;
+
+  const { error } = await supabase.storage
+    .from('vehicle-videos')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+      contentType: file.type || 'video/mp4'
+    });
+
+  if (error) throw error;
+
+  const { data: urlData } = supabase.storage
+    .from('vehicle-videos')
+    .getPublicUrl(filePath);
+
+  return { publicUrl: urlData.publicUrl, path: filePath };
+};
