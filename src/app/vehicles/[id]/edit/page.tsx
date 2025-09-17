@@ -1042,7 +1042,7 @@ export default function EditVehiclePage() {
                   
                   {/* Image Count */}
                   <p className="text-sm text-gray-500">
-                    {imageUrls.length - deletedImageIndexes.length} of 12 images selected
+                    {imageUrls.length - deletedImageIndexes.length} of 15 images selected
                     {deletedImageIndexes.length > 0 && (
                       <span className="text-orange-600 ml-2">
                         ({deletedImageIndexes.length} deleted - click "Save Changes" to permanently remove)
@@ -1057,7 +1057,7 @@ export default function EditVehiclePage() {
               <ImageUpload 
                 onImagesChange={handleImagesChange} 
                 onUrlsChange={(urls) => setUploadedUrls(urls)} 
-                maxImages={12} 
+                maxImages={15} 
               />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
             </div>

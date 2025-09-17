@@ -599,7 +599,7 @@ export default function EditVehiclePage() {
               )}
 
               {/* New Image Upload */}
-              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={() => {}} maxImages={12} />
+              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={() => {}} maxImages={15} />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
             </div>
 

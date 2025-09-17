@@ -1446,7 +1446,7 @@ export default function SellPage() {
                 </div>
               </div>
               
-              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={setImageUrls} maxImages={12} />
+              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={setImageUrls} maxImages={15} />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
             </div>
 
