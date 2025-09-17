@@ -62,6 +62,7 @@ export default function EditVehiclePage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
   // Image compression function
   const compressImage = (file: File): Promise<File> => {
@@ -346,7 +347,7 @@ export default function EditVehiclePage() {
         if (value) formDataToSend.append(key, value);
       });
 
-      // Add images with compression
+      // Add images with compression (fallback - prefer uploadedUrls)
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
         // Compress image if it's too large (>2MB)
@@ -357,6 +358,13 @@ export default function EditVehiclePage() {
         } else {
           formDataToSend.append('images', image);
         }
+      }
+
+      // Add URLs uploaded directly to Storage from ImageUpload (preferred)
+      if (uploadedUrls && uploadedUrls.length > 0) {
+        uploadedUrls.forEach((url) => {
+          if (url && url.trim() !== '') formDataToSend.append('existingImages', url);
+        });
       }
 
       // Add existing image URLs (excluding deleted ones)
@@ -1041,7 +1049,11 @@ export default function EditVehiclePage() {
 
 
               {/* New Image Upload */}
-              <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={() => {}} maxImages={12} />
+              <ImageUpload 
+                onImagesChange={handleImagesChange} 
+                onUrlsChange={(urls) => setUploadedUrls(urls)} 
+                maxImages={12} 
+              />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
             </div>
 
