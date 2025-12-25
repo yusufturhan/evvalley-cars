@@ -140,9 +140,11 @@ export async function GET(request: Request) {
     }
 
     // Get total count USING THE SAME FILTERS as the data query
+    // IMPORTANT: Use service role client to bypass RLS for accurate count
     let totalCount = 0;
     try {
-      let countQuery = supabase
+      const supabaseForCount = createServerSupabaseClient();
+      let countQuery = supabaseForCount
         .from('vehicles')
         .select('*', { count: 'exact', head: true });
 
@@ -313,13 +315,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       vehicles: serializedData,
       total: totalCount,
-      // Don't include limit in response - we always fetch all vehicles
       offset: parsedOffset,
+      limit: parsedLimit,
+      page: page ? parseInt(page) : undefined,
       debug: {
         vehiclesCount: vehiclesCount,
         totalCount: totalCount,
-        rangeApplied: 'range(0, 99999) - always get all vehicles',
-        note: 'All vehicles are fetched regardless of any limit parameter'
+        parsedLimit: parsedLimit,
+        parsedOffset: parsedOffset,
+        rangeApplied: parsedLimit ? `range(${parsedOffset}, ${parsedOffset + parsedLimit - 1})` : 'range(0, 9999)',
+        note: parsedLimit ? `Pagination mode: ${vehiclesCount} vehicles returned for page ${page || 1}` : 'No limit: fetching all vehicles'
       }
     });
   } catch (error) {
