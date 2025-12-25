@@ -243,13 +243,12 @@ export async function GET(request: Request) {
     // Apply pagination if limit is provided (for homepage with 12 per page)
     // If no limit is provided, fetch all vehicles (for /vehicles page - but we'll use pagination there too)
     if (parsedLimit) {
-      // Pagination mode: use limit and offset
-      query = query.limit(parsedLimit);
+      // Pagination mode: use range only (range includes limit functionality)
+      // Supabase range is inclusive: range(0, 11) returns 12 items (0-11)
       query = query.range(parsedOffset, parsedOffset + parsedLimit - 1);
     } else {
       // No limit provided: fetch all vehicles (for backward compatibility)
       // But we'll use a reasonable max limit to avoid performance issues
-      query = query.limit(10000);
       query = query.range(0, 9999);
     }
 
@@ -258,7 +257,9 @@ export async function GET(request: Request) {
     // DEBUG: Log the query to see what's being executed
     console.log('=== VEHICLES QUERY DEBUG ===');
     console.log('Total count from separate query:', totalCount);
-    console.log('Query will fetch with limit(100000) and range(0, 99999)');
+    console.log('Parsed limit:', parsedLimit);
+    console.log('Parsed offset:', parsedOffset);
+    console.log('Range:', parsedLimit ? `${parsedOffset} to ${parsedOffset + parsedLimit - 1}` : '0 to 9999');
     
     const queryResult = await Promise.race([
       query,
