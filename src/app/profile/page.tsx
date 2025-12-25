@@ -213,33 +213,40 @@ export default function ProfilePage() {
                     ${vehicle.price.toLocaleString()}
                   </div>
                   
-                  {vehicle.sold ? (
-                    <div className="flex items-center justify-center">
-                      <span className="px-3 py-2 bg-red-100 text-red-800 rounded text-sm font-medium">
-                        SOLD
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => router.push('/vehicles/' + vehicle.id + '/edit')}
-                        className="flex-1 bg-[#3AB0FF] text-white px-3 py-2 rounded text-sm hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          console.log('🗑️ Delete button clicked for vehicle:', vehicle.id);
-                          handleDeleteVehicle(vehicle.id);
-                        }}
-                        className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 flex items-center justify-center transition-colors"
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => router.push('/vehicles/' + vehicle.id + '/edit')}
+                      className="flex-1 bg-[#3AB0FF] text-white px-3 py-2 rounded text-sm hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
+                    >
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const response = await fetch(`/api/vehicles/${vehicle.id}/mark-sold`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              sold: !vehicle.sold,
+                              sold_at: !vehicle.sold ? new Date().toISOString() : null,
+                            }),
+                          });
+                          if (response.ok) {
+                            window.location.reload();
+                          } else {
+                            alert('Failed to update vehicle status');
+                          }
+                        } catch (error) {
+                          console.error('Error updating vehicle status:', error);
+                          alert('Error updating vehicle status');
+                        }
+                      }}
+                      className={`flex-1 ${vehicle.sold ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white px-3 py-2 rounded text-sm flex items-center justify-center transition-colors`}
+                    >
+                      {vehicle.sold ? 'Available' : 'Sold'}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

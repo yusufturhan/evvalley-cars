@@ -1,102 +1,93 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Search, Car, MapPin, Filter, Zap, Battery, Bike, Instagram, Facebook, Shield, Star, Users, TrendingUp, ChevronRight, ChevronDown, ChevronLeft } from "lucide-react";
+import React, { useState, useEffect, Suspense } from "react";
+import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
-import OptimizedImage from "@/components/OptimizedImage";
-import AuthSync from "@/components/AuthSync";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
-import { parseNaturalLanguageQuery, buildVehiclesSearchParams } from "@/lib/nlSearch";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { trackEvent, trackSearch, trackCategoryView, trackClick, trackScrollDepth, trackSocialMediaClick } from "@/lib/analytics";
-import Head from "next/head";
-import NewsletterSignup from "@/components/NewsletterSignup";
 
 export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F5F9FF]">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading vehicles...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+export function HomeContent() {
   const router = useRouter();
-  const [featuredVehicles, setFeaturedVehicles] = useState<Vehicle[]>([]);
+  
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [smartQuery, setSmartQuery] = useState('');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [filters, setFilters] = useState({
+    category: 'all',
+    brand: 'all',
+    year: 'all',
+    minPrice: '',
+    maxPrice: '',
+    color: 'all',
+    maxMileage: ''
+  });
+  const [showSoldVehicles, setShowSoldVehicles] = useState(true); // Default: show all vehicles (including sold)
+  
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalVehicles, setTotalVehicles] = useState(0);
   const vehiclesPerPage = 12;
 
-  // Structured Data for SEO
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Evvalley",
-    "description": "Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility with expert guidance.",
-    "url": "https://www.evvalley.com",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://www.evvalley.com/vehicles?search={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  };
-
-  const organizationData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Evvalley",
-    "url": "https://www.evvalley.com",
-    "logo": "https://www.evvalley.com/logo.svg",
-    "description": "US Electric Vehicle & E-Mobility Marketplace",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "San Francisco",
-      "addressRegion": "CA",
-      "addressCountry": "US"
-    },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "email": "evvalley@evvalley.com"
-    }
-  };
-
-
+  // Fetch vehicles with pagination
   useEffect(() => {
-    const fetchFeaturedVehicles = async () => {
+    const fetchVehicles = async () => {
       try {
         setLoading(true);
-        setError(null);
         
-        // Calculate offset for pagination
-        const offset = (currentPage - 1) * vehiclesPerPage;
-        const response = await fetch(`/api/vehicles?limit=${vehiclesPerPage}&offset=${offset}&includeSold=true`);
+              // Build API params
+              const params = new URLSearchParams();
+              params.append('page', currentPage.toString());
+              params.append('limit', vehiclesPerPage.toString());
+              // IMPORTANT: Always show ALL vehicles (both sold and unsold) - never filter sold vehicles
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        console.log('🔍 Fetching vehicles for page:', currentPage, 'with params:', params.toString());
         
+        if (filters.category !== 'all') params.append('category', filters.category);
+        if (filters.brand !== 'all') params.append('brand', filters.brand);
+        if (filters.year !== 'all') params.append('year', filters.year);
+        if (filters.minPrice) params.append('minPrice', filters.minPrice);
+        if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+        if (filters.color !== 'all') params.append('color', filters.color);
+        if (filters.maxMileage) params.append('maxMileage', filters.maxMileage);
+        // includeSold parameter removed - we now use 'sold' parameter instead
+        if (searchQuery.trim()) params.append('search', searchQuery.trim());
+        if (locationQuery.trim()) params.append('location', locationQuery.trim());
+
+        const response = await fetch(`/api/vehicles?${params.toString()}`);
         const data = await response.json();
         
-        if (!data.vehicles) {
-          throw new Error('No vehicles data received');
-        }
+        console.log('📊 API Response for page', currentPage, ':', {
+          vehiclesCount: data.vehicles?.length || 0,
+          total: data.total,
+          page: currentPage
+        });
         
-        // Set total count and calculate total pages
-        if (data.total !== undefined) {
-          setTotalVehicles(data.total);
-          setTotalPages(Math.ceil(data.total / vehiclesPerPage));
-        }
-        
-
-        
-        // Ensure all data is properly serialized for Next.js 15 compatibility
-        const serializedVehicles = data.vehicles.map((vehicle: any) => {
-          try {
+        if (data.vehicles && data.vehicles.length > 0) {
+          // Ensure all data is properly serialized
+          const serializedVehicles = data.vehicles.map((vehicle: any) => {
             const plainVehicle = { ...vehicle };
-            // Convert dates to strings
             if (plainVehicle.created_at) {
               plainVehicle.created_at = plainVehicle.created_at.toString();
             }
@@ -106,286 +97,99 @@ export default function Home() {
             if (plainVehicle.sold_at) {
               plainVehicle.sold_at = plainVehicle.sold_at.toString();
             }
-            // Ensure all properties are serializable
             return JSON.parse(JSON.stringify(plainVehicle));
-          } catch (serializeError) {
-            console.error('Error serializing vehicle:', serializeError);
-            return null;
-          }
-        }).filter(Boolean); // Remove null entries
-        
-        setFeaturedVehicles(serializedVehicles);
+          });
+          
+          setVehicles(serializedVehicles);
+          setTotalPages(Math.ceil(data.total / vehiclesPerPage));
+          setTotalVehicles(data.total);
+        } else {
+          setVehicles([]);
+          setTotalPages(1);
+          setTotalVehicles(0);
+        }
       } catch (error) {
         console.error('Error fetching vehicles:', error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch vehicles');
+        setVehicles([]);
+        setTotalPages(1);
+        setTotalVehicles(0);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFeaturedVehicles();
-
-    // Track scroll depth
-    const handleScroll = () => {
-      try {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const scrollPercent = Math.round((scrollTop / docHeight) * 100);
-        
-        if (scrollPercent >= 25 && scrollPercent < 50) {
-          trackScrollDepth(25);
-        } else if (scrollPercent >= 50 && scrollPercent < 75) {
-          trackScrollDepth(50);
-        } else if (scrollPercent >= 75) {
-          trackScrollDepth(75);
-        }
-      } catch (scrollError) {
-        console.error('Error tracking scroll:', scrollError);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [currentPage]); // Add currentPage as dependency
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      try {
-        const target = event.target as Element;
-        if (!target.closest('.category-dropdown')) {
-          setShowCategoryDropdown(false);
-        }
-      } catch (clickError) {
-        console.error('Error handling click outside:', clickError);
-      }
-    };
-
-    if (showCategoryDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showCategoryDropdown]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // Scroll to top when page changes
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSearch = () => {
-    try {
-      const params = new URLSearchParams();
-      if (searchQuery.trim()) {
-        params.append('search', searchQuery.trim());
-      }
-      if (locationQuery.trim()) {
-        params.append('location', locationQuery.trim());
-      }
-      if (selectedCategory && selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
-      }
-      
-      const queryString = params.toString();
-      const url = `/vehicles${queryString ? `?${queryString}` : ''}`;
-      
-      trackSearch(searchQuery, featuredVehicles.length);
-      console.log('🔍 Search tracked:', searchQuery, 'Results:', featuredVehicles.length);
-      console.log('🔍 Redirecting to:', url);
-      router.push(url);
-    } catch (searchError) {
-      console.error('Error handling search:', searchError);
-    }
-  };
-
-  const handleSmartSearch = () => {
-    (async () => {
-      try {
-        const res = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
-        const data = await res.json();
-        const qs = data?.params || '';
-        const url = `/vehicles${qs ? `?${qs}` : ''}`;
-        router.push(url);
-      } catch {
-        try {
-          const det = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
-          const data = await det.json();
-          const qs = data?.params || '';
-          const url = `/vehicles${qs ? `?${qs}` : ''}`;
-          router.push(url);
-        } catch {
-          const parsed = parseNaturalLanguageQuery(smartQuery);
-          const params = buildVehiclesSearchParams(parsed);
-          const url = `/vehicles?${params.toString()}`;
-          router.push(url);
-        }
-      }
-    })();
-  };
-
-  const handleCategorySelect = (category: string) => {
-    try {
-      setSelectedCategory(category);
-      setShowCategoryDropdown(false);
-      trackCategoryView(category);
-      console.log('📂 Category selected:', category);
-    } catch (categoryError) {
-      console.error('Error selecting category:', categoryError);
-    }
-  };
-
-  const handleVehicleClick = (vehicleId: string) => {
-    try {
-      trackClick('vehicle_card', vehicleId);
-      console.log('🖱️ Click tracked:', vehicleId);
-    } catch (clickError) {
-      console.error('Error tracking vehicle click:', clickError);
-    }
-  };
-
-  // Show error state if there's an error
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#F5F9FF]">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to Load Vehicles</h2>
-            <p className="text-gray-600 mb-8">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-[#3AB0FF] text-white px-6 py-3 rounded-lg hover:bg-[#2A8FD9] transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+    fetchVehicles();
+  }, [currentPage, filters, showSoldVehicles, searchQuery, locationQuery]);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'ev-car':
-        return 'bg-green-100 text-green-800';
-      case 'hybrid-car':
         return 'bg-blue-100 text-blue-800';
+      case 'hybrid-car':
+        return 'bg-green-100 text-green-800';
       case 'ev-scooter':
         return 'bg-purple-100 text-purple-800';
-      case 'ev-bike':
+      case 'e-bike':
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'ev-car':
-        return 'EV CAR';
-      case 'hybrid-car':
-        return 'HYBRID';
-      case 'ev-scooter':
-        return 'E-SCOOTER';
-      case 'ev-bike':
-        return 'E-BIKE';
-      default:
-        return category.toUpperCase();
+  const handleSearch = async () => {
+    // Reset to page 1 when searching
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to page 1 when filters change
+  };
+
+  // Structured Data for SEO
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Evvalley - Buy & Sell Electric Vehicles USA",
+    "description": "America's #1 electric vehicle marketplace. Buy and sell EVs, hybrid cars, e-bikes, and e-scooters across the United States. Free listings, no commission fees.",
+    "url": "https://www.evvalley.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.evvalley.com/vehicles?search={search_term_string}",
+      "query-input": "required name=search_term_string"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Evvalley",
+      "url": "https://www.evvalley.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.evvalley.com/logo.png"
+      },
+      "sameAs": [
+        "https://www.facebook.com/evvalley",
+        "https://www.instagram.com/evvalley",
+        "https://www.twitter.com/evvalley"
+      ],
+      "areaServed": "United States"
+    },
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "Electric Vehicles for Sale",
+      "description": "Browse electric vehicles, hybrid cars, e-bikes, and e-scooters for sale",
+      "url": "https://www.evvalley.com/vehicles"
     }
   };
-
-  const getCategoryDisplayName = (category: string) => {
-    switch (category) {
-      case 'all':
-        return 'All Categories';
-      case 'ev-car':
-        return 'Electric Cars';
-      case 'hybrid-car':
-        return 'Hybrid Cars';
-      case 'ev-scooter':
-        return 'E-Scooters';
-      case 'ev-bike':
-        return 'E-Bikes';
-      default:
-        return 'All Categories';
-    }
-  };
-
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    
-    if (totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      // Show pages around current page
-      let start = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      let end = Math.min(totalPages, start + maxVisiblePages - 1);
-      
-      // Adjust start if we're near the end
-      if (end - start + 1 < maxVisiblePages) {
-        start = Math.max(1, end - maxVisiblePages + 1);
-      }
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-    }
-    
-    return pages;
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
-
 
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
-      <AuthSync />
-      
-      {/* Structured Data for SEO */}
-      <Script
-        id="structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData)
-        }}
-      />
-      <Script
-        id="organization-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationData)
-        }}
-      />
-      
-      {/* Google Analytics */}
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-XXXXXXXXXX');
-        `}
-      </Script>
+      {/* SEO Head */}
+      <head>
+        <title>Evvalley - US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles</title>
+        <meta name="description" content="America's premier electric vehicle marketplace. Buy and sell EVs, hybrid cars, e-bikes, and e-scooters across the United States. Free listings, no commission fees." />
+        <meta name="keywords" content="electric vehicles, EV marketplace, Tesla, hybrid cars, e-bikes, e-scooters, buy EV, sell EV, electric car marketplace, USA" />
+        <link rel="canonical" href="https://www.evvalley.com/" />
+      </head>
 
       <Header />
 
@@ -394,56 +198,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Find Your Perfect Electric Vehicle
+              Electric Vehicles
             </h1>
             <p className="text-xl text-white/90">
-              US Electric Vehicle & E-Mobility Marketplace
+              Discover the future of transportation with zero emissions
             </p>
 
             {/* Search Bar */}
-            <div className="max-w-4xl mx-auto mt-8">
+            <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-lg p-4 shadow-lg">
                 <div className="flex flex-col md:flex-row gap-4">
-                  {/* Category Dropdown */}
-                  <div className="relative category-dropdown">
-                    <button
-                      onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                      className="w-full md:w-48 px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 flex items-center justify-between hover:border-[#3AB0FF] transition-colors"
-                    >
-                      <span className="flex items-center">
-                        <Zap className="w-4 h-4 mr-2 text-gray-500" />
-                        {getCategoryDisplayName(selectedCategory)}
-                      </span>
-                      <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showCategoryDropdown ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    {showCategoryDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
-                        {[
-                          { value: 'all', label: 'All Categories', icon: Zap },
-                          { value: 'ev-car', label: 'Electric Cars', icon: Car },
-                          { value: 'hybrid-car', label: 'Hybrid Cars', icon: Car },
-                          { value: 'ev-scooter', label: 'E-Scooters', icon: Bike },
-                          { value: 'ev-bike', label: 'E-Bikes', icon: Bike }
-                        ].map((category) => {
-                          const IconComponent = category.icon;
-                          return (
-                            <button
-                              key={category.value}
-                              onClick={() => handleCategorySelect(category.value)}
-                              className={`w-full px-4 py-3 text-left flex items-center hover:bg-gray-50 transition-colors ${
-                                selectedCategory === category.value ? 'bg-blue-50 text-blue-600' : 'text-gray-900'
-                              }`}
-                            >
-                              <IconComponent className="w-4 h-4 mr-2" />
-                              {category.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
                   <div className="flex-1">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -451,7 +215,7 @@ export default function Home() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search Tesla, Chevy Bolt, Ford Mach-E..."
+                        placeholder="Search electric vehicles..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                       />
@@ -464,20 +228,18 @@ export default function Home() {
                         type="text"
                         value={locationQuery}
                         onChange={(e) => setLocationQuery(e.target.value)}
-                        placeholder="Enter city, state, or zip code..."
+                        placeholder="Select location..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                       />
                     </div>
                   </div>
-                  
-
                   <button 
                     onClick={handleSearch}
                     className="bg-[#1C1F4A] text-white px-8 py-3 rounded-lg hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
                   >
                     <Filter className="mr-2 h-5 w-5" />
-                    Search EVs
+                    Search
                   </button>
                 </div>
               </div>
@@ -486,133 +248,278 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Search - separate section */}
-      <section className="py-6 bg-[#F5F9FF]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Search with EvValley AI</h3>
+      {/* Category Info */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Zap className="w-8 h-8 text-[#3AB0FF] mr-3" />
+              <h2 className="text-3xl font-bold text-gray-900">All Electric Vehicles</h2>
             </div>
-            <div className="flex flex-col md:flex-row gap-3">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type="text"
-                    value={smartQuery}
-                    onChange={(e) => setSmartQuery(e.target.value)}
-                    placeholder="Search with EvValley AI"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
-                    onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
-                  />
-                </div>
-              </div>
-              <button
-                onClick={handleSmartSearch}
-                className="bg-[#3AB0FF] text-white px-6 py-3 rounded-lg hover:bg-[#2A8FE6] transition-colors"
-              >
-                Try AI Search
-              </button>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Browse our complete selection of electric vehicles including cars, scooters, and bikes. 
+              Find the perfect EV for your lifestyle and budget.
+            </p>
+            <div className="mt-4 text-2xl font-bold text-green-600">
+              {loading ? 'Loading...' : `${totalVehicles} Electric Vehicles`} Currently Available
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Category Filters */}
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Browse Electric Vehicle Categories
-            </h2>
-            <p className="text-gray-600">
-              Find the perfect electric vehicle for your needs
-            </p>
-          </div>
           <div className="flex flex-wrap gap-3 justify-center">
             <button 
               onClick={() => {
-                setSelectedCategory('all');
-                router.push('/vehicles');
+                setFilters(prev => ({ ...prev, category: 'all' }));
+                setShowSoldVehicles(true); // Ensure all vehicles (including sold) are shown for "All"
               }}
               className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
             >
               <Zap className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white">All Electric Vehicles</span>
+              <span className="text-sm font-medium">All Electric Vehicles</span>
             </button>
             
             <button 
               onClick={() => {
-                setSelectedCategory('ev-car');
-                router.push('/vehicles?category=ev-car');
+                setFilters(prev => ({ ...prev, category: 'ev-car' }));
+                setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Car className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-medium text-gray-900">Electric Cars</span>
+              <Car className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Cars</span>
             </button>
             
             <button 
               onClick={() => {
-                setSelectedCategory('hybrid-car');
-                router.push('/vehicles?category=hybrid-car');
+                setFilters(prev => ({ ...prev, category: 'hybrid-car' }));
+                setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Car className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-medium text-gray-900">Hybrid Cars</span>
+              <Car className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Hybrid Cars</span>
             </button>
             
             <button 
               onClick={() => {
-                setSelectedCategory('ev-scooter');
-                router.push('/vehicles?category=ev-scooter');
+                setFilters(prev => ({ ...prev, category: 'ev-scooter' }));
+                setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Bike className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-medium text-gray-900">Electric Scooters</span>
+              <Bike className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Scooters</span>
             </button>
             
             <button 
               onClick={() => {
-                setSelectedCategory('ev-bike');
-                router.push('/vehicles?category=ev-bike');
+                setFilters(prev => ({ ...prev, category: 'e-bike' }));
+                setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF]"
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Bike className="w-4 h-4 text-gray-700" />
-              <span className="text-sm font-medium text-gray-900">Electric Bikes</span>
+              <Bike className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Bikes</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Featured Vehicles Section */}
-      <section className="py-16">
+      {/* Filters Section */}
+      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Featured Electric Vehicles
-              </h2>
-              <p className="text-gray-600">
-                Discover top-rated electric cars, hybrid vehicles, and e-mobility solutions
-              </p>
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+            <div className="flex items-center mb-4">
+              <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
+              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
             </div>
-            <div className="flex gap-4">
-              <Link href="/vehicles" className="text-[#3AB0FF] hover:text-[#2A2F6B] font-semibold transition-colors">
-                View All Electric Vehicles →
-              </Link>
-              <Link href="/incentives" className="text-[#78D64B] hover:text-[#5BBF3A] font-semibold transition-colors">
-                Earn Money Selling →
-              </Link>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Category Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Category</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.category}
+                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                  >
+                    <option value="all" className="text-gray-900">All Categories</option>
+                    <option value="ev-car" className="text-gray-900">Electric Cars</option>
+                    <option value="hybrid-car" className="text-gray-900">Hybrid Cars</option>
+                    <option value="ev-scooter" className="text-gray-900">Electric Scooters</option>
+                    <option value="e-bike" className="text-gray-900">Electric Bikes</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Brand Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Brand</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.brand}
+                    onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}
+                  >
+                    <option value="all" className="text-gray-900">All Brands</option>
+                    <option value="Tesla" className="text-gray-900">Tesla</option>
+                    <option value="Rivian" className="text-gray-900">Rivian</option>
+                    <option value="Lucid" className="text-gray-900">Lucid</option>
+                    <option value="Ford" className="text-gray-900">Ford</option>
+                    <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
+                    <option value="Nissan" className="text-gray-900">Nissan</option>
+                    <option value="BMW" className="text-gray-900">BMW</option>
+                    <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
+                    <option value="Audi" className="text-gray-900">Audi</option>
+                    <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
+                    <option value="Hyundai" className="text-gray-900">Hyundai</option>
+                    <option value="Kia" className="text-gray-900">Kia</option>
+                    <option value="Porsche" className="text-gray-900">Porsche</option>
+                    <option value="Volvo" className="text-gray-900">Volvo</option>
+                    <option value="Polestar" className="text-gray-900">Polestar</option>
+                    <option value="Fisker" className="text-gray-900">Fisker</option>
+                    <option value="VinFast" className="text-gray-900">VinFast</option>
+                    <option value="Other" className="text-gray-900">Other</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Year Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Year</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.year}
+                    onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value }))}
+                  >
+                    <option value="all" className="text-gray-900">All Years</option>
+                    <option value="2025" className="text-gray-900">2025</option>
+                    <option value="2024" className="text-gray-900">2024</option>
+                    <option value="2023" className="text-gray-900">2023</option>
+                    <option value="2022" className="text-gray-900">2022</option>
+                    <option value="2021" className="text-gray-900">2021</option>
+                    <option value="2020" className="text-gray-900">2020</option>
+                    <option value="2019" className="text-gray-900">2019</option>
+                    <option value="2018" className="text-gray-900">2018</option>
+                    <option value="2017" className="text-gray-900">2017</option>
+                    <option value="2016" className="text-gray-900">2016</option>
+                    <option value="2015" className="text-gray-900">2015</option>
+                    <option value="2014" className="text-gray-900">2014</option>
+                    <option value="2013" className="text-gray-900">2013</option>
+                    <option value="2012" className="text-gray-900">2012</option>
+                    <option value="2011" className="text-gray-900">2011</option>
+                    <option value="2010" className="text-gray-900">2010</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Min Price Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Min Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    value={filters.minPrice}
+                    onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Max Price Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Max Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <input
+                    type="number"
+                    placeholder="100,000"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    value={filters.maxPrice}
+                    onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => {
+                  setFilters({
+                    category: 'all',
+                    brand: 'all',
+                    year: 'all',
+                    minPrice: '',
+                    maxPrice: '',
+                    color: 'all',
+                    maxMileage: ''
+                  });
+                }}
+                className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Clear all filters
+              </button>
+            </div>
+            
+            {/* Show Sold Vehicles Toggle */}
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="showSoldVehicles"
+                    checked={showSoldVehicles}
+                    onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                    className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                  />
+                  <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
+                    Show sold vehicles
+                  </label>
+                </div>
+                {showSoldVehicles && (
+                  <span className="text-xs text-gray-500">
+                    Showing all vehicles including sold ones
+                  </span>
+                )}
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
+      {/* Vehicles Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(12)].map((_, i) => (
+              {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
                   <div className="h-64 bg-gray-200"></div>
                   <div className="p-6">
@@ -627,16 +534,28 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          ) : vehicles.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">🚗</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No vehicles found
+              </h3>
+              <p className="text-gray-600">
+                Try adjusting your filters or check back later.
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredVehicles.map((vehicle) => (
+              {vehicles.map((vehicle) => (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {vehicle.images && vehicle.images.length > 0 ? (
+                      {vehicle.video_url ? (
+                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+                      ) : vehicle.images && vehicle.images.length > 0 ? (
                         <img
                           src={vehicle.images[0]}
-                          alt={`${vehicle.brand} ${vehicle.model} electric vehicle for sale`}
+                          alt={vehicle.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -646,51 +565,57 @@ export default function Home() {
                           }}
                         />
                       ) : null}
-                      <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                      <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
                         <div className="text-4xl mb-2">🚗</div>
                         <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
                     </div>
-                    {/* SOLD Badge - Small and positioned */}
-                    {vehicle.sold && (
-                      <div className="absolute top-2 left-2 z-10">
-                        <span className="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                          SOLD
-                        </span>
-                      </div>
-                    )}
                     <div className="absolute top-2 right-2">
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
                   <div className="p-6">
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center mb-2 gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
-                        {getCategoryLabel(vehicle.category)}
+                        {vehicle.category.replace('-', ' ').toUpperCase()}
                       </span>
+                      {vehicle.sold && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          SOLD
+                        </span>
+                      )}
                     </div>
-                    
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.title}</h3>
                     <p className="text-gray-600 mb-4">
-                      {vehicle.year} • {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}
+                      {vehicle.year} • {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'} 
                       {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-[#3AB0FF]">
-                        {formatPrice(vehicle.price)}
-                      </span>
-                      <Link href={`/vehicles/${vehicle.id}`} onClick={() => handleVehicleClick(vehicle.id)}>
-                        <button 
-                          className={`px-4 py-2 rounded-lg transition-colors ${
-                            vehicle.sold 
-                              ? 'bg-gray-600 text-white hover:bg-gray-700' 
-                              : 'bg-[#1C1F4A] text-white hover:bg-[#2A2F6B]'
-                          }`}
-                          onClick={() => trackClick('view_details_button', vehicle.title)}
-                        >
-                          View Details
-                        </button>
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const rawOld = (vehicle as any).old_price;
+                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                            <span className="text-gray-400 line-through text-lg">${oldP.toLocaleString()}</span>
+                          ) : null;
+                        })()}
+                        <span className="text-2xl font-bold text-green-600">
+                          ${vehicle.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller">
+                          <button className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center" title="Contact Seller">
+                            <MessageCircle className="h-4 w-4" />
+                          </button>
+                        </Link>
+                        <Link href={`/vehicles/${vehicle.id}`}>
+                          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            View Details
+                          </button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -698,165 +623,127 @@ export default function Home() {
             </div>
           )}
         </div>
-
+        
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-12">
-            <div className="flex items-center space-x-2">
-              {/* Previous button */}
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12 px-4">
+            {/* Mobile: Show only current page info */}
+            <div className="sm:hidden flex items-center space-x-2">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
               >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Previous
+                ← Prev
               </button>
-
-              {/* Page numbers */}
-              {getPageNumbers().map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-3 py-2 rounded-lg transition-colors ${
-                    currentPage === page 
-                      ? 'bg-[#3AB0FF] text-white' 
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-
-              {/* Next button */}
+              
+              <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">
+                {currentPage} / {totalPages}
+              </span>
+              
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
               >
-                Next
-                <ChevronRight className="w-4 h-4 ml-1" />
+                Next →
               </button>
             </div>
 
-            {/* Page info */}
-            <div className="ml-8 text-sm text-gray-600">
-              Page {currentPage} of {totalPages} • {totalVehicles} vehicles total
+            {/* Desktop: Show full pagination */}
+            <div className="hidden sm:flex items-center space-x-3">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+              >
+                Previous
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 7) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 4) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 3) {
+                  pageNum = totalPages - 6 + i;
+                } else {
+                  pageNum = currentPage - 3 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      currentPage === pageNum
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg transform scale-105'
+                        : 'border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 hover:shadow-md'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+              >
+                Next
+              </button>
             </div>
           </div>
         )}
       </section>
 
-      {/* Newsletter Signup Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <NewsletterSignup
-            campaignType="buyer_updates"
-            title="Get Electric Vehicle Deals First"
-            description="Subscribe to get notified about new listings, price drops, and exclusive deals"
-            buttonText="Get Notified"
-            className="max-w-md mx-auto"
-          />
-        </div>
-      </section>
-
-      {/* Product Schema for Featured Vehicles */}
-      {featuredVehicles.length > 0 && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "ItemList",
-              "name": "Featured Electric Vehicles",
-              "description": "Featured electric vehicles available for purchase on Evvalley",
-              "numberOfItems": featuredVehicles.length,
-              "itemListElement": featuredVehicles.map((vehicle, index) => ({
-                "@type": "ListItem",
-                "position": index + 1,
-                "item": {
-                  "@type": "Product",
-                  "name": vehicle.title,
-                  "description": `${vehicle.year} ${vehicle.brand} ${vehicle.model} - ${vehicle.category}`,
-                  "brand": {
-                    "@type": "Brand",
-                    "name": vehicle.brand
-                  },
-                  "model": vehicle.model,
-                  "category": vehicle.category,
-                  "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
-                  "offers": {
-                    "@type": "Offer",
-                    "price": vehicle.price,
-                    "priceCurrency": "USD",
-                    "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                    "availability": vehicle.sold_at ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-                    "itemCondition": "https://schema.org/UsedCondition"
-                  }
-                }
-              }))
-            })
-          }}
-        />
-      )}
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      {/* About Section */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Evvalley</h3>
-              <p className="text-gray-400">
-                Your trusted marketplace for electric vehicles and e-mobility solutions.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/vehicles" className="hover:text-white">Browse Vehicles</Link></li>
-                <li><Link href="/sell" className="hover:text-white">Sell Your EV</Link></li>
-                <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-                <li><Link href="/about" className="hover:text-white">About Us</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/safety" className="hover:text-white">Safety</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Follow Us</h4>
-              <div className="flex space-x-4">
-                <a
-                  href="https://www.facebook.com/profile.php?id=61579466595719"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackSocialMediaClick('facebook', 'link')}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <Facebook className="w-6 h-6" />
-                </a>
-                <a
-                  href="https://www.instagram.com/evvalleyus/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackSocialMediaClick('instagram', 'link')}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <Instagram className="w-6 h-6" />
-                </a>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">About Electric Vehicles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Zero Emissions, Maximum Performance</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles represent the future of transportation, offering zero emissions while delivering 
+                  incredible performance and acceleration. With instant torque and smooth operation, EVs provide 
+                  a driving experience unlike any traditional vehicle.
+                </p>
+                <p className="text-gray-600">
+                  Modern electric vehicles feature advanced battery technology, providing ranges of 200-400+ miles 
+                  on a single charge, making them practical for daily commuting and long-distance travel.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Cost Savings & Environmental Benefits</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles offer significant cost savings over time, with lower fuel costs, reduced 
+                  maintenance requirements, and various government incentives. They also contribute to a cleaner 
+                  environment by eliminating tailpipe emissions.
+                </p>
+                <p className="text-gray-600">
+                  At Evvalley, we offer a wide selection of electric vehicles from leading manufacturers like 
+                  Tesla, Rivian, Lucid, and more. Our expert team can help you find the perfect EV for your 
+                  lifestyle and budget.
+                </p>
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Evvalley. All rights reserved.</p>
-          </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Structured Data */}
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
+      />
     </div>
   );
 }

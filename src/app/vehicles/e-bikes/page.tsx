@@ -31,6 +31,7 @@ function EBikesContent() {
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
     const searchFromUrl = searchParams.get('search') || '';
     const locationFromUrl = searchParams.get('location') || '';
+    const categoryFromUrl = searchParams.get('category');
     
     setFilters({
       brand: brandFromUrl,
@@ -41,7 +42,32 @@ function EBikesContent() {
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
-  }, [searchParams]);
+    
+    // Redirect if category=e-bike is in URL (duplicate canonical issue)
+    // The canonical URL is /vehicles/e-bikes without query params
+    if (categoryFromUrl === 'e-bike') {
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('category');
+      const newUrl = newParams.toString() 
+        ? `/vehicles/e-bikes?${newParams.toString()}`
+        : '/vehicles/e-bikes';
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, router]);
+  
+  // Set canonical URL - always point to clean URL without redundant category param
+  useEffect(() => {
+    const canonicalUrl = 'https://www.evvalley.com/vehicles/e-bikes';
+    let existingCanonical = document.querySelector('link[rel="canonical"]');
+    if (existingCanonical) {
+      existingCanonical.setAttribute('href', canonicalUrl);
+    } else {
+      const canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      canonicalLink.setAttribute('href', canonicalUrl);
+      document.head.appendChild(canonicalLink);
+    }
+  }, []);
 
   // Fetch vehicles when URL params change
   useEffect(() => {

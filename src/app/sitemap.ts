@@ -1,223 +1,193 @@
-import { MetadataRoute } from 'next';
-import { createClient } from '@supabase/supabase-js';
+// src/app/sitemap.ts
+import type { MetadataRoute } from "next";
+import { createClient } from "@supabase/supabase-js";
 
+const BASE_URL = "https://www.evvalley.com";
+
+// Service role yerine anonim key kullanmak daha güvenli
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.evvalley.com';
-  const currentDate = new Date();
+// Force dynamic generation to ensure fresh sitemap
+export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 
-  // Static pages with enhanced priorities and frequencies
-  const staticPages = [
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+
+  // 1) Statik sayfalar
+  const staticPages: MetadataRoute.Sitemap = [
     {
-      url: baseUrl,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
+      url: BASE_URL,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 1,
     },
     {
-      url: `${baseUrl}/vehicles`,
-      lastModified: currentDate,
-      changeFrequency: 'hourly' as const,
+      url: `${BASE_URL}/vehicles`,
+      lastModified: now,
+      changeFrequency: "hourly",
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/blog`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly' as const,
+      url: `${BASE_URL}/blog`,
+      lastModified: now,
+      changeFrequency: "weekly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/sell`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
+      url: `${BASE_URL}/sell`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/about`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
+      url: `${BASE_URL}/about`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/contact`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
+      url: `${BASE_URL}/contact`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/community`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly' as const,
+      url: `${BASE_URL}/community`,
+      lastModified: now,
+      changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/escrow`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
+      url: `${BASE_URL}/escrow`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/safety`,
-      lastModified: currentDate,
-      changeFrequency: 'monthly' as const,
+      url: `${BASE_URL}/safety`,
+      lastModified: now,
+      changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${baseUrl}/privacy`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly' as const,
+      url: `${BASE_URL}/privacy`,
+      lastModified: now,
+      changeFrequency: "yearly",
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/terms`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly' as const,
+      url: `${BASE_URL}/terms`,
+      lastModified: now,
+      changeFrequency: "yearly",
       priority: 0.3,
     },
-    // Category pages with canonical URLs - prevent duplicate content
+    // Kategori sayfaları
     {
-      url: `${baseUrl}/vehicles/ev-cars`,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
+      url: `${BASE_URL}/vehicles/ev-cars`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles/hybrid-cars`,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
+      url: `${BASE_URL}/vehicles/hybrid-cars`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles/ev-scooters`,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
+      url: `${BASE_URL}/vehicles/ev-scooters`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vehicles/e-bikes`,
-      lastModified: currentDate,
-      changeFrequency: 'daily' as const,
+      url: `${BASE_URL}/vehicles/e-bikes`,
+      lastModified: now,
+      changeFrequency: "daily",
       priority: 0.8,
     },
   ];
 
-  // Fetch vehicles with enhanced error handling and validation
+  // 2) Araç ilanları
   let vehiclePages: MetadataRoute.Sitemap = [];
   try {
     const { data: vehicles, error } = await supabase
-      .from('vehicles')
-      .select('id, updated_at, vin, title, sold_at, category')
-      .is('sold_at', null) // Only unsold vehicles
-      .not('id', 'is', null) // Must have ID
-      .not('title', 'is', null) // Must have title
-      .order('updated_at', { ascending: false })
-      .limit(5000); // Increased limit for better coverage
-    
-    if (error) {
-      console.error('Sitemap: Error fetching vehicles:', error);
-    } else if (vehicles && vehicles.length > 0) {
-      console.log(`Sitemap: Found ${vehicles.length} vehicles from database`);
-      
+      .from("vehicles")
+      .select("id, updated_at, sold_at, title")
+      .is("sold_at", null)
+      .not("id", "is", null)
+      .not("title", "is", null)
+      .not("title", "eq", "")
+      .order("updated_at", { ascending: false })
+      .limit(1000);
+
+    if (!error && vehicles) {
       vehiclePages = vehicles
-        .filter((vehicle: any) => {
-          const hasId = vehicle.id;
-          const hasTitle = vehicle.title;
-          const isUnsold = vehicle.sold_at === null;
-          
-          if (!hasId) console.log(`Sitemap: Filtered out vehicle - missing ID`);
-          if (!hasTitle) console.log(`Sitemap: Filtered out vehicle - missing title`);
-          if (!isUnsold) console.log(`Sitemap: Filtered out vehicle - sold: ${vehicle.sold_at}`);
-          
-          return hasId && hasTitle && isUnsold;
-        })
-        .map((vehicle: any) => ({
-          url: `${baseUrl}/vehicles/${vehicle.id}`,
-          lastModified: vehicle.updated_at ? new Date(vehicle.updated_at) : currentDate,
-          changeFrequency: 'weekly' as const,
+        .filter((v) => v.id && v.title && v.sold_at === null)
+        .map((v) => ({
+          url: `${BASE_URL}/vehicles/${v.id}`,
+          lastModified: v.updated_at ? new Date(v.updated_at) : now,
+          changeFrequency: "weekly" as const,
           priority: 0.8,
         }));
-      
-      console.log(`Sitemap: After filtering, ${vehiclePages.length} vehicles included in sitemap`);
-    } else {
-      console.log('Sitemap: No vehicles found in database');
     }
-  } catch (error) {
-    console.error('Sitemap: Unexpected error fetching vehicles:', error);
+  } catch {
+    // hata olursa sitemap yine de döner, sadece araçlar eklenmez
     vehiclePages = [];
   }
 
-  // Blog posts with enhanced error handling
+  // 3) Blog yazıları
   let blogPages: MetadataRoute.Sitemap = [];
   try {
-    const { blogPosts } = await import('@/lib/blog-content');
-    if (blogPosts && Array.isArray(blogPosts)) {
+    const { blogPosts } = await import("@/lib/blog-content");
+
+    if (Array.isArray(blogPosts)) {
       blogPages = blogPosts
         .filter((post: any) => post && post.slug && post.title)
         .map((post: any) => ({
-          url: `${baseUrl}/blog/${post.slug}`,
-          lastModified: post.updatedAt ? new Date(post.updatedAt) : currentDate,
-          changeFrequency: 'monthly' as const,
+          url: `${BASE_URL}/blog/${post.slug}`,
+          lastModified: post.updatedAt ? new Date(post.updatedAt) : now,
+          changeFrequency: "monthly" as const,
           priority: 0.7,
         }));
     }
-  } catch (error) {
-    console.error('Sitemap: Error importing blog content:', error);
+  } catch {
     blogPages = [];
   }
 
-  // Blog category pages with canonical URLs
+  // 4) Blog kategori sayfaları (sadece gerçekten var olan route'lar)
   const blogCategories = [
-    'ev-guide',
-    'market-analysis', 
-    'technology-updates',
-    'buying-selling-tips',
-    'e-mobility'
+    "ev-guide", // ✅ Var: src/app/blog/category/ev-guide/page.tsx
+    // "market-analysis", // ❌ Route yok
+    // "technology-updates", // ❌ Route yok
+    // "buying-selling-tips", // ❌ Route yok
+    // "e-mobility", // ❌ Route yok
   ];
 
-  const blogCategoryPages = blogCategories.map((category) => ({
-    url: `${baseUrl}/blog/category/${category}`,
-    lastModified: currentDate,
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
-
-  // Brand and model specific pages to prevent duplicate content
-  const brandPages = [
-    'tesla', 'bmw', 'audi', 'mercedes', 'volkswagen', 'ford', 'toyota', 'honda', 'nissan'
-  ].map(brand => ({
-    url: `${baseUrl}/vehicles/brand/${brand}`,
-    lastModified: currentDate,
-    changeFrequency: 'daily' as const,
-    priority: 0.7,
-  }));
-
-  // Combine all pages and ensure we always return something
-  const allPages = [
-    ...staticPages, 
-    ...vehiclePages, 
-    ...blogPages, 
-    ...blogCategoryPages,
-    ...brandPages
-  ];
-  
-  // Remove any duplicate URLs to prevent duplicate content issues
-  const uniquePages = allPages.filter((page, index, self) => 
-    index === self.findIndex(p => p.url === page.url)
+  const blogCategoryPages: MetadataRoute.Sitemap = blogCategories.map(
+    (category) => ({
+      url: `${BASE_URL}/blog/category/${category}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    })
   );
-  
-  // Log sitemap generation for debugging
-  console.log(`Sitemap generated with ${uniquePages.length} unique URLs:`, {
-    static: staticPages.length,
-    vehicles: vehiclePages.length,
-    blogs: blogPages.length,
-    categories: blogCategoryPages.length,
-    brands: brandPages.length,
-    duplicatesRemoved: allPages.length - uniquePages.length
-  });
+
+  // 5) Hepsini birleştir + duplicate URL temizle
+  const allPages = [
+    ...staticPages,
+    ...vehiclePages,
+    ...blogPages,
+    ...blogCategoryPages,
+  ];
+
+  const uniquePages = allPages.filter(
+    (page, index, self) => index === self.findIndex((p) => p.url === page.url)
+  );
 
   return uniquePages;
 }

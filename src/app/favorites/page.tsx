@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Vehicle } from "@/lib/database";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function FavoritesPage() {
   const { isSignedIn, user } = useUser();
@@ -30,10 +31,11 @@ export default function FavoritesPage() {
       });
       if (userResponse.ok) {
         const userData = await userResponse.json();
-        const userId = userData.user.id;
-        
-        // Fetch favorites from API
-        const favoritesResponse = await fetch(`/api/favorites?user_id=${userId}`);
+        const userId = userData.user?.id;
+
+        // Try by Supabase user_id first, fallback to clerk_id if needed
+        const query = userId ? `user_id=${userId}` : `clerk_id=${user?.id}`;
+        const favoritesResponse = await fetch(`/api/favorites?${query}`);
         if (favoritesResponse.ok) {
           const favoritesData = await favoritesResponse.json();
           const favoriteIds = favoritesData.favorites.map((fav: any) => fav.vehicle_id);
@@ -108,6 +110,12 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Head>
+        <title>My Favorites - EvValley</title>
+        <meta name="description" content="View your favorite electric vehicles, e-scooters, and e-bikes on EvValley. Save and manage your preferred listings." />
+        <meta name="robots" content="noindex, follow" />
+        <link rel="canonical" href="https://www.evvalley.com/favorites" />
+      </Head>
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -184,7 +192,10 @@ export default function FavoritesPage() {
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-[#3AB0FF]">
-                      ${vehicle.price.toLocaleString()}
+                    {typeof (vehicle as any).old_price === 'number' && (vehicle as any).old_price > (vehicle as any).price ? (
+                      <span className="text-gray-400 line-through mr-2">${(vehicle as any).old_price.toLocaleString()}</span>
+                    ) : null}
+                    ${vehicle.price.toLocaleString()}
                     </span>
                     <Link href={`/vehicles/${vehicle.id}`}>
                       <button className="bg-[#1C1F4A] text-white px-4 py-2 rounded-lg hover:bg-[#2A2F6B] transition-colors">

@@ -525,7 +525,7 @@ export const blogPosts: BlogPost[] = [
     updatedAt: '2024-03-23',
     category: 'EV Guide',
     tags: ['best electric cars', 'top electric vehicles', 'EV comparison', 'electric car rankings', 'electric vehicle reviews'],
-    featuredImage: 'https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=400&fit=crop&crop=center',
+    featuredImage: '/blog-images/best-electric-cars-2024-top-10-evs-ranked-by-value.jpg?v=2',
     readTime: 15,
     metaDescription: '🏆 Best Electric Cars 2024: Top 10 EVs Ranked by Value! Compare Tesla, Ford, Chevrolet prices, range & performance. Expert rankings with real-world data. Find your perfect EV!',
     keywords: ['best electric cars 2024', 'top electric vehicles 2024', 'best EVs ranked', 'electric car comparison 2024', 'Tesla vs Ford EV', 'affordable electric cars', 'electric vehicle rankings', 'best EV for money']
@@ -1814,7 +1814,7 @@ export const blogPosts: BlogPost[] = [
     category: 'Buying/Selling Tips',
     tags: ['cheap electric cars', 'under 25000', 'budget EV 2025'],
     readTime: 9,
-    featuredImage: '/blog-images/best-electric-cars-2024.jpg',
+    featuredImage: '/blog-images/best-electric-cars-2024-top-10-evs-ranked-by-value.jpg',
     metaDescription: 'Best electric cars under $25,000 in 2025: models, pros/cons and ownership costs.',
     keywords: ['best electric cars under 25000 2025', 'cheap EV 2025', 'budget electric cars']
   },

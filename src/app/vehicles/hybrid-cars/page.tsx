@@ -32,6 +32,7 @@ function HybridCarsContent() {
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
     const searchFromUrl = searchParams.get('search') || '';
     const locationFromUrl = searchParams.get('location') || '';
+    const categoryFromUrl = searchParams.get('category');
     
     setFilters({
       brand: brandFromUrl,
@@ -42,7 +43,31 @@ function HybridCarsContent() {
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
-  }, [searchParams]);
+    
+    // Redirect if category=hybrid-car is in URL (duplicate canonical issue)
+    if (categoryFromUrl === 'hybrid-car') {
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('category');
+      const newUrl = newParams.toString() 
+        ? `/vehicles/hybrid-cars?${newParams.toString()}`
+        : '/vehicles/hybrid-cars';
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, router]);
+  
+  // Set canonical URL - always point to clean URL without redundant category param
+  useEffect(() => {
+    const canonicalUrl = 'https://www.evvalley.com/vehicles/hybrid-cars';
+    let existingCanonical = document.querySelector('link[rel="canonical"]');
+    if (existingCanonical) {
+      existingCanonical.setAttribute('href', canonicalUrl);
+    } else {
+      const canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      canonicalLink.setAttribute('href', canonicalUrl);
+      document.head.appendChild(canonicalLink);
+    }
+  }, []);
 
   // Fetch vehicles when URL params change
   useEffect(() => {
@@ -605,9 +630,19 @@ function HybridCarsContent() {
                       {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
-                        ${vehicle.price.toLocaleString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const rawOld = (vehicle as any).old_price;
+                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                            <span className="text-gray-400 line-through text-lg">${oldP.toLocaleString()}</span>
+                          ) : null;
+                        })()}
+                        <span className="text-2xl font-bold text-green-600">
+                          ${vehicle.price.toLocaleString()}
+                        </span>
+                      </div>
                       <Link href={`/vehicles/${vehicle.id}`}>
                         <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                           View Details

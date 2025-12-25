@@ -2,15 +2,15 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'EV Rehberleri - Evvalley Blog',
-  description: 'Elektrikli araçlar hakkında kapsamlı rehberler, ipuçları ve güncel bilgiler. EV satın alma, şarj ve bakım konularında uzman tavsiyeleri.',
-  keywords: 'elektrikli araç rehberi, EV satın alma, şarj istasyonu, bakım ipuçları, Tesla rehberi',
+  title: 'EV Guides - Evvalley Blog',
+  description: 'Comprehensive guides, tips, and up-to-date information about electric vehicles. Expert advice on EV purchasing, charging, and maintenance.',
+  keywords: 'electric vehicle guide, EV buying guide, charging station, maintenance tips, Tesla guide',
   alternates: {
     canonical: 'https://www.evvalley.com/blog/category/ev-guide',
   },
   openGraph: {
-    title: 'EV Rehberleri - Evvalley Blog',
-    description: 'Elektrikli araçlar hakkında kapsamlı rehberler ve uzman tavsiyeleri.',
+    title: 'EV Guides - Evvalley Blog',
+    description: 'Comprehensive guides and expert advice about electric vehicles.',
     url: 'https://www.evvalley.com/blog/category/ev-guide',
   },
 };
@@ -22,31 +22,31 @@ export default function EVGuideCategoryPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            📚 EV Rehberleri
+            📚 EV Guides
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Elektrikli araçlar hakkında kapsamlı rehberler, satın alma ipuçları, 
-            şarj çözümleri ve bakım tavsiyeleri.
+            Comprehensive guides about electric vehicles, buying tips, 
+            charging solutions, and maintenance advice.
           </p>
         </div>
 
         {/* Category Description */}
         <div className="bg-white rounded-lg shadow-sm p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            Elektrikli Araç Rehberleri
+            Electric Vehicle Guides
           </h2>
           <div className="prose max-w-none text-gray-600">
             <p className="mb-4">
-              Elektrikli araç dünyasına yeni adım atanlar için kapsamlı rehberler 
-              ve deneyimli EV sürücüleri için gelişmiş ipuçları sunuyoruz.
+              We offer comprehensive guides for newcomers to the electric vehicle world 
+              and advanced tips for experienced EV drivers.
             </p>
             <p className="mb-4">
-              Bu kategoride elektrikli araç satın alma süreci, şarj istasyonu 
-              bulma, bakım ve performans optimizasyonu gibi konuları ele alıyoruz.
+              In this category, we cover topics such as the electric vehicle purchasing process, 
+              finding charging stations, maintenance, and performance optimization.
             </p>
             <p>
-              Uzman yazarlarımız tarafından hazırlanan güncel ve doğru bilgilerle 
-              elektrikli araç deneyiminizi en üst seviyeye çıkarın.
+              Enhance your electric vehicle experience with up-to-date and accurate information 
+              prepared by our expert writers.
             </p>
           </div>
         </div>
@@ -57,17 +57,17 @@ export default function EVGuideCategoryPage() {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Elektrikli Araç Satın Alma Rehberi 2024
+                Electric Vehicle Buying Guide 2024
               </h3>
               <p className="text-gray-600 mb-4">
-                İlk elektrikli aracınızı satın alırken dikkat etmeniz gereken 
-                tüm detaylar ve püf noktaları.
+                All the details and tips you need to pay attention to when 
+                buying your first electric vehicle.
               </p>
               <Link
                 href="/blog/ev-buying-guide-2024"
                 className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
               >
-                Devamını Oku →
+                Read More →
               </Link>
             </div>
           </div>
@@ -76,17 +76,17 @@ export default function EVGuideCategoryPage() {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Evde Tesla Şarj Kurulumu
+                Home Tesla Charging Installation
               </h3>
               <p className="text-gray-600 mb-4">
-                Evinizde Tesla şarj istasyonu kurulumu için adım adım rehber 
-                ve maliyet analizi.
+                Step-by-step guide and cost analysis for installing a Tesla 
+                charging station at your home.
               </p>
               <Link
                 href="/blog/tesla-home-charging-setup"
                 className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
               >
-                Devamını Oku →
+                Read More →
               </Link>
             </div>
           </div>
@@ -95,17 +95,17 @@ export default function EVGuideCategoryPage() {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                EV Bakım ve Servis Rehberi
+                EV Maintenance and Service Guide
               </h3>
               <p className="text-gray-600 mb-4">
-                Elektrikli araçların bakım gereksinimleri, servis aralıkları 
-                ve uzun ömürlü kullanım ipuçları.
+                Maintenance requirements, service intervals, and tips for 
+                long-term use of electric vehicles.
               </p>
               <Link
                 href="/blog/ev-maintenance-guide"
                 className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
               >
-                Devamını Oku →
+                Read More →
               </Link>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function EVGuideCategoryPage() {
             href="/blog"
             className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Tüm Blog Yazılarına Dön
+            Back to All Blog Posts
           </Link>
         </div>
       </div>

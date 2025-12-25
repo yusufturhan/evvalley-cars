@@ -1,0 +1,37 @@
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import Header from '@/components/Header';
+import { VehiclesContent } from '@/app/vehicles/page';
+
+export const metadata: Metadata = {
+  title: 'EVs Under $40,000 | Best Value Electric Cars | Evvalley',
+  description: 'Find the best value EVs and hybrids under $40k. Compare models and prices on Evvalley.',
+  alternates: { canonical: 'https://www.evvalley.com/vehicles/price/under-40k' },
+  robots: { index: true, follow: true },
+};
+
+export default function Under40kEVsPage() {
+  return (
+    <div className="min-h-screen bg-[#F5F9FF]">
+      <Header />
+      <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
+        <VehiclesContent defaults={{ maxPrice: '40000' }} />
+      </Suspense>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              { '@type': 'Question', name: '$40k altı EV var mı?', acceptedAnswer: { '@type': 'Answer', text: 'Evet, Evvalley\'de $40,000 altındaki uygun fiyatlı EV modelleri listelenir.' } },
+              { '@type': 'Question', name: 'Listeler nasıl filtrelenir?', acceptedAnswer: { '@type': 'Answer', text: 'Sayfadaki filtreler ile marka, yıl ve konuma göre arama yapabilirsiniz.' } }
+            ]
+          })
+        }}
+      />
+    </div>
+  );
+}
+
+

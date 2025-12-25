@@ -52,6 +52,7 @@ interface Vehicle {
   drivetrain: string;
   vin: string;
   seller_type: string;
+  video_url?: string | null;
 }
 
 export default function EditVehiclePage() {
@@ -65,6 +66,7 @@ export default function EditVehiclePage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [removeVideo, setRemoveVideo] = useState<boolean>(false);
 
   // Image compression function
   const compressImage = (file: File): Promise<File> => {
@@ -244,6 +246,9 @@ export default function EditVehiclePage() {
           vin: vehicleInfo.vin || ""
         });
 
+        // Set existing video (if any)
+        setVideoUrl(vehicleInfo.video_url || null);
+
         // Set existing images - ensure it's always an array
         const existingImages = Array.isArray(vehicleInfo.images) ? vehicleInfo.images : [];
         setImageUrls(existingImages);
@@ -323,8 +328,8 @@ export default function EditVehiclePage() {
     // Images validation
     if (imageUrls.length === 0 && images.length === 0) {
       newErrors.images = 'At least one image is required';
-    } else if (images.length > 12) {
-      newErrors.images = 'Maximum 12 images allowed';
+    } else if (images.length > 15) {
+      newErrors.images = 'Maximum 15 images allowed';
     }
 
     setErrors(newErrors);
@@ -374,9 +379,12 @@ export default function EditVehiclePage() {
         });
       }
 
-      // Attach video URL if present
+      // Attach video controls
       if (videoUrl) {
         formDataToSend.append('video_url', videoUrl);
+      } else if (removeVideo) {
+        // Explicitly request server to clear video_url
+        formDataToSend.append('remove_video', 'true');
       }
 
       // Add existing image URLs (excluding deleted ones)
@@ -806,69 +814,9 @@ export default function EditVehiclePage() {
                   </div>
                 </div>
 
-                {/* Fuel Economy and Horsepower */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Combined Fuel Economy
-                    </label>
-                    <input
-                      type="text"
-                      name="combined_fuel_economy"
-                      value={formData.combined_fuel_economy}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter combined fuel economy here"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Horsepower
-                    </label>
-                    <input
-                      type="number"
-                      name="horsepower"
-                      value={formData.horsepower}
-                      onChange={handleInputChange}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter horsepower here"
-                    />
-                  </div>
-                </div>
+                {/* Fuel Economy and Horsepower removed */}
 
-                {/* Electric Range and Battery Warranty */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Electric Mile Range
-                    </label>
-                    <input
-                      type="number"
-                      name="electric_mile_range"
-                      value={formData.electric_mile_range}
-                      onChange={handleInputChange}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter electric mile range here"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Battery Warranty
-                    </label>
-                    <input
-                      type="text"
-                      name="battery_warranty"
-                      value={formData.battery_warranty}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter battery warranty here"
-                    />
-                  </div>
-                </div>
+                {/* Electric Range and Battery Warranty removed */}
 
                 {/* Drivetrain and VIN */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -1071,7 +1019,13 @@ export default function EditVehiclePage() {
       {/* Optional Short Video */}
       <div className="mt-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Optional Video (≤ 60s)</label>
-        <VideoUpload value={videoUrl} onChange={setVideoUrl} />
+        <VideoUpload 
+          value={videoUrl} 
+          onChange={(url) => {
+            setVideoUrl(url);
+            setRemoveVideo(url === null);
+          }} 
+        />
       </div>
             </div>
 

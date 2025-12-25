@@ -5,10 +5,24 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const vehicleId = searchParams.get('vehicle_id');
-    const userId = searchParams.get('user_id');
+    let userId = searchParams.get('user_id');
+    const clerkId = searchParams.get('clerk_id');
 
     const supabase = createServerSupabaseClient();
     
+    // If client sent Clerk ID instead of Supabase user_id, resolve it first
+    if (!userId && clerkId) {
+      const { data: userByClerk, error: userByClerkError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('clerk_id', clerkId)
+        .single();
+
+      if (!userByClerkError && userByClerk) {
+        userId = userByClerk.id as string;
+      }
+    }
+
     let query = supabase.from('favorites').select('*');
 
     if (vehicleId) {

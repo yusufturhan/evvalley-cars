@@ -37,6 +37,11 @@ interface VehicleDetailClientProps {
 export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
   const router = useRouter();
   const { user, isSignedIn } = useUser();
+  // Build media array: video first (if exists), then images
+  const media: string[] = [
+    ...(vehicle?.video_url ? [vehicle.video_url] : []),
+    ...(vehicle?.images || [])
+  ];
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showMessaging, setShowMessaging] = useState(false);
   const [sellerInfo, setSellerInfo] = useState<any>(null);
@@ -99,6 +104,20 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     fetchUserSupabaseId();
   }, [isSignedIn, user]);
 
+  // Check for #contact hash and auto-open messaging
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#contact') {
+      setShowMessaging(true);
+      // Scroll to contact section
+      setTimeout(() => {
+        const contactElement = document.getElementById('contact');
+        if (contactElement) {
+          contactElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
+
   // Debug when userSupabaseId changes (development only)
   useEffect(() => {
     if (userSupabaseId && process.env.NODE_ENV === 'development') {
@@ -109,6 +128,20 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
       });
     }
   }, [userSupabaseId, vehicle?.seller_id]);
+
+  // Check for #contact hash and auto-open messaging
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#contact') {
+      setShowMessaging(true);
+      // Scroll to contact section
+      setTimeout(() => {
+        const contactElement = document.getElementById('contact');
+        if (contactElement) {
+          contactElement.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
 
   // Fetch seller information
   useEffect(() => {
@@ -265,7 +298,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     }
   };
 
-  const hasImages = vehicle.images && vehicle.images.length > 0;
+  const hasImages = media.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -286,23 +319,32 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
           {/* Vehicle Images */}
           <div className="space-y-4">
-            {/* Main Image */}
+            {/* Main Media (Video or Image) */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden relative">
               <div className="h-[500px] lg:h-[600px] bg-gray-200 flex items-center justify-center">
-                {hasImages && vehicle.images && vehicle.images[selectedImageIndex] ? (
-                  <img
-                    src={vehicle.images[selectedImageIndex]}
-                    alt={vehicle.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const fallback = target.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'flex';
-                    }}
-                  />
+                {hasImages && media[selectedImageIndex] ? (
+                  selectedImageIndex === 0 && vehicle.video_url ? (
+                    <video
+                      src={media[0]}
+                      controls
+                      playsInline
+                      className="w-full h-full object-contain bg-black"
+                    />
+                  ) : (
+                    <img
+                      src={media[selectedImageIndex]}
+                      alt={vehicle.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  )
                 ) : null}
-                {hasImages && vehicle.images && (
+                {hasImages && (
                   <div className="hidden text-center">
                     <div className="text-8xl mb-4">🚗</div>
                     <div className="text-gray-600">{vehicle.brand} {vehicle.model}</div>
@@ -320,10 +362,10 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               )}
             </div>
 
-            {/* Image Thumbnails */}
-            {hasImages && vehicle.images && vehicle.images.length > 1 && (
+            {/* Media Thumbnails */}
+            {hasImages && media.length > 1 && (
               <div className="grid grid-cols-5 gap-3">
-                {vehicle.images.map((image, index) => (
+                {media.map((m, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
@@ -331,11 +373,17 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                       selectedImageIndex === index ? 'border-[#3AB0FF]' : 'border-transparent'
                     }`}
                   >
-                    <img
-                      src={image}
-                      alt={`${vehicle.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    {index === 0 && vehicle.video_url ? (
+                      <div className="w-full h-full bg-black flex items-center justify-center">
+                        <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent" />
+                      </div>
+                    ) : (
+                      <img
+                        src={m}
+                        alt={`${vehicle.title} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </button>
                 ))}
               </div>
@@ -343,7 +391,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
 
             {/* Contact Actions */}
             {!vehicle?.sold && (
-              <div className="space-y-3 mt-6">
+              <div id="contact" className="space-y-3 mt-6">
                 {isSignedIn ? (
                   <button 
                     onClick={() => setShowMessaging(!showMessaging)}
@@ -363,8 +411,8 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
               </div>
             )}
 
-            {/* Messaging Component - Only show for signed-in users */}
-            {vehicle && isSignedIn && (
+            {/* Messaging Component - Only show for signed-in users and when showMessaging is true */}
+            {vehicle && isSignedIn && showMessaging && (
               <div className="mt-6">
                 <SimpleChat
                   vehicleId={vehicle.id}
@@ -467,7 +515,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 user?.emailAddresses[0]?.emailAddress === vehicle.seller_email || 
                 vehicle.seller_id === userSupabaseId
               ) && (
-                <div className="mt-4 space-y-2">
+                <div className="mt-4">
                   <button
                     onClick={handleMarkAsSold}
                     disabled={markingAsSold}
@@ -482,16 +530,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                       : (vehicle.sold ? 'Unmark as Sold' : 'Mark as Sold')
                     }
                   </button>
-                  
-                  {/* Delete Button */}
-                  <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="bg-red-800 text-white px-4 py-2 rounded-lg hover:bg-red-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {deleting ? 'Deleting...' : 'Delete Listing'}
-                  </button>
                 </div>
               )}
             </div>
@@ -503,7 +541,12 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   <p className="text-sm font-medium text-[#3AB0FF]">
                     Price
                   </p>
+                <div className="flex items-center gap-3">
+                  {typeof (vehicle as any).old_price === 'number' && (vehicle as any).old_price > (vehicle as any).price ? (
+                    <span className="text-gray-400 line-through text-2xl">${(vehicle as any).old_price.toLocaleString()}</span>
+                  ) : null}
                   <p className="text-3xl font-bold text-[#3AB0FF]">${vehicle.price.toLocaleString()}</p>
+                </div>
                 </div>
                 <DollarSign className="h-8 w-8 text-[#3AB0FF]" />
               </div>
@@ -576,10 +619,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   <p className="font-semibold text-gray-900 capitalize">{vehicle.title_status || 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="text-gray-800 font-medium">Battery:</span>
-                  <p className="font-semibold text-gray-900">{vehicle.battery_capacity || 'N/A'}</p>
-                </div>
-                <div>
                   <span className="text-gray-800 font-medium">Interior Color:</span>
                   <p className="font-semibold text-gray-900">{vehicle.interior_color || 'N/A'}</p>
                 </div>
@@ -598,18 +637,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 <div>
                   <span className="text-gray-800 font-medium">Fuel Economy:</span>
                   <p className="font-semibold text-gray-900">{vehicle.combined_fuel_economy || 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-800 font-medium">Horsepower:</span>
-                  <p className="font-semibold text-gray-900">{vehicle.horsepower ? `${vehicle.horsepower} hp` : 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-800 font-medium">Electric Range:</span>
-                  <p className="font-semibold text-gray-900">{vehicle.electric_mile_range ? `${vehicle.electric_mile_range} miles` : 'N/A'}</p>
-                </div>
-                <div>
-                  <span className="text-gray-800 font-medium">Battery Warranty:</span>
-                  <p className="font-semibold text-gray-900">{vehicle.battery_warranty || 'N/A'}</p>
                 </div>
                 <div>
                   <span className="text-gray-800 font-medium">Drivetrain:</span>
@@ -704,6 +731,57 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Internal Links Section for SEO */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Category Links */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Browse by Category</h3>
+              <div className="space-y-2">
+                {vehicle.category === 'ev-car' && (
+                  <a href="/vehicles/ev-cars" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                    → View All Electric Cars
+                  </a>
+                )}
+                {vehicle.category === 'hybrid-car' && (
+                  <a href="/vehicles/hybrid-cars" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                    → View All Hybrid Cars
+                  </a>
+                )}
+                {vehicle.category === 'ev-scooter' && (
+                  <a href="/vehicles/ev-scooters" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                    → View All E-Scooters
+                  </a>
+                )}
+                {vehicle.category === 'e-bike' && (
+                  <a href="/vehicles/e-bikes" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                    → View All E-Bikes
+                  </a>
+                )}
+                <a href="/vehicles" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                  → Browse All Vehicles
+                </a>
+              </div>
+            </div>
+
+            {/* Blog Links */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Learn More</h3>
+              <div className="space-y-2">
+                <a href="/blog/complete-guide-to-buying-electric-vehicles" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                  → Complete Guide to Buying Electric Vehicles
+                </a>
+                <a href="/blog/ev-charging-station-guide" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                  → EV Charging Station Guide
+                </a>
+                <a href="/blog" className="block text-blue-600 hover:text-blue-800 hover:underline">
+                  → View All Blog Posts
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

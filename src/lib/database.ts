@@ -93,6 +93,7 @@ export interface Vehicle {
   title: string;
   description: string;
   price: number;
+  old_price?: number;
   year: number;
   mileage?: number;
   fuel_type: string;
@@ -105,12 +106,14 @@ export interface Vehicle {
   max_speed?: number;
   battery_capacity?: string;
   images?: string[];
+  video_url?: string | null;
   seller_id: string;
   seller_email?: string;
   location: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  last_price_change_at?: string;
   // New fields from sell form
   interior_color?: string;
   exterior_color?: string;

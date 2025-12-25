@@ -41,11 +41,11 @@ export default function IncentivesPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">27+</div>
+              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">55+</div>
               <div className="text-gray-600">Active Listings</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">500+</div>
+              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">5000+</div>
               <div className="text-gray-600">Monthly Visitors</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -89,7 +89,7 @@ export default function IncentivesPage() {
                 <Users className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Growing EV Community</h3>
-              <p className="text-gray-600">📈 500+ monthly visitors • 🚗 27+ active listings • 🌍 US-wide reach</p>
+              <p className="text-gray-600">📈 5000+ monthly visitors • 🚗 55+ active listings • 🌍 US-wide reach</p>
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700 font-medium">Live Stats</p>
               </div>
@@ -122,7 +122,7 @@ export default function IncentivesPage() {
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Real Market Data</h3>
-              <p className="text-gray-600">📊 27+ active listings • 💰 Price comparisons • 📈 Market trends</p>
+              <p className="text-gray-600">📊 55+ active listings • 💰 Price comparisons • 📈 Market trends</p>
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-700 font-medium">Live Data</p>
               </div>

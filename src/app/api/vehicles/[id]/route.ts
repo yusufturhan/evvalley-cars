@@ -199,6 +199,12 @@ export async function PUT(
         video_url: getString('video_url'),
       };
 
+      // If client requests video removal
+      const removeVideoFlag = getString('remove_video');
+      if (removeVideoFlag === 'true') {
+        updateData.video_url = null;
+      }
+
       // Extract new images from FormData
       const images = formData.getAll('images') as File[];
       newImages = images.filter(img => img instanceof File && img.size > 0);
@@ -303,14 +309,18 @@ export async function PUT(
       console.log('📸 Total images after uploads:', finalImages.length);
     }
 
-    // Clean up updateData - remove undefined/null values and ensure proper types
+    // Clean up updateData - remove undefined/empty values and ensure proper types
     const cleanedUpdateData: any = {};
     Object.keys(updateData).forEach(key => {
       const value = updateData[key];
-      if (value !== undefined && value !== null && value !== '') {
+      if (value !== undefined && value !== '' && value !== null) {
         cleanedUpdateData[key] = value;
       }
     });
+    // Special case: allow explicit null to clear video_url
+    if (Object.prototype.hasOwnProperty.call(updateData, 'video_url') && updateData.video_url === null) {
+      cleanedUpdateData.video_url = null;
+    }
 
     // Always set images field with finalImages
     cleanedUpdateData.images = finalImages;
@@ -348,8 +358,13 @@ export async function PUT(
 
     console.log('✅ Vehicle updated successfully:', vehicle?.id);
 
-    // Check if price changed and send notifications to favorite users
+    // Check if price changed and update old_price + notify favorites
     if (updateData.price && updateData.price !== currentVehicle.price) {
+      // persist old price for UI
+      await supabase
+        .from('vehicles')
+        .update({ old_price: currentVehicle.price, last_price_change_at: new Date().toISOString() })
+        .eq('id', id);
       console.log('🔔 Price change detected!');
       console.log('Old price:', currentVehicle.price);
       console.log('New price:', updateData.price);
@@ -530,23 +545,6 @@ The Evvalley Team
       }
     } else {
       console.log('🔔 No price change detected');
-    }
-
-    // Re-index the updated vehicle for semantic search
-    try {
-      const indexResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/index-vehicle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ vehicleId: id })
-      })
-      
-      if (!indexResponse.ok) {
-        console.warn('Failed to re-index vehicle for semantic search:', await indexResponse.text())
-      } else {
-        console.log('Vehicle re-indexed successfully for semantic search')
-      }
-    } catch (indexError) {
-      console.warn('Error re-indexing vehicle for semantic search:', indexError)
     }
 
     return NextResponse.json({ vehicle });

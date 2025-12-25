@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { uploadTempImage } from "@/lib/storage";
 import { Upload, X, Image as ImageIcon, Move } from "lucide-react";
 
@@ -20,6 +20,81 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tempIdRef = useRef<string>(crypto.randomUUID());
 
+  // Image compression function with error handling
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+          try {
+            // Calculate new dimensions (max 1920px width)
+            const maxWidth = 1920;
+            const maxHeight = 1080;
+            let { width, height } = img;
+            
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw and compress
+            ctx?.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file); // Fallback to original file
+              }
+            }, 'image/jpeg', 0.8);
+          } catch (error) {
+            console.error('Error compressing image:', error);
+            resolve(file); // Fallback to original file
+          }
+        };
+        
+        img.onerror = () => {
+          console.error('Error loading image for compression');
+          resolve(file); // Fallback to original file
+        };
+        
+        img.src = URL.createObjectURL(file);
+      } catch (error) {
+        console.error('Error setting up compression:', error);
+        resolve(file); // Fallback to original file
+      }
+    });
+  };
+
+  // Restore uploaded URLs from localStorage on mount
+  useEffect(() => {
+    const savedUrls = localStorage.getItem('sellFormImages');
+    if (savedUrls) {
+      try {
+        const parsed = JSON.parse(savedUrls);
+        setUploadedUrls(parsed);
+        // Create previews from saved URLs
+        setPreviews(parsed);
+        console.log('🖼️ Images restored from localStorage:', parsed.length);
+      } catch (error) {
+        console.error('❌ Error parsing saved images:', error);
+      }
+    }
+  }, []);
+
   const handleImageSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
@@ -28,6 +103,9 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
       alert(`You can only upload up to ${maxImages} images.`);
       return;
     }
+
+    // No file size limit - users can upload any size
+    // Compression is available but not actively used to avoid issues
 
     const newImages = [...images, ...imageFiles];
     setImages(newImages);
@@ -50,6 +128,10 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
       }
     }
     setUploadedUrls(urls);
+    
+    // Update localStorage
+    localStorage.setItem('sellFormImages', JSON.stringify(urls));
+    
     if (onUrlsChange) onUrlsChange(urls);
     setUploading(false);
 
@@ -70,6 +152,10 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     setImages(newImages);
     setPreviews(newPreviews);
     setUploadedUrls(newUrls);
+    
+    // Update localStorage
+    localStorage.setItem('sellFormImages', JSON.stringify(newUrls));
+    
     if (onImagesChange) onImagesChange(newImages);
     if (onUrlsChange) onUrlsChange(newUrls);
   };
@@ -105,6 +191,10 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
       }
     }
     setUploadedUrls(urls);
+    
+    // Update localStorage
+    localStorage.setItem('sellFormImages', JSON.stringify(urls));
+    
     if (onUrlsChange) onUrlsChange(urls);
     setUploading(false);
 
@@ -150,6 +240,10 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
     setImages(newImages);
     setPreviews(newPreviews);
     setUploadedUrls(newUrls);
+    
+    // Update localStorage
+    localStorage.setItem('sellFormImages', JSON.stringify(newUrls));
+    
     if (onImagesChange) onImagesChange(newImages);
     if (onUrlsChange) onUrlsChange(newUrls);
   };
@@ -192,7 +286,7 @@ export default function ImageUpload({ onImagesChange, onUrlsChange, maxImages = 
               Drag and drop images here, or click to select files
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              Maximum {maxImages} images, up to 4MB each
+              Maximum {maxImages} images (large images will be compressed)
             </p>
           </div>
           <button

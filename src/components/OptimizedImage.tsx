@@ -38,7 +38,8 @@ export default function OptimizedImage({
       priority={priority}
       placeholder={placeholder}
       sizes={sizes}
-      quality={85}
+      quality={75}
+      loading="lazy"
       loading={priority ? 'eager' : 'lazy'}
       unoptimized={unoptimized}
     />

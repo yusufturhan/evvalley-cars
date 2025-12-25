@@ -9,9 +9,15 @@ export default function ClerkProvider({
 }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
+  // Get domain from environment or use default
+  const domain = typeof window !== 'undefined' 
+    ? window.location.hostname 
+    : process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '') || 'evvalley.com';
+
   return (
     <ClerkProviderBase
       publishableKey={publishableKey}
+      domain={domain}
       clerkJSUrl="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js"
       appearance={{
         elements: {

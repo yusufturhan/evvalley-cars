@@ -6,13 +6,22 @@ import { useUser } from "@clerk/nextjs";
 export default function AuthSync() {
   const { user, isLoaded } = useUser();
   const [mounted, setMounted] = useState(false);
+  const [synced, setSynced] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (mounted && isLoaded && user) {
+    // Only sync once per session and only if user exists
+    if (mounted && isLoaded && user && !synced) {
+      // Check if already synced in this session
+      const sessionKey = `auth_synced_${user.id}`;
+      if (sessionStorage.getItem(sessionKey)) {
+        setSynced(true);
+        return;
+      }
+
       // Sync user data with Supabase
       const syncUser = async () => {
         try {
@@ -31,6 +40,8 @@ export default function AuthSync() {
 
           if (response.ok) {
             console.log('✅ User synced successfully');
+            setSynced(true);
+            sessionStorage.setItem(sessionKey, 'true');
           } else {
             console.error('❌ Failed to sync user');
           }
@@ -41,7 +52,7 @@ export default function AuthSync() {
 
       syncUser();
     }
-  }, [mounted, user, isLoaded]);
+  }, [mounted, user, isLoaded, synced]);
 
   return null; // This component doesn't render anything
 } 

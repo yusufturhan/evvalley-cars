@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Car, Zap, Battery, Bike, Upload, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
+import VideoUpload from "@/components/VideoUpload";
 
 export default function SellPage() {
   const { isSignedIn, user } = useUser();
@@ -26,7 +27,6 @@ export default function SellPage() {
     category: "ev-car",
     range_miles: "",
     max_speed: "",
-    battery_capacity: "",
     location: "",
     fuel_type: "",
     seller_type: "private",
@@ -55,14 +55,65 @@ export default function SellPage() {
     body_seating: "",
     combined_fuel_economy: "",
     transmission: "",
-    horsepower: "",
-    electric_mile_range: "",
-    battery_warranty: "",
     drivetrain: "",
     vin: ""
   });
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  // Save form data to localStorage to prevent data loss on page refresh
+  useEffect(() => {
+    const savedFormData = localStorage.getItem('sellFormData');
+    const savedImages = localStorage.getItem('sellFormImages');
+    const savedVideo = localStorage.getItem('sellFormVideo');
+    
+    if (savedFormData) {
+      try {
+        const parsed = JSON.parse(savedFormData);
+        setFormData(parsed);
+        console.log('📝 Form data restored from localStorage');
+      } catch (error) {
+        console.error('❌ Error parsing saved form data:', error);
+      }
+    }
+    
+    if (savedImages) {
+      try {
+        const parsed = JSON.parse(savedImages);
+        setImageUrls(parsed);
+        console.log('🖼️ Images restored from localStorage');
+      } catch (error) {
+        console.error('❌ Error parsing saved images:', error);
+      }
+    }
+    
+    if (savedVideo) {
+      setVideoUrl(savedVideo);
+      console.log('🎥 Video restored from localStorage');
+    }
+  }, []);
+
+  // Save form data to localStorage whenever form data changes
+  useEffect(() => {
+    if (formData.title || formData.description || formData.price) {
+      localStorage.setItem('sellFormData', JSON.stringify(formData));
+    }
+  }, [formData]);
+
+  // Save images to localStorage
+  useEffect(() => {
+    if (imageUrls.length > 0) {
+      localStorage.setItem('sellFormImages', JSON.stringify(imageUrls));
+    }
+  }, [imageUrls]);
+
+  // Save video to localStorage
+  useEffect(() => {
+    if (videoUrl) {
+      localStorage.setItem('sellFormVideo', videoUrl);
+    }
+  }, [videoUrl]);
 
   // Fetch user's Supabase ID when component mounts
   useEffect(() => {
@@ -213,8 +264,8 @@ export default function SellPage() {
     // Images validation (prefer uploaded URLs)
     if (imageUrls.length === 0 && images.length === 0) {
       newErrors.images = 'At least one image is required';
-    } else if (images.length > 12) {
-      newErrors.images = 'Maximum 12 images allowed';
+    } else if (images.length > 15) {
+      newErrors.images = 'Maximum 15 images allowed';
     }
 
     setErrors(newErrors);
@@ -317,7 +368,6 @@ export default function SellPage() {
         category: formData.category,
         range_miles: formData.range_miles || '',
         max_speed: formData.max_speed || '',
-        battery_capacity: formData.battery_capacity || '',
         location: formData.location.trim() || '',
         seller_id: sellerIdToUse,
         seller_email: userEmail, // Use the email from Clerk directly
@@ -330,12 +380,10 @@ export default function SellPage() {
         body_seating: formData.body_seating || '',
         combined_fuel_economy: formData.combined_fuel_economy || '',
         transmission: formData.transmission || '',
-        horsepower: formData.horsepower || '',
-        electric_mile_range: formData.electric_mile_range || '',
-        battery_warranty: formData.battery_warranty || '',
         drivetrain: formData.drivetrain || '',
         vin: formData.vin || '',
         images: imageUrls,
+        video_url: videoUrl || null,
       };
       
       console.log("📤 Sending request to /api/vehicles...");
@@ -349,6 +397,12 @@ export default function SellPage() {
       console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
+        // Clear localStorage after successful submission
+        localStorage.removeItem('sellFormData');
+        localStorage.removeItem('sellFormImages');
+        localStorage.removeItem('sellFormVideo');
+        console.log('🧹 Form data cleared from localStorage');
+        
         setShowSuccess(true);
         // Auto-hide success message after 3 seconds
         setTimeout(() => {
@@ -584,6 +638,7 @@ export default function SellPage() {
                       <option value="Rivian" className="text-gray-900">Rivian</option>
                       <option value="Lucid" className="text-gray-900">Lucid</option>
                       <option value="Ford" className="text-gray-900">Ford</option>
+                      <option value="GMC" className="text-gray-900">GMC</option>
                       <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
                       <option value="Toyota" className="text-gray-900">Toyota</option>
                       <option value="Honda" className="text-gray-900">Honda</option>
@@ -862,69 +917,9 @@ export default function SellPage() {
                   </div>
                 </div>
 
-                {/* Fuel Economy and Horsepower */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Combined Fuel Economy
-                    </label>
-                    <input
-                      type="text"
-                      name="combined_fuel_economy"
-                      value={formData.combined_fuel_economy}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter combined fuel economy here"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Horsepower
-                    </label>
-                    <input
-                      type="number"
-                      name="horsepower"
-                      value={formData.horsepower}
-                      onChange={handleInputChange}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter horsepower here"
-                    />
-                  </div>
-                </div>
+                {/* Fuel Economy and Horsepower removed */}
 
-                {/* Electric Range and Battery Warranty */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Electric Mile Range
-                    </label>
-                    <input
-                      type="number"
-                      name="electric_mile_range"
-                      value={formData.electric_mile_range}
-                      onChange={handleInputChange}
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter electric mile range here"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Battery Warranty
-                    </label>
-                    <input
-                      type="text"
-                      name="battery_warranty"
-                      value={formData.battery_warranty}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="Enter battery warranty here"
-                    />
-                  </div>
-                </div>
+                {/* Electric Range and Battery Warranty removed */}
 
                 {/* Drivetrain and VIN */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -964,40 +959,7 @@ export default function SellPage() {
               </div>
             )}
             
-            {/* EV Specific Fields - Only for Cars */}
-            {(selectedCategory === 'ev-car' || selectedCategory === 'hybrid-car') && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Max Speed (mph)
-                  </label>
-                  <input
-                    type="number"
-                    name="max_speed"
-                    value={formData.max_speed}
-                    onChange={handleInputChange}
-                    min="0"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="155"
-                  />
-                  {errors.max_speed && <p className="text-red-500 text-xs mt-1">{errors.max_speed}</p>}
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Battery Capacity
-                  </label>
-                  <input
-                    type="text"
-                    name="battery_capacity"
-                    value={formData.battery_capacity}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                    placeholder="75 kWh"
-                  />
-                </div>
-              </div>
-            )}
+            {/* EV Specific Fields removed per UX simplification */}
 
             {/* Scooter Specific Fields */}
             {selectedCategory === 'ev-scooter' && (
@@ -1055,19 +1017,6 @@ export default function SellPage() {
                     />
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Battery Capacity
-                    </label>
-                    <input
-                      type="text"
-                      name="battery_capacity"
-                      value={formData.battery_capacity}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="36V 7.8Ah"
-                    />
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -1260,19 +1209,6 @@ export default function SellPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Battery Capacity
-                    </label>
-                    <input
-                      type="text"
-                      name="battery_capacity"
-                      value={formData.battery_capacity}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                      placeholder="36V 10Ah"
-                    />
-                  </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1448,6 +1384,15 @@ export default function SellPage() {
               
               <ImageUpload onImagesChange={handleImagesChange} onUrlsChange={setImageUrls} maxImages={15} />
               {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+            </div>
+
+            {/* Optional Video Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Optional Video (≤ 60s, ≤ 50MB)
+              </label>
+              <VideoUpload value={videoUrl || undefined} onChange={setVideoUrl} maxDurationSec={60} maxSizeMB={50} />
+              <p className="text-xs text-gray-500 mt-1">You can add one short video to your listing.</p>
             </div>
 
             {/* Highlighted Features */}

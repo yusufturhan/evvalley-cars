@@ -262,8 +262,8 @@ export default function EditVehiclePage() {
     // Images validation
     if (imageUrls.length === 0 && images.length === 0) {
       newErrors.images = 'At least one image is required';
-    } else if (images.length > 12) {
-      newErrors.images = 'Maximum 12 images allowed';
+    } else if (images.length > 15) {
+      newErrors.images = 'Maximum 15 images allowed';
     }
 
     setErrors(newErrors);

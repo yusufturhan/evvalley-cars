@@ -9,6 +9,23 @@ import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
 import Head from "next/head";
 
+export default function EVCarsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F5F9FF]">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading electric cars...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <EVCarsContent />
+    </Suspense>
+  );
+}
+
 function EVCarsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -32,6 +49,7 @@ function EVCarsContent() {
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
     const searchFromUrl = searchParams.get('search') || '';
     const locationFromUrl = searchParams.get('location') || '';
+    const categoryFromUrl = searchParams.get('category');
     
     setFilters({
       brand: brandFromUrl,
@@ -42,7 +60,31 @@ function EVCarsContent() {
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
-  }, [searchParams]);
+    
+    // Redirect if category=ev-car is in URL (duplicate canonical issue)
+    if (categoryFromUrl === 'ev-car') {
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('category');
+      const newUrl = newParams.toString() 
+        ? `/vehicles/ev-cars?${newParams.toString()}`
+        : '/vehicles/ev-cars';
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [searchParams, router]);
+  
+  // Set canonical URL - always point to clean URL without redundant category param
+  useEffect(() => {
+    const canonicalUrl = 'https://www.evvalley.com/vehicles/ev-cars';
+    let existingCanonical = document.querySelector('link[rel="canonical"]');
+    if (existingCanonical) {
+      existingCanonical.setAttribute('href', canonicalUrl);
+    } else {
+      const canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      canonicalLink.setAttribute('href', canonicalUrl);
+      document.head.appendChild(canonicalLink);
+    }
+  }, []);
 
   // Fetch vehicles when URL params change
   useEffect(() => {
@@ -557,7 +599,9 @@ function EVCarsContent() {
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {vehicle.images && vehicle.images.length > 0 ? (
+                      {vehicle.video_url ? (
+                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+                      ) : vehicle.images && vehicle.images.length > 0 ? (
                         <img
                           src={vehicle.images[0]}
                           alt={vehicle.title}
@@ -570,7 +614,7 @@ function EVCarsContent() {
                           }}
                         />
                       ) : null}
-                      <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                      <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
                         <div className="text-4xl mb-2">🚗</div>
                         <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
@@ -596,9 +640,19 @@ function EVCarsContent() {
                       {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
-                        ${vehicle.price.toLocaleString()}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const rawOld = (vehicle as any).old_price;
+                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                            <span className="text-gray-400 line-through text-lg">${oldP.toLocaleString()}</span>
+                          ) : null;
+                        })()}
+                        <span className="text-2xl font-bold text-green-600">
+                          ${vehicle.price.toLocaleString()}
+                        </span>
+                      </div>
                       <Link href={`/vehicles/${vehicle.id}`}>
                         <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                           View Details
@@ -649,23 +703,5 @@ function EVCarsContent() {
         </div>
       </section>
     </div>
-  );
-}
-
-export default function EVCarsPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#F5F9FF]">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading electric cars...</p>
-          </div>
-        </div>
-      </div>
-    }>
-      <EVCarsContent />
-    </Suspense>
   );
 }
