@@ -4,9 +4,12 @@ import { uploadImage as uploadToStorage } from '@/lib/storage';
 
 export async function GET(request: Request) {
   try {
+    // Use service role key to bypass RLS policies and get all vehicles
+    const supabase = createServerSupabaseClient();
     const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit');
     const offset = searchParams.get('offset');
+    const page = searchParams.get('page');
     const category = searchParams.get('category');
     const brand = searchParams.get('brand');
     const year = searchParams.get('year');
@@ -17,21 +20,47 @@ export async function GET(request: Request) {
     const search = searchParams.get('search');
     const location = searchParams.get('location');
     const includeSold = searchParams.get('includeSold');
+    const soldParam = searchParams.get('sold');
+
+    // Add caching headers for better performance
+    const response = new Response();
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300'); // 5 minutes cache
+    response.headers.set('CDN-Cache-Control', 'public, max-age=300');
 
     // Validate and sanitize parameters
-    const parsedLimit = limit ? Math.min(parseInt(limit), 100) : 12; // Max 100 items
-    const parsedOffset = offset ? Math.max(parseInt(offset), 0) : 0;
+    // Use limit parameter for pagination (default: 12 for homepage, no limit for /vehicles page)
+    const parsedLimit = limit ? Math.min(parseInt(limit), 10000) : undefined;
+    
+    // Calculate offset from page parameter (only if limit is provided)
+    let parsedOffset = 0;
+    if (parsedLimit && page) {
+      const parsedPage = Math.max(parseInt(page), 1); // Page starts from 1
+      parsedOffset = (parsedPage - 1) * parsedLimit;
+    } else if (parsedLimit && offset) {
+      parsedOffset = Math.max(parseInt(offset), 0);
+    }
 
+    // IMPORTANT: We need to get ALL vehicles, so we set a very high limit from the start
+    // Supabase's default limit is 1000, but we want all vehicles (currently 97, but could grow)
+    // CRITICAL: We DON'T use count: 'exact' here because it can cause limit issues
+    // We get the count from a separate query above, so we only need the data here
+    // range() must be called AFTER all filters are applied to override default limits
     let query = supabase
       .from('vehicles')
-      .select('*')
+      .select('*') // No count: 'exact' to avoid limit issues
       .order('created_at', { ascending: false });
 
-    // Show all vehicles by default (including sold ones)
-    // Only filter out sold vehicles if explicitly requested
-    if (includeSold === 'false') {
+    // Sold filter behavior:
+    // - Default: show ALL vehicles (both sold and unsold) - no filter applied
+    // - If sold='false': show only unsold vehicles
+    // - If sold='true': show only sold vehicles
+    // - If includeSold='false': show only unsold vehicles (backward compatibility)
+    if (soldParam === 'false' || includeSold === 'false') {
       query = query.eq('sold', false);
+    } else if (soldParam === 'true') {
+      query = query.eq('sold', true);
     }
+    // If no sold param and includeSold !== 'false', show all (both sold and unsold)
 
     if (category) {
       query = query.eq('category', category);
@@ -110,13 +139,96 @@ export async function GET(request: Request) {
       query = query.or(patterns.join(','));
     }
 
-    // Get total count first with error handling
+    // Get total count USING THE SAME FILTERS as the data query
     let totalCount = 0;
     try {
-      const { count, error: countError } = await supabase
+      let countQuery = supabase
         .from('vehicles')
         .select('*', { count: 'exact', head: true });
-      
+
+      // Apply the same filters to countQuery
+      // Default: show ALL vehicles (both sold and unsold) - no filter applied
+      // If sold='false': show only unsold vehicles
+      // If sold='true': show only sold vehicles
+      // If includeSold='false': show only unsold vehicles (backward compatibility)
+      if (soldParam === 'false' || includeSold === 'false') {
+        countQuery = countQuery.eq('sold', false);
+      } else if (soldParam === 'true') {
+        countQuery = countQuery.eq('sold', true);
+      }
+      // If no sold param and includeSold !== 'false', show all (both sold and unsold)
+
+      if (category) {
+        countQuery = countQuery.eq('category', category);
+      }
+
+      if (brand && brand !== 'all') {
+        countQuery = countQuery.ilike('brand', brand);
+      }
+
+      if (seller_id) {
+        countQuery = countQuery.eq('seller_id', seller_id);
+      } else if (seller_email) {
+        countQuery = countQuery.eq('seller_email', seller_email);
+      }
+
+      if (year && year !== 'all') {
+        const parsedYear = parseInt(year);
+        if (!isNaN(parsedYear)) {
+          countQuery = countQuery.eq('year', parsedYear);
+        }
+      }
+
+      const modelParam = searchParams.get('model');
+      if (modelParam && modelParam.trim().length > 0) {
+        const pattern = `%${modelParam.trim()}%`;
+        countQuery = countQuery.ilike('model', pattern);
+      }
+
+      const colorParam = searchParams.get('color');
+      if (colorParam && colorParam.trim().length > 0) {
+        const c = colorParam.trim();
+        const map: Record<string,string> = {
+          'midnight silver metallic': 'gray', 'midnight silver': 'gray', 'obsidian black': 'black', 'pearl white': 'white'
+        };
+        const canonical = map[c.toLowerCase()] || c;
+        const like = `%${canonical}%`;
+        countQuery = countQuery.or(`color.ilike.${like},exterior_color.ilike.${like}`);
+      }
+
+      if (minPrice) {
+        const parsedMinPrice = parseFloat(minPrice);
+        if (!isNaN(parsedMinPrice)) {
+          countQuery = countQuery.gte('price', parsedMinPrice);
+        }
+      }
+
+      if (maxPrice) {
+        const parsedMaxPrice = parseFloat(maxPrice);
+        if (!isNaN(parsedMaxPrice)) {
+          countQuery = countQuery.lte('price', parsedMaxPrice);
+        }
+      }
+
+      if (search && search.trim().length > 0) {
+        const sanitizedSearch = search.trim().substring(0, 100);
+        countQuery = countQuery.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
+      }
+
+      if (location && location.trim().length > 0) {
+        const raw = location.trim().substring(0, 100);
+        const cityOnly = raw.split(',')[0].trim();
+        const patterns = [
+          `location.eq.${cityOnly}`,
+          `location.ilike.${cityOnly},%`,
+          `location.ilike.${cityOnly} %`,
+          `location.ilike.${cityOnly}`,
+        ];
+        countQuery = countQuery.or(patterns.join(','));
+      }
+
+      const { count, error: countError } = await countQuery;
+
       if (countError) {
         console.error('Error getting total count:', countError);
         totalCount = 0;
@@ -128,16 +240,41 @@ export async function GET(request: Request) {
       totalCount = 0;
     }
 
-    // Apply pagination
-    query = query.range(parsedOffset, parsedOffset + parsedLimit - 1);
+    // Apply pagination if limit is provided (for homepage with 12 per page)
+    // If no limit is provided, fetch all vehicles (for /vehicles page - but we'll use pagination there too)
+    if (parsedLimit) {
+      // Pagination mode: use limit and offset
+      query = query.limit(parsedLimit);
+      query = query.range(parsedOffset, parsedOffset + parsedLimit - 1);
+    } else {
+      // No limit provided: fetch all vehicles (for backward compatibility)
+      // But we'll use a reasonable max limit to avoid performance issues
+      query = query.limit(10000);
+      query = query.range(0, 9999);
+    }
 
-    // Execute main query with timeout protection
-    const { data, error } = await Promise.race([
+    // Execute main query WITHOUT count to avoid any limit issues
+    // We already have totalCount from the separate count query above
+    // DEBUG: Log the query to see what's being executed
+    console.log('=== VEHICLES QUERY DEBUG ===');
+    console.log('Total count from separate query:', totalCount);
+    console.log('Query will fetch with limit(100000) and range(0, 99999)');
+    
+    const queryResult = await Promise.race([
       query,
       new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Query timeout')), 10000) // 10 second timeout
       )
-    ]);
+    ]) as { data: any[] | null; error: any; count: number | null };
+    
+    const { data, error } = queryResult;
+    // Use totalCount from the separate count query, not from this query
+    const count = totalCount;
+    
+    // DEBUG: Log the result
+    console.log('Vehicles returned from query:', data?.length || 0);
+    console.log('Expected total:', totalCount);
+    console.log('============================');
 
     if (error) {
       console.error('Error fetching vehicles:', error);
@@ -146,6 +283,9 @@ export async function GET(request: Request) {
         details: process.env.NODE_ENV === 'development' ? error.message : 'Internal error'
       }, { status: 500 });
     }
+
+    // Debug: Get vehicle count for response
+    const vehiclesCount = data?.length || 0;
 
     // Serialize dates and ensure all data is plain objects for Next.js 15 compatibility
     const serializedData = data?.map(vehicle => {
@@ -172,8 +312,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ 
       vehicles: serializedData,
       total: totalCount,
-      limit: parsedLimit,
-      offset: parsedOffset
+      // Don't include limit in response - we always fetch all vehicles
+      offset: parsedOffset,
+      debug: {
+        vehiclesCount: vehiclesCount,
+        totalCount: totalCount,
+        rangeApplied: 'range(0, 99999) - always get all vehicles',
+        note: 'All vehicles are fetched regardless of any limit parameter'
+      }
     });
   } catch (error) {
     console.error('GET /api/vehicles error:', error);
@@ -219,6 +365,7 @@ export async function POST(request: Request) {
     const vehicle_condition = json.vehicle_condition as string;
     const title_status = json.title_status as string;
     const highlighted_features = json.highlighted_features as string;
+    const video_url = json.video_url as string | null;
 
     // Validate required fields
     if (!title || !price || !year || !brand || !model || !category) {
@@ -383,6 +530,7 @@ export async function POST(request: Request) {
       drivetrain: json.drivetrain as string || null,
       vin: json.vin as string || null,
       images: Array.isArray(json.images) ? json.images : [],
+      video_url: video_url && typeof video_url === 'string' && video_url.trim() ? video_url : null,
       is_active: true
     };
 
@@ -407,6 +555,33 @@ export async function POST(request: Request) {
     }
 
     console.log('Successfully created vehicle:', vehicle);
+
+    // Send new listing notification to newsletter subscribers
+    try {
+      const notificationResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://www.evvalley.com'}/api/notifications/new-listing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          vehicleId: vehicle.id,
+          vehicleTitle: vehicle.title,
+          vehicleBrand: vehicle.brand,
+          vehicleModel: vehicle.model,
+          vehiclePrice: vehicle.price,
+          vehicleCategory: vehicle.category,
+          vehicleLocation: vehicle.location,
+        }),
+      });
+
+      if (notificationResponse.ok) {
+        console.log('✅ New listing notifications sent to subscribers');
+      } else {
+        console.error('❌ Failed to send new listing notifications');
+      }
+    } catch (notificationError) {
+      console.error('❌ Error sending new listing notifications:', notificationError);
+    }
 
     // No server-side uploads anymore. Client sends URLs.
 

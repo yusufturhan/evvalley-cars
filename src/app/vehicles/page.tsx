@@ -1,18 +1,78 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Search, Filter, Car, Zap, Battery, Bike, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
-import { parseNaturalLanguageQuery, buildVehiclesSearchParams } from "@/lib/nlSearch";
 import { useSearchParams, useRouter } from "next/navigation";
-import Head from "next/head";
 
-function VehiclesContent() {
+// Generate canonical URL based on current filters
+function generateCanonicalUrl(searchParams: URLSearchParams): string {
+  const baseUrl = 'https://www.evvalley.com/vehicles';
+  const params = new URLSearchParams();
+  
+  // Only add non-default parameters to canonical URL
+  const category = searchParams.get('category');
+  const brand = searchParams.get('brand');
+  const year = searchParams.get('year');
+  const minPrice = searchParams.get('minPrice');
+  const maxPrice = searchParams.get('maxPrice');
+  const location = searchParams.get('location');
+  const color = searchParams.get('color');
+  const maxMileage = searchParams.get('maxMileage');
+  
+  if (category && category !== 'all') params.append('category', category);
+  if (brand && brand !== 'all') params.append('brand', brand);
+  if (year && year !== 'all') params.append('year', year);
+  if (minPrice) params.append('minPrice', minPrice);
+  if (maxPrice) params.append('maxPrice', maxPrice);
+  if (location) params.append('location', location);
+  if (color) params.append('color', color);
+  if (maxMileage) params.append('maxMileage', maxMileage);
+  
+  const queryString = params.toString();
+  return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+}
+
+export default function VehiclesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F5F9FF]">
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading vehicles...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <VehiclesContent />
+    </Suspense>
+  );
+}
+
+export function VehiclesContent({ defaults }: { defaults?: { location?: string; minPrice?: string; maxPrice?: string; brand?: string; year?: string; category?: string } } = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  
+  // Generate canonical URL for this page
+  const canonicalUrl = generateCanonicalUrl(new URLSearchParams(searchParams.toString()));
+  
+  // Add canonical URL to head
+  useEffect(() => {
+    const existingCanonical = document.querySelector('link[rel="canonical"]');
+    if (existingCanonical) {
+      existingCanonical.setAttribute('href', canonicalUrl);
+    } else {
+      const canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      canonicalLink.setAttribute('href', canonicalUrl);
+      document.head.appendChild(canonicalLink);
+    }
+  }, [canonicalUrl]);
+  
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,12 +82,17 @@ function VehiclesContent() {
     brand: 'all',
     year: 'all',
     minPrice: '',
-    maxPrice: ''
+    maxPrice: '',
+    color: 'all',
+    maxMileage: ''
   });
-  const [showSoldVehicles, setShowSoldVehicles] = useState(true);
-  const [smartQuery, setSmartQuery] = useState<string>("");
-  const [semanticResults, setSemanticResults] = useState<Vehicle[]>([]);
-  const [isSemanticSearch, setIsSemanticSearch] = useState(false);
+  const [showSoldVehicles, setShowSoldVehicles] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalVehicles, setTotalVehicles] = useState(0);
+  const vehiclesPerPage = 12;
 
   // Sync filters state with URL params for UI
   useEffect(() => {
@@ -36,262 +101,104 @@ function VehiclesContent() {
     const yearFromUrl = searchParams.get('year') || 'all';
     const minPriceFromUrl = searchParams.get('minPrice') || '';
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
+    const colorFromUrl = searchParams.get('color') || 'all';
+    const maxMileageFromUrl = searchParams.get('maxMileage') || '';
     const searchFromUrl = searchParams.get('search') || '';
     const locationFromUrl = searchParams.get('location') || '';
-    const colorFromUrl = searchParams.get('color') || '';
     
     setFilters({
       category: categoryFromUrl,
       brand: brandFromUrl,
       year: yearFromUrl,
       minPrice: minPriceFromUrl,
-      maxPrice: maxPriceFromUrl
+      maxPrice: maxPriceFromUrl,
+      color: colorFromUrl,
+      maxMileage: maxMileageFromUrl
     });
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
-    // Store color in URL-only state (we don't have a dedicated UI control yet)
-    (window as any).__evvalley_color = colorFromUrl;
   }, [searchParams]);
 
-  const handleSmartSearch = () => {
-    if (!smartQuery.trim()) return;
-    (async () => {
-      try {
-        // First try AI parser
-        const res = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
-        const data = await res.json();
-        const qs = data?.params || '';
-        const url = `/vehicles${qs ? `?${qs}` : ''}`;
-        router.push(url);
-      } catch {
-        try {
-          // Deterministic fallback
-          const det = await fetch('/api/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q: smartQuery }) });
-          const data = await det.json();
-          const qs = data?.params || '';
-          const url = `/vehicles${qs ? `?${qs}` : ''}`;
-          router.push(url);
-        } catch {
-          // Local parser last resort
-          const parsed = parseNaturalLanguageQuery(smartQuery);
-          const params = buildVehiclesSearchParams(parsed);
-          const url = `/vehicles?${params.toString()}`;
-          router.push(url);
-        }
-      }
-    })();
-  };
-
-  // Fetch vehicles when URL params change
+  // Fetch vehicles with pagination
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
-        let allVehicles: any[] = [];
-
-        // Check if this is a semantic search
-        const isSemantic = searchParams.get('semantic') === 'true';
-        const semanticQuery = searchParams.get('query');
-
-        if (isSemantic && semanticQuery) {
-          // Handle semantic search results - search across all categories
-          console.log('🔍 Semantic search query:', semanticQuery);
-          
-          // Single call to semantic search (it handles all categories internally)
-          const response = await fetch('/api/semantic-search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ q: semanticQuery })
-          });
-          
-          const data = await response.json();
-
-          // Apply client-side filters to semantic results using URL params
-          const brand = (searchParams.get('brand') || '').toLowerCase();
-          const modelSearch = (searchParams.get('search') || '').toLowerCase();
-          const color = (searchParams.get('color') || '').toLowerCase();
-          const loc = (searchParams.get('location') || '').toLowerCase();
-          const maxPriceParam = searchParams.get('maxPrice');
-          const maxMileageParam = searchParams.get('maxMileage');
-          const maxPrice = maxPriceParam ? parseInt(maxPriceParam) : undefined;
-          const maxMileage = maxMileageParam ? parseInt(maxMileageParam) : undefined;
-
-          let results = (data.vehicles || []) as any[];
-          results = results.filter((v: any) => {
-            // brand
-            if (brand && v.brand && !v.brand.toLowerCase().includes(brand)) return false;
-            // model via search param
-            if (modelSearch && v.model && !v.model.toLowerCase().includes(modelSearch)) return false;
-            // color
-            if (color) {
-              const vc = (v.color || v.exterior_color || '').toLowerCase();
-              if (!vc.includes(color)) return false;
-            }
-            // location exact city before comma
-            if (loc) {
-              const city = (v.location || '').split(',')[0].trim().toLowerCase();
-              if (city !== loc) return false;
-            }
-            // price
-            if (typeof maxPrice === 'number' && v.price && v.price > maxPrice) return false;
-            // mileage
-            if (typeof maxMileage === 'number' && v.mileage && v.mileage > maxMileage) return false;
-            return true;
-          });
-
-          setSemanticResults(results);
-          setIsSemanticSearch(true);
-          setVehicles([]);
-          setLoading(false);
-          return;
-        }
-
-        // Regular search
-        setIsSemanticSearch(false);
-        setSemanticResults([]);
-
+        
         // Get current filters from URL params
         const currentCategory = searchParams.get('category') || 'all';
         const currentBrand = searchParams.get('brand') || 'all';
         const currentYear = searchParams.get('year') || 'all';
         const currentMinPrice = searchParams.get('minPrice') || '';
         const currentMaxPrice = searchParams.get('maxPrice') || '';
+        const currentColor = searchParams.get('color') || 'all';
+        const currentMaxMileage = searchParams.get('maxMileage') || '';
         const currentSearch = searchParams.get('search') || '';
         const currentLocation = searchParams.get('location') || '';
-        const currentColor = (searchParams.get('color') || (typeof window !== 'undefined' ? (window as any).__evvalley_color : '')) || '';
 
-        console.log('🔍 Current URL params:', {
-          category: currentCategory,
-          brand: currentBrand,
-          year: currentYear,
-          minPrice: currentMinPrice,
-          maxPrice: currentMaxPrice,
-          search: currentSearch,
-          location: currentLocation
+        // Build API params with pagination
+        const params = new URLSearchParams();
+        params.append('page', currentPage.toString());
+        params.append('limit', vehiclesPerPage.toString());
+        
+        if (currentCategory !== 'all') params.append('category', currentCategory);
+        if (currentBrand !== 'all') params.append('brand', currentBrand);
+        if (currentYear !== 'all') params.append('year', currentYear);
+        if (currentMinPrice) params.append('minPrice', currentMinPrice);
+        if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+        if (currentColor !== 'all') params.append('color', currentColor);
+        if (currentMaxMileage) params.append('maxMileage', currentMaxMileage);
+        // Always show all vehicles (both sold and unsold) - no sold filter
+        if (currentSearch.trim()) params.append('search', currentSearch.trim());
+        if (currentLocation.trim()) params.append('location', currentLocation.trim());
+
+        console.log('🔍 Fetching vehicles for page:', currentPage, 'with params:', params.toString());
+
+        const response = await fetch(`/api/vehicles?${params.toString()}`);
+        const data = await response.json();
+
+        console.log('📊 API Response for page', currentPage, ':', {
+          vehiclesCount: data.vehicles?.length || 0,
+          total: data.total,
+          page: currentPage
         });
 
-        // Fetch from different endpoints based on category
-        if (currentCategory === 'all' || currentCategory === 'ev-car' || currentCategory === 'hybrid-car') {
-          const params = new URLSearchParams();
-          params.append('limit', '100'); // Show all vehicles
-          if (currentCategory !== 'all') params.append('category', currentCategory);
-          if (currentBrand !== 'all') params.append('brand', currentBrand);
-          if (currentYear !== 'all') params.append('year', currentYear);
-          if (currentMinPrice) params.append('minPrice', currentMinPrice);
-          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
-          if (currentSearch) params.append('search', currentSearch);
-          if (currentColor) params.append('color', currentColor);
-          if (currentLocation) params.append('location', currentLocation);
-          if (showSoldVehicles) params.append('includeSold', 'true');
-
-          console.log('🔍 Fetching vehicles with params:', params.toString());
-          const response = await fetch(`/api/vehicles?${params.toString()}`);
-          const data = await response.json();
-          console.log('📦 API response:', data);
-          if (data.vehicles) {
-            console.log('✅ Adding vehicles:', data.vehicles.length);
-            allVehicles.push(...data.vehicles);
-          }
-        }
-
-        // Fetch E-Scooters
-        if (currentCategory === 'all' || currentCategory === 'ev-scooter') {
-          const params = new URLSearchParams();
-          if (currentBrand !== 'all') params.append('brand', currentBrand);
-          if (currentYear !== 'all') params.append('year', currentYear);
-          if (currentMinPrice) params.append('minPrice', currentMinPrice);
-          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
-          if (currentSearch) params.append('search', currentSearch);
-          if (currentLocation) params.append('location', currentLocation);
-          if (showSoldVehicles) params.append('includeSold', 'true');
-
-          console.log('🔍 Fetching scooters with params:', params.toString());
-          const response = await fetch(`/api/ev-scooters?${params.toString()}`);
-          const data = await response.json();
-          if (data.scooters) {
-            console.log('✅ Adding scooters:', data.scooters.length);
-            allVehicles.push(...data.scooters);
-          }
-        }
-
-        // Fetch E-Bikes
-        if (currentCategory === 'all' || currentCategory === 'e-bike') {
-          const params = new URLSearchParams();
-          if (currentBrand !== 'all') params.append('brand', currentBrand);
-          if (currentYear !== 'all') params.append('year', currentYear);
-          if (currentMinPrice) params.append('minPrice', currentMinPrice);
-          if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
-          if (currentSearch) params.append('search', currentSearch);
-          if (currentLocation) params.append('location', currentLocation);
-          if (showSoldVehicles) params.append('includeSold', 'true');
-
-          console.log('🔍 Fetching bikes with params:', params.toString());
-          const response = await fetch(`/api/e-bikes?${params.toString()}`);
-          const data = await response.json();
-          if (data.bikes) {
-            console.log('✅ Adding bikes:', data.bikes.length);
-            allVehicles.push(...data.bikes);
-          }
-        }
-
-        // Client-side safety filter for location: exact city match (before comma)
-        let filteredVehicles = allVehicles;
-        if (currentLocation) {
-          const locCity = currentLocation.split(',')[0].trim().toLowerCase();
-          filteredVehicles = filteredVehicles.filter((v: any) => {
-            const lvCity = (v.location || '').split(',')[0].trim().toLowerCase();
-            return lvCity === locCity;
+        if (data.vehicles && data.vehicles.length > 0) {
+          // Ensure all data is properly serialized
+          const serializedVehicles = data.vehicles.map((vehicle: any) => {
+            const plainVehicle = { ...vehicle };
+            if (plainVehicle.created_at) {
+              plainVehicle.created_at = plainVehicle.created_at.toString();
+            }
+            if (plainVehicle.updated_at) {
+              plainVehicle.updated_at = plainVehicle.updated_at.toString();
+            }
+            if (plainVehicle.sold_at) {
+              plainVehicle.sold_at = plainVehicle.sold_at.toString();
+            }
+            return JSON.parse(JSON.stringify(plainVehicle));
           });
+          
+          setVehicles(serializedVehicles);
+          setTotalVehicles(data.total || 0);
+          setTotalPages(Math.ceil((data.total || 0) / vehiclesPerPage));
+        } else {
+          setVehicles([]);
+          setTotalVehicles(0);
+          setTotalPages(1);
         }
-        
-        console.log('🔍 Total vehicles from API:', allVehicles.length);
-        console.log('🔍 Search query:', currentSearch);
-        console.log('🔍 Location query:', currentLocation);
-        
-        // Ensure all data is properly serialized for Next.js 15 compatibility
-        const serializedVehicles = filteredVehicles.map((vehicle: any) => {
-          const plainVehicle = { ...vehicle };
-          // Convert dates to strings
-          if (plainVehicle.created_at) {
-            plainVehicle.created_at = plainVehicle.created_at.toString();
-          }
-          if (plainVehicle.updated_at) {
-            plainVehicle.updated_at = plainVehicle.updated_at.toString();
-          }
-          if (plainVehicle.sold_at) {
-            plainVehicle.sold_at = plainVehicle.sold_at.toString();
-          }
-          // Ensure all properties are serializable
-          return JSON.parse(JSON.stringify(plainVehicle));
-        });
-        
-        console.log('🎯 Final vehicles to display:', serializedVehicles.length);
-        setVehicles(serializedVehicles);
       } catch (error) {
         console.error('Error fetching vehicles:', error);
+        setVehicles([]);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
 
     fetchVehicles();
-  }, [searchParams, showSoldVehicles, searchQuery, locationQuery]);
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'ev-car':
-        return <Car className="h-6 w-6" />;
-      case 'hybrid-car':
-        return <Zap className="h-6 w-6" />;
-      case 'ev-scooter':
-        return <Battery className="h-6 w-6" />;
-      case 'e-bike':
-        return <Bike className="h-6 w-6" />;
-      default:
-        return <Car className="h-6 w-6" />;
-    }
-  };
+  }, [currentPage, searchParams, searchQuery, locationQuery, vehiclesPerPage]);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -309,45 +216,20 @@ function VehiclesContent() {
   };
 
   const handleSearch = async () => {
-    // Trigger the main fetchVehicles function which now handles all categories
-    // fetchVehicles function is already defined above
+    // Reset to page 1 when searching
+    setCurrentPage(1);
   };
+
+  // Reset to page 1 when filters change (but not when currentPage changes)
+  useEffect(() => {
+    // Only reset if we're not on page 1 already
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [searchParams.get('category'), searchParams.get('brand'), searchParams.get('year'), searchParams.get('minPrice'), searchParams.get('maxPrice'), searchParams.get('color'), searchParams.get('maxMileage'), searchParams.get('search'), searchParams.get('location')]);
 
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
-      {/* Canonical for vehicles listing; query param variations are redirected or noindexed */}
-      <Head>
-        {(() => {
-          const category = filters.category || 'all';
-          const brand = filters.brand && filters.brand !== 'all' ? filters.brand : '';
-          const loc = (locationQuery || '').trim();
-          const humanCategory = category === 'ev-car' ? 'Electric Cars' : category === 'hybrid-car' ? 'Hybrid Cars' : category === 'ev-scooter' ? 'Electric Scooters' : category === 'e-bike' ? 'Electric Bikes' : 'Electric Vehicles';
-          const parts = [brand, humanCategory, loc ? `in ${loc}` : ''].filter(Boolean);
-          const title = parts.length ? `${parts.join(' ')} for Sale | Evvalley` : 'Buy & Sell Electric Vehicles | Evvalley';
-          const desc = `Browse ${brand ? brand + ' ' : ''}${humanCategory.toLowerCase()}${loc ? ' in ' + loc : ''}. Filter by price, year and brand. Verified listings on Evvalley.`;
-          return (
-            <>
-              <title>{title}</title>
-              <meta name="description" content={desc} />
-            </>
-          );
-        })()}
-        <link rel="canonical" href="https://www.evvalley.com/vehicles" />
-        {(() => {
-          const hasNonCanonicalFilters = (
-            (filters.brand && filters.brand !== 'all') ||
-            (filters.year && filters.year !== 'all') ||
-            (filters.minPrice && filters.minPrice !== '') ||
-            (filters.maxPrice && filters.maxPrice !== '') ||
-            (searchQuery && searchQuery.trim() !== '') ||
-            (locationQuery && locationQuery.trim() !== '')
-          );
-          return hasNonCanonicalFilters ? (
-            <meta name="robots" content="noindex,follow" />
-          ) : null;
-        })()}
-      </Head>
-
       <Header />
 
       {/* Hero Section */}
@@ -355,10 +237,10 @@ function VehiclesContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              EVs & E-Mobility
+              Electric Vehicles
             </h1>
             <p className="text-xl text-white/90">
-              Find your perfect electric vehicle
+              Discover the future of transportation with zero emissions
             </p>
 
             {/* Search Bar */}
@@ -372,7 +254,7 @@ function VehiclesContent() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search EV, Hybrid, Scooter, or E-Bike..."
+                        placeholder="Search electric vehicles..."
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                       />
@@ -405,33 +287,20 @@ function VehiclesContent() {
         </div>
       </section>
 
-      {/* AI Search - separate section */}
-      <section className="py-6 bg-[#F5F9FF]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 md:p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Search with EvValley AI</h3>
+      {/* Category Info */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Zap className="w-8 h-8 text-[#3AB0FF] mr-3" />
+              <h2 className="text-3xl font-bold text-gray-900">All Electric Vehicles</h2>
             </div>
-            <div className="flex flex-col md:flex-row gap-3">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type="text"
-                    value={smartQuery}
-                    onChange={(e) => setSmartQuery(e.target.value)}
-                    placeholder="Search with EvValley AI"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
-                    onKeyPress={(e) => e.key === 'Enter' && handleSmartSearch()}
-                  />
-                </div>
-              </div>
-              <button
-                onClick={handleSmartSearch}
-                className="bg-[#3AB0FF] text-white px-6 py-3 rounded-lg hover:bg-[#2A8FE6] transition-colors"
-              >
-                Try AI Search
-              </button>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Browse our complete selection of electric vehicles including cars, scooters, and bikes. 
+              Find the perfect EV for your lifestyle and budget.
+            </p>
+            <div className="mt-4 text-2xl font-bold text-green-600">
+              {loading ? 'Loading...' : `${totalVehicles} Electric Vehicles`} Currently Available
             </div>
           </div>
         </div>
@@ -445,70 +314,50 @@ function VehiclesContent() {
               onClick={() => {
                 router.push('/vehicles');
               }}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                filters.category === 'all' 
-                  ? 'bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md' 
-                  : 'bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
             >
-              <Zap className={`w-4 h-4 ${filters.category === 'all' ? 'text-white' : 'text-gray-600'}`} />
-              <span className="text-sm font-medium">All Categories</span>
+              <Zap className="w-4 h-4 text-white" />
+              <span className="text-sm font-medium">All Electric Vehicles</span>
             </button>
             
             <button 
               onClick={() => {
-                router.push('/vehicles?category=ev-car');
+                router.push('/vehicles/ev-cars');
               }}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                filters.category === 'ev-car' 
-                  ? 'bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md' 
-                  : 'bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Car className={`w-4 h-4 ${filters.category === 'ev-car' ? 'text-white' : 'text-gray-600'}`} />
-              <span className="text-sm font-medium">EV Cars</span>
+              <Car className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Cars</span>
             </button>
             
             <button 
               onClick={() => {
-                router.push('/vehicles?category=hybrid-car');
+                router.push('/vehicles/hybrid-cars');
               }}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                filters.category === 'hybrid-car' 
-                  ? 'bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md' 
-                  : 'bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Car className={`w-4 h-4 ${filters.category === 'hybrid-car' ? 'text-white' : 'text-gray-600'}`} />
+              <Car className="w-4 h-4 text-gray-600" />
               <span className="text-sm font-medium">Hybrid Cars</span>
             </button>
             
             <button 
               onClick={() => {
-                router.push('/vehicles?category=ev-scooter');
+                router.push('/vehicles/ev-scooters');
               }}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                filters.category === 'ev-scooter' 
-                  ? 'bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md' 
-                  : 'bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Bike className={`w-4 h-4 ${filters.category === 'ev-scooter' ? 'text-white' : 'text-gray-600'}`} />
-              <span className="text-sm font-medium">EV Scooters</span>
+              <Bike className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Scooters</span>
             </button>
             
             <button 
               onClick={() => {
-                router.push('/vehicles?category=e-bike');
+                router.push('/vehicles/e-bikes');
               }}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 ${
-                filters.category === 'e-bike' 
-                  ? 'bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md' 
-                  : 'bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900'
-              }`}
+              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
             >
-              <Bike className={`w-4 h-4 ${filters.category === 'e-bike' ? 'text-white' : 'text-gray-600'}`} />
-              <span className="text-sm font-medium">E-Bikes</span>
+              <Bike className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium">Electric Bikes</span>
             </button>
           </div>
         </div>
@@ -524,6 +373,44 @@ function VehiclesContent() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Category Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Category</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.category}
+                    onChange={(e) => {
+                      const newCategory = e.target.value;
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (newCategory !== 'all') params.append('category', newCategory);
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
+                    }}
+                  >
+                    <option value="all" className="text-gray-900">All Categories</option>
+                    <option value="ev-car" className="text-gray-900">Electric Cars</option>
+                    <option value="hybrid-car" className="text-gray-900">Hybrid Cars</option>
+                    <option value="ev-scooter" className="text-gray-900">Electric Scooters</option>
+                    <option value="e-bike" className="text-gray-900">Electric Bikes</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
               {/* Brand Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Brand</label>
@@ -554,8 +441,6 @@ function VehiclesContent() {
                     <option value="Lucid" className="text-gray-900">Lucid</option>
                     <option value="Ford" className="text-gray-900">Ford</option>
                     <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
-                    <option value="Toyota" className="text-gray-900">Toyota</option>
-                    <option value="Honda" className="text-gray-900">Honda</option>
                     <option value="Nissan" className="text-gray-900">Nissan</option>
                     <option value="BMW" className="text-gray-900">BMW</option>
                     <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
@@ -563,21 +448,11 @@ function VehiclesContent() {
                     <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
                     <option value="Hyundai" className="text-gray-900">Hyundai</option>
                     <option value="Kia" className="text-gray-900">Kia</option>
-                    <option value="Lexus" className="text-gray-900">Lexus</option>
                     <option value="Porsche" className="text-gray-900">Porsche</option>
                     <option value="Volvo" className="text-gray-900">Volvo</option>
-                    <option value="Jaguar" className="text-gray-900">Jaguar</option>
-                    <option value="Land Rover" className="text-gray-900">Land Rover</option>
-                    <option value="Mazda" className="text-gray-900">Mazda</option>
-                    <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
-                    <option value="Subaru" className="text-gray-900">Subaru</option>
                     <option value="Polestar" className="text-gray-900">Polestar</option>
                     <option value="Fisker" className="text-gray-900">Fisker</option>
                     <option value="VinFast" className="text-gray-900">VinFast</option>
-                    <option value="Bollinger" className="text-gray-900">Bollinger</option>
-                    <option value="Canoo" className="text-gray-900">Canoo</option>
-                    <option value="Lordstown" className="text-gray-900">Lordstown</option>
-                    <option value="Nikola" className="text-gray-900">Nikola</option>
                     <option value="Other" className="text-gray-900">Other</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -629,16 +504,6 @@ function VehiclesContent() {
                     <option value="2012" className="text-gray-900">2012</option>
                     <option value="2011" className="text-gray-900">2011</option>
                     <option value="2010" className="text-gray-900">2010</option>
-                    <option value="2009" className="text-gray-900">2009</option>
-                    <option value="2008" className="text-gray-900">2008</option>
-                    <option value="2007" className="text-gray-900">2007</option>
-                    <option value="2006" className="text-gray-900">2006</option>
-                    <option value="2005" className="text-gray-900">2005</option>
-                    <option value="2004" className="text-gray-900">2004</option>
-                    <option value="2003" className="text-gray-900">2003</option>
-                    <option value="2002" className="text-gray-900">2002</option>
-                    <option value="2001" className="text-gray-900">2001</option>
-                    <option value="2000" className="text-gray-900">2000</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -753,16 +618,6 @@ function VehiclesContent() {
       {/* Vehicles Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">
-              {loading ? 'Loading...' : 
-                isSemanticSearch 
-                  ? `${semanticResults.length} AI Search Results` 
-                  : `${vehicles.length} Vehicles Found`
-              }
-            </h2>
-          </div>
-          
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
@@ -780,26 +635,25 @@ function VehiclesContent() {
                 </div>
               ))}
             </div>
-          ) : (isSemanticSearch ? semanticResults : vehicles).length === 0 ? (
+          ) : vehicles.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">🚗</div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {isSemanticSearch ? 'No matching vehicles found' : 'No vehicles found'}
+                {'No vehicles found'}
               </h3>
               <p className="text-gray-600">
-                {isSemanticSearch 
-                  ? 'Try a different search term or use the filters below.' 
-                  : 'Try adjusting your filters or check back later.'
-                }
+                {'Try adjusting your filters or check back later.'}
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(isSemanticSearch ? semanticResults : vehicles).map((vehicle) => (
+              {vehicles.map((vehicle) => (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
                     <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {vehicle.images && vehicle.images.length > 0 ? (
+                      {vehicle.video_url ? (
+                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+                      ) : vehicle.images && vehicle.images.length > 0 ? (
                         <img
                           src={vehicle.images[0]}
                           alt={vehicle.title}
@@ -812,21 +666,11 @@ function VehiclesContent() {
                           }}
                         />
                       ) : null}
-                      <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
+                      <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
                         <div className="text-4xl mb-2">🚗</div>
                         <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
                     </div>
-                    
-                    {/* SOLD Badge - Small and positioned */}
-                    {vehicle.sold && (
-                      <div className="absolute top-2 left-2 z-10">
-                        <span className="bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                          SOLD
-                        </span>
-                      </div>
-                    )}
-                    
                     <div className="absolute top-2 right-2">
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
@@ -848,15 +692,21 @@ function VehiclesContent() {
                       {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span className={`text-2xl font-bold ${vehicle.sold ? 'text-red-600' : 'text-green-600'}`}>
-                        {vehicle.sold ? 'SOLD' : `$${vehicle.price.toLocaleString()}`}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          const rawOld = (vehicle as any).old_price;
+                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                            <span className="text-gray-400 line-through text-lg">${oldP.toLocaleString()}</span>
+                          ) : null;
+                        })()}
+                        <span className="text-2xl font-bold text-green-600">
+                          ${vehicle.price.toLocaleString()}
+                        </span>
+                      </div>
                       <Link href={`/vehicles/${vehicle.id}`}>
-                        <button className={`px-4 py-2 rounded-lg transition-colors ${
-                          vehicle.sold 
-                            ? 'bg-gray-600 text-white hover:bg-gray-700' 
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
                           View Details
                         </button>
                       </Link>
@@ -867,74 +717,118 @@ function VehiclesContent() {
             </div>
           )}
         </div>
+        
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12 px-4">
+            {/* Mobile: Show only current page info */}
+            <div className="sm:hidden flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
+              >
+                ← Prev
+              </button>
+              
+              <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">
+                {currentPage} / {totalPages}
+              </span>
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
+              >
+                Next →
+              </button>
+            </div>
+
+            {/* Desktop: Show full pagination */}
+            <div className="hidden sm:flex items-center space-x-3">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+              >
+                Previous
+              </button>
+              
+              {/* Page Numbers */}
+              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 7) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 4) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 3) {
+                  pageNum = totalPages - 6 + i;
+                } else {
+                  pageNum = currentPage - 3 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      currentPage === pageNum
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg transform scale-105'
+                        : 'border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 hover:shadow-md'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* SEO: BreadcrumbList and ItemList JSON-LD (does not affect UI) */}
-      {(() => {
-        try {
-          const category = filters.category || 'all';
-          const humanCategory = category === 'ev-car' ? 'Electric Cars' : category === 'hybrid-car' ? 'Hybrid Cars' : category === 'ev-scooter' ? 'E‑Scooters' : category === 'e-bike' ? 'E‑Bikes' : 'All Vehicles';
-          const breadcrumb = {
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            "itemListElement": [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://www.evvalley.com/" },
-              { "@type": "ListItem", position: 2, name: "Vehicles", item: "https://www.evvalley.com/vehicles" },
-              ...(category && category !== 'all' ? [{ "@type": "ListItem", position: 3, name: humanCategory, item: `https://www.evvalley.com/vehicles` }] : [])
-            ]
-          };
-          const itemList = {
-            "@context": "https://schema.org",
-            "@type": "ItemList",
-            name: `${humanCategory} on Evvalley`,
-            numberOfItems: Array.isArray(vehicles) ? vehicles.length : 0,
-            itemListElement: (Array.isArray(vehicles) ? vehicles : []).slice(0, 30).map((v: any, idx: number) => ({
-              "@type": "ListItem",
-              position: idx + 1,
-              item: {
-                "@type": "Product",
-                name: v.title,
-                brand: { "@type": "Brand", name: v.brand || v.make },
-                model: v.model,
-                image: v.images && v.images.length > 0 ? v.images[0] : undefined,
-                url: `https://www.evvalley.com/vehicles/${v.id}`,
-                offers: {
-                  "@type": "Offer",
-                  price: v.price,
-                  priceCurrency: "USD",
-                  availability: v.sold ? "https://schema.org/OutOfStock" : "https://schema.org/InStock"
-                }
-              }
-            }))
-          };
-          return (
-            <>
-              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
-            </>
-          );
-        } catch (e) {
-          return null;
-        }
-      })()}
+      {/* About Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">About Electric Vehicles</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Zero Emissions, Maximum Performance</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles represent the future of transportation, offering zero emissions while delivering 
+                  incredible performance and acceleration. With instant torque and smooth operation, EVs provide 
+                  a driving experience unlike any traditional vehicle.
+                </p>
+                <p className="text-gray-600">
+                  Modern electric vehicles feature advanced battery technology, providing ranges of 200-400+ miles 
+                  on a single charge, making them practical for daily commuting and long-distance travel.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Cost Savings & Environmental Benefits</h3>
+                <p className="text-gray-600 mb-4">
+                  Electric vehicles offer significant cost savings over time, with lower fuel costs, reduced 
+                  maintenance requirements, and various government incentives. They also contribute to a cleaner 
+                  environment by eliminating tailpipe emissions.
+                </p>
+                <p className="text-gray-600">
+                  At Evvalley, we offer a wide selection of electric vehicles from leading manufacturers like 
+                  Tesla, Rivian, Lucid, and more. Our expert team can help you find the perfect EV for your 
+                  lifestyle and budget.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
-
-export default function VehiclesPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#F5F9FF]">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading vehicles...</p>
-          </div>
-        </div>
-      </div>
-    }>
-      <VehiclesContent />
-    </Suspense>
-  );
-} 
