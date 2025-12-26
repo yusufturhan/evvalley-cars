@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 import { SITE_URL, SITE_NAME } from "@/lib/seo/site";
-import { LISTING_CREATE_PATH } from "@/lib/seo/links";
 import { buildFaqJsonLd } from "@/lib/seo/faqJsonLd";
 import { SELL_EV_FAQ_EN } from "@/lib/seo/sellerFaq";
+import { getSellCtaHref } from "@/lib/seo/cta";
 
 const PAGE_PATH = "/sell-your-ev";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -40,6 +41,9 @@ export function generateMetadata(): Metadata {
 }
 
 export default function SellYourEvPage() {
+  const { userId } = auth();
+  const isSignedIn = !!userId;
+  const sellHref = getSellCtaHref(isSignedIn);
   const faqJsonLd = buildFaqJsonLd(SELL_EV_FAQ_EN, PAGE_URL);
 
   return (
@@ -60,7 +64,7 @@ export default function SellYourEvPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href={LISTING_CREATE_PATH}
+              href={sellHref}
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-[#1C1F4A] font-semibold shadow-lg hover:shadow-xl transition"
             >
               List your EV for free
@@ -108,7 +112,7 @@ export default function SellYourEvPage() {
           <div className="space-y-4" id="faq">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold">FAQs</h3>
-              <Link href={LISTING_CREATE_PATH} className="text-[#1C1F4A] font-semibold hover:text-[#3AB0FF]">
+              <Link href={sellHref} className="text-[#1C1F4A] font-semibold hover:text-[#3AB0FF]">
                 Start listing →
               </Link>
             </div>
@@ -130,7 +134,7 @@ export default function SellYourEvPage() {
               Create your listing for free and start talking to buyers today.
             </p>
             <Link
-              href={LISTING_CREATE_PATH}
+              href={sellHref}
               className="inline-flex w-full items-center justify-center px-4 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
             >
               List your EV now
@@ -156,7 +160,7 @@ export default function SellYourEvPage() {
             <p className="text-sm text-gray-700">Connect with EV buyers in minutes.</p>
           </div>
           <Link
-            href={LISTING_CREATE_PATH}
+            href={sellHref}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
           >
             Start free listing
