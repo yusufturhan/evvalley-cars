@@ -13,65 +13,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Generate Vehicle JSON-LD structured data
-const generateVehicleJsonLd = (vehicle: any, canonicalUrl: string) => {
-  if (!vehicle) return null;
-
-  const jsonLd: any = {
-    "@context": "https://schema.org",
-    "@type": "Vehicle",
-    "url": canonicalUrl,
-  };
-
-  // Brand (make)
-  if (vehicle.brand) {
-    jsonLd.brand = vehicle.brand;
-  }
-
-  // Model
-  if (vehicle.model) {
-    jsonLd.model = vehicle.model;
-  }
-
-  // Vehicle model date (year)
-  if (vehicle.year) {
-    jsonLd.vehicleModelDate = vehicle.year.toString();
-  }
-
-  // VIN
-  if (vehicle.vin) {
-    jsonLd.vehicleIdentificationNumber = vehicle.vin;
-  }
-
-  // Mileage
-  if (vehicle.mileage) {
-    jsonLd.mileageFromOdometer = {
-      "@type": "QuantitativeValue",
-      "value": vehicle.mileage,
-      "unitCode": "SMI"
-    };
-  }
-
-  // Images
-  if (vehicle.images && vehicle.images.length > 0) {
-    jsonLd.image = vehicle.images;
-  }
-
-  // Offers
-  if (vehicle.price) {
-    jsonLd.offers = {
-      "@type": "Offer",
-      "price": vehicle.price,
-      "priceCurrency": "USD",
-      "availability": vehicle.sold_at ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
-      "itemCondition": "https://schema.org/UsedCondition",
-      "url": canonicalUrl
-    };
-  }
-
-  return jsonLd;
-};
-
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -179,25 +120,8 @@ export default async function VehicleDetailPage({ params }: { params: { id: stri
       }
     }
 
-    const vehicleUrl = `https://www.evvalley.com/vehicles/${vehicle.id}`;
-
-    // Generate Vehicle JSON-LD
-    const jsonLd = generateVehicleJsonLd(vehicle, vehicleUrl);
-
     return (
-      <>
-        {/* Vehicle JSON-LD Structured Data */}
-        {jsonLd && (
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(jsonLd)
-            }}
-          />
-        )}
-        
-        <VehicleDetailClient vehicle={vehicle} />
-      </>
+      <VehicleDetailClient vehicle={vehicle} />
     );
   } catch (error) {
     console.error('Error fetching vehicle:', error);
