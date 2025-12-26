@@ -46,10 +46,11 @@ export default async function VehicleDetailLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const vehicle = await fetchVehicle(params.id);
-  const canonicalUrl = `https://www.evvalley.com/vehicles/${params.id}`;
+  const { id } = await params;
+  const vehicle = await fetchVehicle(id);
+  const canonicalUrl = `https://www.evvalley.com/vehicles/${id}`;
   const jsonLd = vehicle ? generateVehicleJsonLd(vehicle, canonicalUrl) : null;
 
   return (

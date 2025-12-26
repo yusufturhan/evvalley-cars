@@ -9,13 +9,14 @@ import VehicleDetailClient from './VehicleDetailClient';
 export const revalidate = 3600; // Revalidate every hour
 export const dynamic = 'force-dynamic'; // Allow dynamic rendering for real-time data
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
   const supabase = createServerSupabaseClient();
 
   const { data: vehicle } = await supabase
     .from('vehicles')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (!vehicle) {
@@ -79,15 +80,16 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function VehicleDetailPage({ params }: { params: { id: string } }) {
+export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const supabase = createServerSupabaseClient();
     
     // Fetch vehicle data
     let { data: vehicle } = await supabase
       .from('vehicles')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (!vehicle) {
@@ -103,7 +105,7 @@ export default async function VehicleDetailPage({ params }: { params: { id: stri
         let { data: bike } = await supabase
           .from('e_bikes')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', id)
           .single();
 
         if (!bike) {
