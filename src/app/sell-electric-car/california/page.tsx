@@ -3,40 +3,10 @@ import Link from "next/link";
 import { SITE_URL, SITE_NAME } from "@/lib/seo/site";
 import { LISTING_CREATE_PATH } from "@/lib/seo/links";
 import { buildFaqJsonLd } from "@/lib/seo/faqJsonLd";
+import { SELL_CA_FAQ_EN } from "@/lib/seo/sellerFaq";
 
 const PAGE_PATH = "/sell-electric-car/california";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-
-const FAQ_ITEMS = [
-  {
-    question: "Kaliforniya'da EV ilanı vermek ücretli mi?",
-    answer: "Hayır, EvValley'de ilan vermek ücretsiz. Komisyon yok, gizli ücret yok.",
-  },
-  {
-    question: "Yerel alıcılarla nasıl eşleşirim?",
-    answer: "Kaliforniya'dan arama yapan alıcılar ilanınızı görür ve platform içi mesajlaşma ile size ulaşır.",
-  },
-  {
-    question: "BATTERY / VIN bilgisi eklemeli miyim?",
-    answer: "Evet, VIN ve batarya bilgisi güven artırır. Eklemek zorunlu değil ama önerilir.",
-  },
-  {
-    question: "Video ve fotoğraf ekleyebilir miyim?",
-    answer: "Evet, yüksek çözünürlüklü fotoğraflar ve kısa video yükleyebilirsiniz.",
-  },
-  {
-    question: "Dolandırıcılığa karşı ne yapıyorsunuz?",
-    answer: "Kullanıcı doğrulama, şüpheli mesaj filtreleri ve raporlama araçlarıyla spam'i azaltıyoruz.",
-  },
-  {
-    question: "Satış sonrası komisyon var mı?",
-    answer: "Hayır, satış sonrası komisyon yok. Ödeme ve teslimatı alıcıyla direkt konuşursunuz.",
-  },
-  {
-    question: "Ne kadar hızlı yayına alınıyor?",
-    answer: "İlanınızı birkaç dakika içinde oluşturup yayına alabilirsiniz.",
-  },
-];
 
 export function generateMetadata(): Metadata {
   const title = "Sell Your Electric Car in California | EvValley";
@@ -70,7 +40,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function SellElectricCarCaliforniaPage() {
-  const faqJsonLd = buildFaqJsonLd(FAQ_ITEMS, PAGE_URL);
+  const faqJsonLd = buildFaqJsonLd(SELL_CA_FAQ_EN, PAGE_URL);
 
   return (
     <div className="bg-white text-gray-900">
@@ -111,9 +81,9 @@ export default function SellElectricCarCaliforniaPage() {
             <h2 className="text-2xl font-bold">How it works in California</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {[
-                { title: "1) Create listing", desc: "Foto/video yükle, fiyat belirle, (isteğe bağlı) VIN ekle." },
-                { title: "2) Talk to local buyers", desc: "California alıcıları sana doğrudan mesaj atar." },
-                { title: "3) Close the deal", desc: "Teslimat ve ödemeyi alıcıyla anlaşırsın; komisyon yok." },
+                { title: "1) Create listing", desc: "Upload photos/video, set price, add VIN (optional)." },
+                { title: "2) Talk to local buyers", desc: "California buyers message you directly through the platform." },
+                { title: "3) Close the deal", desc: "Handle delivery and payment with the buyer; no commission." },
               ].map((item) => (
                 <div key={item.title} className="p-4 border rounded-lg bg-gray-50">
                   <p className="font-semibold">{item.title}</p>
@@ -143,7 +113,7 @@ export default function SellElectricCarCaliforniaPage() {
               </Link>
             </div>
             <div className="space-y-3">
-              {FAQ_ITEMS.map((faq) => (
+              {SELL_CA_FAQ_EN.map((faq) => (
                 <details key={faq.question} className="rounded-lg border bg-gray-50 px-4 py-3">
                   <summary className="font-semibold cursor-pointer">{faq.question}</summary>
                   <p className="mt-2 text-sm text-gray-700">{faq.answer}</p>

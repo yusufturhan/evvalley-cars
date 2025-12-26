@@ -3,40 +3,10 @@ import Link from "next/link";
 import { SITE_URL, SITE_NAME } from "@/lib/seo/site";
 import { LISTING_CREATE_PATH } from "@/lib/seo/links";
 import { buildFaqJsonLd } from "@/lib/seo/faqJsonLd";
+import { SELL_EV_FAQ_EN } from "@/lib/seo/sellerFaq";
 
 const PAGE_PATH = "/sell-your-ev";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-
-const FAQ_ITEMS = [
-  {
-    question: "EvValley'de EV ilanı vermek ücretli mi?",
-    answer: "Hayır, ilan vermek tamamen ücretsiz. Komisyon yok, gizli ücret yok.",
-  },
-  {
-    question: "Alıcılarla nasıl iletişime geçerim?",
-    answer: "İlanınızı gören alıcılar doğrudan platform üzerinden mesaj atar, siz de onlarla uygulama içinden konuşursunuz.",
-  },
-  {
-    question: "Ne kadar hızlı yayınlanır?",
-    answer: "İlanınızı dakikalar içinde oluşturur ve hemen yayına alırız. Fotoğraf, video ve fiyatı eklediğinizde hazır olur.",
-  },
-  {
-    question: "Satıldığında komisyon ödüyor muyum?",
-    answer: "Hayır, satış sonrası komisyon yok. Ödemeler ve teslimatı alıcıyla direkt konuşursunuz.",
-  },
-  {
-    question: "Dolandırıcılık ve spam'e karşı güvenlik var mı?",
-    answer: "Evet, kullanıcı doğrulama, şüpheli mesaj filtreleri ve raporlama araçlarıyla spam'i azaltıyoruz.",
-  },
-  {
-    question: "Video ve birden çok fotoğraf yükleyebilir miyim?",
-    answer: "Evet, yüksek çözünürlüklü fotoğraflar ve kısa video ekleyebilirsiniz.",
-  },
-  {
-    question: "Satılan ilanımı kapatmak kolay mı?",
-    answer: "Evet, ilanı satıldı olarak işaretlemek tek tık. İsterseniz yeniden aktif edebilirsiniz.",
-  },
-];
 
 export function generateMetadata(): Metadata {
   const title = "Sell Your EV for Free | EvValley";
@@ -70,7 +40,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function SellYourEvPage() {
-  const faqJsonLd = buildFaqJsonLd(FAQ_ITEMS, PAGE_URL);
+  const faqJsonLd = buildFaqJsonLd(SELL_EV_FAQ_EN, PAGE_URL);
 
   return (
     <div className="bg-white text-gray-900">
@@ -143,7 +113,7 @@ export default function SellYourEvPage() {
               </Link>
             </div>
             <div className="space-y-3">
-              {FAQ_ITEMS.map((faq) => (
+              {SELL_EV_FAQ_EN.map((faq) => (
                 <details key={faq.question} className="rounded-lg border bg-gray-50 px-4 py-3">
                   <summary className="font-semibold cursor-pointer">{faq.question}</summary>
                   <p className="mt-2 text-sm text-gray-700">{faq.answer}</p>

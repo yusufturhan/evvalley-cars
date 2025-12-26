@@ -3,40 +3,10 @@ import Link from "next/link";
 import { SITE_URL, SITE_NAME } from "@/lib/seo/site";
 import { LISTING_CREATE_PATH } from "@/lib/seo/links";
 import { buildFaqJsonLd } from "@/lib/seo/faqJsonLd";
+import { SELL_TESLA_FAQ_EN } from "@/lib/seo/sellerFaq";
 
 const PAGE_PATH = "/sell-your-tesla";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-
-const FAQ_ITEMS = [
-  {
-    question: "Tesla ilanı vermek ücretsiz mi?",
-    answer: "Evet, Tesla'nızı ücretsiz listeleyin. Komisyon yok, platform ücreti yok.",
-  },
-  {
-    question: "Tesla alıcıları burada mı?",
-    answer: "EvValley tamamen EV odaklıdır; Tesla arayan hedefli alıcılara ulaşırsınız.",
-  },
-  {
-    question: "FSD, donanım ve batarya bilgilerini ekleyebilir miyim?",
-    answer: "Evet, açıklamada donanım, FSD lisansı, batarya sağlığı, servis kayıtları gibi bilgileri ekleyebilirsiniz.",
-  },
-  {
-    question: "Alıcılarla nasıl mesajlaşırım?",
-    answer: "Alıcılar ilanınıza tıkladığında doğrudan platform içi mesaj kutunuza yazar; mesajlara anında cevap verebilirsiniz.",
-  },
-  {
-    question: "Tesla'ya özel özellikleri vurgulayabilir miyim?",
-    answer: "Evet, Autopilot, FSD, Premium Connectivity, LFP batarya, donanım revizyonları gibi detayları ekleyebilirsiniz.",
-  },
-  {
-    question: "Satış sonrası komisyon var mı?",
-    answer: "Hayır, satış sonrası komisyon yok. Ödeme ve teslimatı alıcıyla direkt konuşursunuz.",
-  },
-  {
-    question: "Video ve çoklu fotoğraf ekleyebilir miyim?",
-    answer: "Evet, yüksek çözünürlüklü fotoğraflar ve kısa video yükleyebilirsiniz.",
-  },
-];
 
 export function generateMetadata(): Metadata {
   const title = "Sell Your Tesla for Free | EvValley";
@@ -70,7 +40,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default function SellYourTeslaPage() {
-  const faqJsonLd = buildFaqJsonLd(FAQ_ITEMS, PAGE_URL);
+  const faqJsonLd = buildFaqJsonLd(SELL_TESLA_FAQ_EN, PAGE_URL);
 
   return (
     <div className="bg-white text-gray-900">
@@ -111,9 +81,9 @@ export default function SellYourTeslaPage() {
             <h2 className="text-2xl font-bold">How it works</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {[
-                { title: "1) Create Tesla listing", desc: "Foto/ video ekleyin, FSD/Hardware, batarya notlarını yazın." },
-                { title: "2) Talk directly", desc: "Tesla arayan alıcılar size platform üzerinden mesaj atar." },
-                { title: "3) Close on your terms", desc: "Teslimat ve ödemeyi alıcıyla konuşun; komisyon yok." },
+                { title: "1) Create Tesla listing", desc: "Add photos/video, include FSD/hardware details, battery notes." },
+                { title: "2) Talk directly", desc: "Tesla buyers message you directly through the platform." },
+                { title: "3) Close on your terms", desc: "Handle delivery and payment with the buyer; no commission." },
               ].map((item) => (
                 <div key={item.title} className="p-4 border rounded-lg bg-gray-50">
                   <p className="font-semibold">{item.title}</p>
@@ -143,7 +113,7 @@ export default function SellYourTeslaPage() {
               </Link>
             </div>
             <div className="space-y-3">
-              {FAQ_ITEMS.map((faq) => (
+              {SELL_TESLA_FAQ_EN.map((faq) => (
                 <details key={faq.question} className="rounded-lg border bg-gray-50 px-4 py-3">
                   <summary className="font-semibold cursor-pointer">{faq.question}</summary>
                   <p className="mt-2 text-sm text-gray-700">{faq.answer}</p>
