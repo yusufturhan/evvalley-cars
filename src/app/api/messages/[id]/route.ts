@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/database';
 
 // Mark message as read
 export async function PATCH(
@@ -8,6 +8,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+    const supabase = createServerSupabaseClient();
 
     const { data, error } = await supabase
       .from('vehicle_messages')

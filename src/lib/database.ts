@@ -1,42 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
+// Re-export client-side supabase from supabase-browser
+export { supabase } from './supabase-browser';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-// Enhanced Supabase client with error handling
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: false
-  },
-  global: {
-    headers: {
-      'X-Client-Info': 'evvalley-web'
-    }
-  }
-});
-
-// Server-side client for admin operations with retry logic
-export const createServerSupabaseClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-  if (!supabaseServiceKey) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    },
-    global: {
-      headers: {
-        'X-Client-Info': 'evvalley-server'
-      }
-    }
-  });
-};
+// Re-export server-side client from supabase-server
+export { createServerSupabaseClient } from './supabase-server';
 
 // Enhanced database client with retry logic
 export const createRetrySupabaseClient = (maxRetries = 3, delay = 1000) => {

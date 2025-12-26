@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase, createServerSupabaseClient } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/database';
 
 // Helper function to get or create user
 async function getOrCreateUser(clerkId: string) {

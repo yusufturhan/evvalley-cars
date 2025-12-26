@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase, createServerSupabaseClient } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/database';
 import { uploadImage as uploadToStorage } from '@/lib/storage';
 
 export async function GET(request: Request) {

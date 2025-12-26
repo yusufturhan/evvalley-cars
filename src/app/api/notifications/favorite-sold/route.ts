@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/database';
 import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     console.log('🔔 Sending favorite sold notifications for vehicle:', vehicleId);
 
     // Get all users who have this vehicle in their favorites
+    const supabase = createServerSupabaseClient();
     const { data: favorites, error: favoritesError } = await supabase
       .from('favorites')
       .select('user_id, users!inner(email, first_name, last_name)')

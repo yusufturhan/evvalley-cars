@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase, createServerSupabaseClient } from '@/lib/database';
+import { createServerSupabaseClient } from '@/lib/database';
 import { uploadImage as uploadToStorage } from '@/lib/storage';
 
 export async function GET(request: Request) {
@@ -392,6 +392,7 @@ export async function POST(request: Request) {
 
       // Check if an ACTIVE, UNSOLD listing already exists with the same VIN
       // Allow re-listing if previous listing is sold or inactive
+      const supabase = createServerSupabaseClient();
       const { data: existingVehicle, error: vinCheckError } = await supabase
         .from('vehicles')
         .select('id, title, sold, is_active')
@@ -441,7 +442,8 @@ export async function POST(request: Request) {
 
     if (!actualSellerId || actualSellerId === '1b69d5c5-283a-4d53-979f-4f6eb7a5ea0a') {
       // Try to find user by email
-      const { data: existingUser, error: userError } = await supabase
+      const supabaseClient = createServerSupabaseClient();
+      const { data: existingUser, error: userError } = await supabaseClient
         .from('users')
         .select('id')
         .eq('email', seller_email)

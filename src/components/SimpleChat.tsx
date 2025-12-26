@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Send, MessageCircle, RefreshCw } from 'lucide-react';
-import { supabase } from '@/lib/database';
+import { supabase } from '@/lib/supabase-browser';
 
 interface SimpleChatProps {
   vehicleId: string;
