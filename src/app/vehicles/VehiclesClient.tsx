@@ -226,6 +226,24 @@ export function VehiclesClient() {
         </div>
       </section>
 
+      {/* Sell CTA Banner */}
+      <section className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-lg border border-[#E5E7EB] bg-[#F8FAFF] px-5 py-4">
+            <div>
+              <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Selling your EV?</p>
+              <p className="text-base text-gray-800">List for free in minutes. No commissions.</p>
+            </div>
+            <Link
+              href="/sell-your-ev"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition-colors"
+            >
+              Start free listing
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Category Info */}
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

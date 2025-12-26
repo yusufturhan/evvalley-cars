@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Trash2
 } from "lucide-react";
+import Link from "next/link";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import SimpleChat from "@/components/SimpleChat";
@@ -731,6 +732,22 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Sell CTA for owners */}
+        <div className="mt-12">
+          <div className="bg-[#F8FAFF] border border-gray-200 rounded-lg px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Have an EV to sell?</p>
+              <p className="text-base text-gray-800">List it for free and reach EV-focused buyers.</p>
+            </div>
+            <Link
+              href="/sell-your-ev"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition-colors"
+            >
+              List it for free
+            </Link>
           </div>
         </div>
 

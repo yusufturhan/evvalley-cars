@@ -1,7 +1,7 @@
 "use client";
 
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut, useUser, useClerk } from "@clerk/nextjs";
-import { Heart, Menu, X } from "lucide-react";
+import { Heart, Menu, X, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import Logo from "./Logo";
@@ -52,9 +52,25 @@ export default function Header() {
             <Link href="/escrow" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
               Escrow
             </Link>
-            <Link href="/sell" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors">
-              Sell Your EV
-            </Link>
+            <div className="relative group">
+              <Link href="/sell-your-ev" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors inline-flex items-center gap-1">
+                Sell
+                <ChevronDown className="h-4 w-4" />
+              </Link>
+              <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity">
+                <div className="py-2">
+                  <Link href="/sell-your-ev" className="block px-4 py-2 text-sm text-[#4A5568] hover:bg-gray-50 hover:text-[#3AB0FF]">
+                    Sell your EV
+                  </Link>
+                  <Link href="/sell-your-tesla" className="block px-4 py-2 text-sm text-[#4A5568] hover:bg-gray-50 hover:text-[#3AB0FF]">
+                    Sell your Tesla
+                  </Link>
+                  <Link href="/sell-electric-car/california" className="block px-4 py-2 text-sm text-[#4A5568] hover:bg-gray-50 hover:text-[#3AB0FF]">
+                    Sell in California
+                  </Link>
+                </div>
+              </div>
+            </div>
 
             {isSignedIn && (
               <Link href="/favorites" className="text-[#4A5568] hover:text-[#3AB0FF] transition-colors flex items-center">
@@ -163,13 +179,30 @@ export default function Header() {
                   >
                     Escrow
                   </Link>
-                  <Link 
-                    href="/sell" 
-                    className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sell Your EV
-                  </Link>
+                  <div className="pt-1 space-y-2">
+                    <p className="text-xs uppercase tracking-wide text-gray-500">Sell</p>
+                    <Link 
+                      href="/sell-your-ev" 
+                      className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors font-medium"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sell your EV
+                    </Link>
+                    <Link 
+                      href="/sell-your-tesla" 
+                      className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sell your Tesla
+                    </Link>
+                    <Link 
+                      href="/sell-electric-car/california" 
+                      className="block text-[#4A5568] hover:text-[#3AB0FF] transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sell in California
+                    </Link>
+                  </div>
                 </div>
 
                 {/* User-specific Links */}
