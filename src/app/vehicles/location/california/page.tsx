@@ -11,9 +11,10 @@ export const metadata: Metadata = {
 
 export default function CaliforniaEVsPage() {
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
-      <VehiclesClient />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
+        <VehiclesClient />
+      </Suspense>
       <script
         type="application/ld+json"
         // California EVs – FAQ
@@ -42,6 +43,7 @@ export default function CaliforniaEVsPage() {
           })
         }}
       />
+    </>
   );
 }
 
