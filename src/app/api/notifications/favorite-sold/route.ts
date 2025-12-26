@@ -31,7 +31,14 @@ export async function POST(request: Request) {
 
     // Send email notifications to each user
     const notificationPromises = favorites.map(async (favorite) => {
-      const user = favorite.users;
+      // Handle users as array (Supabase join returns array)
+      const users = Array.isArray(favorite.users) ? favorite.users : [favorite.users];
+      const user = users[0];
+      
+      if (!user) {
+        console.log('⚠️ No user data found for favorite:', favorite);
+        return;
+      }
       
       if (!user.email) {
         console.log('⚠️ User has no email:', user);
