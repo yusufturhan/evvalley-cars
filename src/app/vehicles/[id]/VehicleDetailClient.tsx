@@ -785,61 +785,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           </div>
         </div>
       </div>
-      
-      {/* Product Schema for Google Rich Results */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": vehicle.title,
-            "description": `${vehicle.year} ${vehicle.brand} ${vehicle.model} - ${vehicle.category}`,
-            "brand": {
-              "@type": "Brand",
-              "name": vehicle.brand
-            },
-            "model": vehicle.model,
-            "category": vehicle.category,
-            "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
-            "offers": {
-              "@type": "Offer",
-              "price": vehicle.price,
-              "priceCurrency": "USD",
-              "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-              "availability": vehicle.sold_at ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-              "seller": {
-                "@type": sellerInfo?.seller_type === 'dealer' ? "Organization" : "Person",
-                "name": sellerInfo?.seller_type === 'dealer' && sellerInfo?.email 
-                  ? sellerInfo.email 
-                  : (sellerInfo?.full_name || formatSellerName(sellerInfo?.email || 'Unknown Seller')),
-                "email": sellerInfo?.email
-              },
-              "itemCondition": "https://schema.org/UsedCondition"
-            },
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.5",
-              "reviewCount": "12"
-            },
-            "review": [
-              {
-                "@type": "Review",
-                "reviewRating": {
-                  "@type": "Rating",
-                  "ratingValue": "5",
-                  "bestRating": "5"
-                },
-                "author": {
-                  "@type": "Person",
-                  "name": "Verified Buyer"
-                },
-                "reviewBody": "Excellent electric vehicle with great range and performance."
-              }
-            ]
-          })
-        }}
-      />
     </div>
   );
 }
