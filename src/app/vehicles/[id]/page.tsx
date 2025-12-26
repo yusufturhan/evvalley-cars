@@ -97,7 +97,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
       let { data: scooter } = await supabase
         .from('ev_scooters')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .single();
 
       if (!scooter) {
