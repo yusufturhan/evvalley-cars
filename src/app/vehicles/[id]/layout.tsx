@@ -1,12 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
+import 'server-only';
+import { createServerSupabaseClient } from '@/lib/database';
 import { generateVehicleJsonLd } from '@/lib/seo/vehicleJsonLd';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 async function fetchVehicle(id: string) {
+  const supabase = createServerSupabaseClient();
+  
   // Try vehicles table first
   let { data: vehicle } = await supabase
     .from('vehicles')

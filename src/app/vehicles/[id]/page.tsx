@@ -1,6 +1,7 @@
+import 'server-only';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { createServerSupabaseClient } from '@/lib/database';
 import React from 'react';
 import VehicleDetailClient from './VehicleDetailClient';
 
@@ -8,16 +9,8 @@ import VehicleDetailClient from './VehicleDetailClient';
 export const revalidate = 3600; // Revalidate every hour
 export const dynamic = 'force-dynamic'; // Allow dynamic rendering for real-time data
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabase = createServerSupabaseClient();
 
   const { data: vehicle } = await supabase
     .from('vehicles')
@@ -88,6 +81,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 
 export default async function VehicleDetailPage({ params }: { params: { id: string } }) {
   try {
+    const supabase = createServerSupabaseClient();
+    
     // Fetch vehicle data
     let { data: vehicle } = await supabase
       .from('vehicles')
