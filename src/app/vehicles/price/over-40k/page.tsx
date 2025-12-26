@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import { VehiclesContent } from '@/app/vehicles/page';
+import { VehiclesClient } from '@/app/vehicles/VehiclesClient';
 
 export const metadata: Metadata = {
   title: 'Premium EVs Over $40,000 | Luxury Electric Cars | Evvalley',
@@ -12,11 +11,9 @@ export const metadata: Metadata = {
 
 export default function Over40kEVsPage() {
   return (
-    <div className="min-h-screen bg-[#F5F9FF]">
-      <Header />
-      <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
-        <VehiclesContent defaults={{ minPrice: '40000' }} />
-      </Suspense>
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
+      <VehiclesClient />
+    </Suspense>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -30,7 +27,6 @@ export default function Over40kEVsPage() {
           })
         }}
       />
-    </div>
   );
 }
 

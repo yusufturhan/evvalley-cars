@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
-import Header from '@/components/Header';
-import { VehiclesContent } from '@/app/vehicles/page';
+import { VehiclesClient } from '@/app/vehicles/VehiclesClient';
 
 export const metadata: Metadata = {
   title: 'Electric Vehicles for Sale in Los Angeles | Evvalley',
@@ -12,11 +11,9 @@ export const metadata: Metadata = {
 
 export default function LosAngelesEVsPage() {
   return (
-    <div className="min-h-screen bg-[#F5F9FF]">
-      <Header />
-      <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
-        <VehiclesContent defaults={{ location: 'Los Angeles', category: 'ev-car' }} />
-      </Suspense>
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-16">Loading…</div>}>
+      <VehiclesClient />
+    </Suspense>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -30,6 +27,5 @@ export default function LosAngelesEVsPage() {
           })
         }}
       />
-    </div>
   );
 }
