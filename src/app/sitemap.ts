@@ -11,7 +11,7 @@ const supabase = createClient(
 );
 
 // Force dynamic generation to ensure fresh sitemap
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 export const revalidate = 3600; // Revalidate every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -43,6 +43,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+
+    // ✅ NEW: Seller SEO landing pages
+    {
+      url: `${BASE_URL}/sell-your-ev`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/sell-your-tesla`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/sell-electric-car/california`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+
     {
       url: `${BASE_URL}/about`,
       lastModified: now,
@@ -162,10 +183,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 4) Blog kategori sayfaları (sadece gerçekten var olan route'lar)
   const blogCategories = [
     "ev-guide", // ✅ Var: src/app/blog/category/ev-guide/page.tsx
-    // "market-analysis", // ❌ Route yok
-    // "technology-updates", // ❌ Route yok
-    // "buying-selling-tips", // ❌ Route yok
-    // "e-mobility", // ❌ Route yok
   ];
 
   const blogCategoryPages: MetadataRoute.Sitemap = blogCategories.map(
@@ -191,3 +208,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return uniquePages;
 }
+
+
+
