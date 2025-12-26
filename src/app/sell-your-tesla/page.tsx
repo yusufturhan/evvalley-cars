@@ -1,10 +1,9 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
 import { SITE_URL, SITE_NAME } from "@/lib/seo/site";
+import { LISTING_CREATE_PATH } from "@/lib/seo/links";
 import { buildFaqJsonLd } from "@/lib/seo/faqJsonLd";
 import { SELL_TESLA_FAQ_EN } from "@/lib/seo/sellerFaq";
-import { getSellCtaHref } from "@/lib/seo/cta";
 
 const PAGE_PATH = "/sell-your-tesla";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -41,9 +40,6 @@ export function generateMetadata(): Metadata {
 }
 
 export default function SellYourTeslaPage() {
-  const { userId } = auth();
-  const isSignedIn = !!userId;
-  const sellHref = getSellCtaHref(isSignedIn);
   const faqJsonLd = buildFaqJsonLd(SELL_TESLA_FAQ_EN, PAGE_URL);
 
   return (
@@ -64,7 +60,7 @@ export default function SellYourTeslaPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href={sellHref}
+              href={LISTING_CREATE_PATH}
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-[#1C1F4A] font-semibold shadow-lg hover:shadow-xl transition"
             >
               List your Tesla for free
@@ -112,7 +108,7 @@ export default function SellYourTeslaPage() {
           <div className="space-y-4" id="faq">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold">FAQs</h3>
-              <Link href={sellHref} className="text-[#1C1F4A] font-semibold hover:text-[#3AB0FF]">
+              <Link href={LISTING_CREATE_PATH} className="text-[#1C1F4A] font-semibold hover:text-[#3AB0FF]">
                 Start listing →
               </Link>
             </div>
@@ -134,7 +130,7 @@ export default function SellYourTeslaPage() {
               List your Tesla for free and talk directly to EV buyers.
             </p>
             <Link
-              href={sellHref}
+              href={LISTING_CREATE_PATH}
               className="inline-flex w-full items-center justify-center px-4 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
             >
               List your Tesla now
@@ -160,7 +156,7 @@ export default function SellYourTeslaPage() {
             <p className="text-sm text-gray-700">Reach EV-focused buyers in minutes.</p>
           </div>
           <Link
-            href={sellHref}
+            href={LISTING_CREATE_PATH}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
           >
             Start free listing
