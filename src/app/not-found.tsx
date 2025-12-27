@@ -2,9 +2,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Sayfa Bulunamadı - Evvalley',
-  description: 'Aradığınız sayfa bulunamadı. Evvalley\'de elektrikli araçlar, hibrit araçlar ve e-mobility çözümleri için doğru sayfaları ziyaret edin.',
-  // Remove robots noindex to allow Google to understand the page structure
+  title: 'Page Not Found - Evvalley',
+  description: 'The page you are looking for does not exist. Visit Evvalley for electric vehicles, hybrids, and e-mobility solutions.',
   robots: {
     index: false,
     follow: true,
@@ -25,46 +24,46 @@ export default function NotFound() {
             </div>
             
             <h1 className="text-4xl font-bold text-gray-900 mb-2">404</h1>
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Sayfa Bulunamadı</h2>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Page Not Found</h2>
             
             <p className="text-gray-600 mb-8">
-              Aradığınız sayfa mevcut değil veya taşınmış olabilir. 
-              Evvalley\'de elektrikli araçlar ve e-mobility çözümleri için doğru sayfaları ziyaret edin.
+              The page you’re looking for doesn’t exist or may have moved.
+              Please visit the right pages on Evvalley for electric vehicles and e-mobility solutions.
             </p>
 
             {/* Popular Pages Navigation */}
             <div className="space-y-3 mb-8">
-              <h3 className="text-sm font-medium text-gray-700">Popüler Sayfalar:</h3>
+              <h3 className="text-sm font-medium text-gray-700">Popular Pages:</h3>
               <div className="grid grid-cols-1 gap-2">
                 <Link 
                   href="/vehicles" 
                   className="text-blue-600 hover:text-blue-800 text-sm hover:underline"
                 >
-                  🚗 Tüm Araçlar
+                  🚗 All Vehicles
                 </Link>
                 <Link 
                   href="/vehicles/ev-cars" 
                   className="text-blue-600 hover:text-blue-800 text-sm hover:underline"
                 >
-                  ⚡ Elektrikli Araçlar
+                  ⚡ Electric Vehicles
                 </Link>
                 <Link 
                   href="/vehicles/hybrid-cars" 
                   className="text-blue-600 hover:text-blue-800 text-sm hover:underline"
                 >
-                  🔋 Hibrit Araçlar
+                  🔋 Hybrid Vehicles
                 </Link>
                 <Link 
                   href="/blog" 
                   className="text-blue-600 hover:text-blue-800 text-sm hover:underline"
                 >
-                  📝 Blog & Rehberler
+                  📝 Blog & Guides
                 </Link>
                 <Link 
                   href="/sell" 
                   className="text-blue-600 hover:text-blue-800 text-sm hover:underline"
                 >
-                  💰 Araç Sat
+                  💰 Sell Your Vehicle
                 </Link>
               </div>
             </div>
@@ -75,26 +74,26 @@ export default function NotFound() {
                 href="/"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Ana Sayfaya Dön
+                Back to Home
               </Link>
               <Link
                 href="/contact"
                 className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                İletişime Geç
+                Contact Us
               </Link>
             </div>
 
             {/* Search Suggestion */}
             <div className="mt-8 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-2">
-                Aradığınız içeriği bulamadınız mı?
+                Can’t find what you’re looking for?
               </p>
               <Link 
                 href="/vehicles" 
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
               >
-                Araç arama sayfasını ziyaret edin →
+                Visit the vehicle search page →
               </Link>
             </div>
           </div>
