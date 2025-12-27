@@ -78,9 +78,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Canonical URL for root */}
-        <link rel="canonical" href="https://www.evvalley.com" />
-        
         {/* Favicon definitions with cache busting */}
         <link rel="icon" href="/favicon.ico?v=2" />
         <link rel="shortcut icon" href="/favicon.ico?v=2" />
