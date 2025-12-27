@@ -13,6 +13,17 @@ export function generateVehicleJsonLd(vehicle: any, canonicalUrl: string): any |
     "url": canonicalUrl,
   };
 
+  // Name (required by Google) — build from year/make/model with safe fallbacks
+  const nameParts = [
+    vehicle.year ? vehicle.year.toString() : null,
+    vehicle.brand || null,
+    vehicle.model || null,
+  ].filter(Boolean);
+  const name = nameParts.length > 0
+    ? nameParts.join(' ')
+    : vehicle.title || 'Vehicle for Sale';
+  jsonLd.name = name;
+
   // Brand (make)
   if (vehicle.brand) {
     jsonLd.brand = vehicle.brand;
