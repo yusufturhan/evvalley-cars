@@ -34,13 +34,17 @@ export function middleware(request: NextRequest) {
     const hostname = hostnameHeader.toLowerCase();
     const protocol = request.nextUrl.protocol;
     
-    // Block indexing of Clerk subdomain (clerk.evvalley.com)
-    // This subdomain is used for authentication and should not be indexed by search engines
+    // Hard-block Clerk subdomain from indexing: return 410 Gone for any path
+    // This ensures Google drops https://clerk.evvalley.com/* permanently.
     if (hostname === 'clerk.evvalley.com' || hostname.startsWith('clerk.evvalley.com:')) {
-      const response = NextResponse.next();
-      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
-      response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      return response;
+      return new NextResponse('Gone', {
+        status: 410,
+        headers: {
+          'Content-Type': 'text/plain',
+          'X-Robots-Tag': 'noindex, nofollow, noarchive, nosnippet',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+        },
+      });
     }
     
     // Single-hop canonical redirect to HTTPS + www (prevents http→https→www chains)
