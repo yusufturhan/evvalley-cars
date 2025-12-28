@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Car, Zap, Battery, Bike, MapPin } from "lucide-react";
+import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
@@ -662,11 +662,18 @@ export function VehiclesClient() {
                           ${vehicle.price.toLocaleString()}
                         </span>
                       </div>
-                      <Link href={`/vehicles/${vehicle.id}`}>
-                        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                          View Details
-                        </button>
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller">
+                          <button className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center" title="Contact Seller">
+                            <MessageCircle className="h-4 w-4" />
+                          </button>
+                        </Link>
+                        <Link href={`/vehicles/${vehicle.id}`}>
+                          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            View Details
+                          </button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
