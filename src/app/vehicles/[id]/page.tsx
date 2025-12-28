@@ -5,12 +5,14 @@ import { createServerSupabaseClient } from '@/lib/database';
 import React from 'react';
 import VehicleDetailClient from './VehicleDetailClient';
 
+const CANONICAL_ORIGIN = 'https://www.evvalley.com';
+
 // Enable ISR (Incremental Static Regeneration) for better SEO and performance
 export const revalidate = 3600; // Revalidate every hour
 export const dynamic = 'force-dynamic'; // Allow dynamic rendering for real-time data
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { id } = params;
   const supabase = createServerSupabaseClient();
 
   const { data: vehicle } = await supabase
@@ -23,10 +25,14 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return {
       title: 'Vehicle Not Found - Evvalley',
       description: 'The requested vehicle could not be found.',
+      metadataBase: new URL(CANONICAL_ORIGIN),
+      alternates: {
+        canonical: `${CANONICAL_ORIGIN}/vehicles/${id}`,
+      },
     };
   }
 
-  const vehicleUrl = `https://www.evvalley.com/vehicles/${vehicle.id}`;
+  const vehicleUrl = `${CANONICAL_ORIGIN}/vehicles/${vehicle.id}`;
   
   // Generate title: "{year} {make} {model} for Sale | EvValley"
   const make = vehicle.brand || '';
@@ -48,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return {
     title,
     description,
-    metadataBase: new URL('https://www.evvalley.com'),
+    metadataBase: new URL(CANONICAL_ORIGIN),
     alternates: {
       canonical: vehicleUrl,
     },
@@ -80,9 +86,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-export default async function VehicleDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function VehicleDetailPage({ params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
+    const { id } = params;
     const supabase = createServerSupabaseClient();
     
     // Fetch vehicle data

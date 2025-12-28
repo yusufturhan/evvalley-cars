@@ -70,6 +70,11 @@
       "permanent": true
     },
     {
+      "source": "/vehicles/year/:year/",
+      "destination": "https://www.evvalley.com/vehicles?year=:year",
+      "permanent": true
+    },
+    {
       "source": "/vehicles/new-arrivals",
       "destination": "https://www.evvalley.com/vehicles",
       "permanent": true
@@ -91,32 +96,22 @@
     },
     {
       "source": "/vehicles/c287f364-bd34-40d6-8644-125ae21cd2bc",
-      "destination": "/vehicles",
+      "destination": "https://www.evvalley.com/vehicles",
       "permanent": true
     },
     {
       "source": "/vehicles/72cf4a6d-a6ef-4aa6-a83d-c680cb02c9f6",
-      "destination": "/vehicles",
-      "permanent": true
-    },
-    {
-      "source": "/vehicles/year/:year",
-      "destination": "/vehicles?year=:year",
-      "permanent": true
-    },
-    {
-      "source": "/vehicles/new-arrivals",
-      "destination": "/vehicles",
+      "destination": "https://www.evvalley.com/vehicles",
       "permanent": true
     },
     {
       "source": "/vehicles/featured",
-      "destination": "/vehicles",
+      "destination": "https://www.evvalley.com/vehicles",
       "permanent": true
     },
     {
       "source": "/vehicles/trending",
-      "destination": "/vehicles",
+      "destination": "https://www.evvalley.com/vehicles",
       "permanent": true
     },
     {

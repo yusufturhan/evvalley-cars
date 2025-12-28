@@ -5,6 +5,8 @@ import ClerkProvider from "@/components/ClerkProvider";
 import AuthSync from "@/components/AuthSync";
 import Script from "next/script";
 
+const CANONICAL_ORIGIN = "https://www.evvalley.com";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -19,9 +21,9 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://www.evvalley.com'),
+  metadataBase: new URL(CANONICAL_ORIGIN),
   alternates: {
-    canonical: 'https://www.evvalley.com',
+    canonical: '/',
   },
   icons: {
     icon: '/favicon.ico',
@@ -31,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Evvalley - US EV & E-Mobility Marketplace",
     description: "Buy and sell electric vehicles, e-scooters, and e-bikes in the US. Trusted marketplace for electric mobility.",
-    url: "https://www.evvalley.com",
+    url: CANONICAL_ORIGIN,
     siteName: "Evvalley",
     images: [
       {

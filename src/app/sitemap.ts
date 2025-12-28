@@ -2,7 +2,7 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 
-const BASE_URL = "https://www.evvalley.com";
+const BASE_URL = "https://www.evvalley.com"; // canonical origin (https + www)
 
 // Service role yerine anonim key kullanmak daha güvenli
 const supabase = createClient(
@@ -202,9 +202,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogCategoryPages,
   ];
 
-  const uniquePages = allPages.filter(
-    (page, index, self) => index === self.findIndex((p) => p.url === page.url)
-  );
+  const uniquePages = allPages
+    .filter(
+      (page, index, self) => index === self.findIndex((p) => p.url === page.url)
+    )
+    // Only emit canonical https://www.evvalley.com/* URLs (drop anything redirected)
+    .filter((page) => page.url.startsWith(BASE_URL));
 
   return uniquePages;
 }

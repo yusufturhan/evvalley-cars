@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const CANONICAL_HOST = 'www.evvalley.com';
+const CANONICAL_PROTOCOL = 'https:';
+
 // Simple in-memory rate limiting (for production, use Redis or similar)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
@@ -27,7 +30,8 @@ function isRateLimited(ip: string): boolean {
 export function middleware(request: NextRequest) {
   try {
     const { pathname, searchParams } = request.nextUrl as unknown as { pathname: string; searchParams: URLSearchParams }
-    const hostname = request.headers.get('host') || '';
+    const hostnameHeader = request.headers.get('host') || '';
+    const hostname = hostnameHeader.toLowerCase();
     const protocol = request.nextUrl.protocol;
     
     // Block indexing of Clerk subdomain (clerk.evvalley.com)
@@ -39,29 +43,16 @@ export function middleware(request: NextRequest) {
       return response;
     }
     
-    // Redirect HTTP to HTTPS (fixes redirect page errors for http://evvalley.com and http://www.evvalley.com)
-    if (protocol === 'http:') {
+    // Single-hop canonical redirect to HTTPS + www (prevents http→https→www chains)
+    const hostWithoutPort = hostname.split(':')[0];
+    const isNonCanonicalHost = hostWithoutPort !== CANONICAL_HOST;
+    const isNotHttps = protocol !== CANONICAL_PROTOCOL;
+    if (isNonCanonicalHost || isNotHttps) {
       const url = request.nextUrl.clone();
-      url.protocol = 'https:';
-      const response = NextResponse.redirect(url, 301);
+      url.protocol = CANONICAL_PROTOCOL;
+      url.host = CANONICAL_HOST;
+      const response = NextResponse.redirect(url, 308);
       response.headers.set('X-Robots-Tag', 'noindex, follow');
-      response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-      return response;
-    }
-    
-    // Redirect evvalley.com (without www) to www.evvalley.com
-    // This ensures canonical URLs and prevents duplicate content issues
-    // This is critical for GSC to prevent Soft 404 errors on non-www domain
-    // IMPORTANT: For evvalley.com property in GSC, we need to ensure all URLs redirect properly
-    if (hostname === 'evvalley.com' || hostname.startsWith('evvalley.com:')) {
-      const url = request.nextUrl.clone();
-      url.host = 'www.evvalley.com';
-      url.protocol = 'https:';
-      const response = NextResponse.redirect(url, 301);
-      // Redirect pages should have noindex to prevent indexing of redirect pages
-      // But we also add Link header to help Google understand the canonical URL
-      response.headers.set('X-Robots-Tag', 'noindex, follow');
-      response.headers.set('Link', `<${url.toString()}>; rel="canonical"`);
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
       return response;
     }
