@@ -26,10 +26,12 @@ export default function LocationPicker({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
+  const pendingPlaceRef = useRef<LocationData | null>(value);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
+  const geocoderRef = useRef<any>(null);
 
   // Initialize Google Maps API (singleton loader) and Autocomplete
   useEffect(() => {
@@ -77,6 +79,11 @@ export default function LocationPicker({
             setInputValue(place.formatted_address);
             onChange(locationData);
           });
+        }
+
+        // Geocoder for fallback (enter/blur without selection)
+        if (!geocoderRef.current) {
+          geocoderRef.current = new google.maps.Geocoder();
         }
 
         // Initialize preview map
@@ -156,6 +163,49 @@ export default function LocationPicker({
     onChange(null); // Clear selection when user types
   };
 
+  // Fallback: on Enter or blur, if user typed something but did not select a suggestion, geocode it.
+  const handleGeocodeFallback = async () => {
+    const query = inputValue.trim();
+    if (!query || !geocoderRef.current) return;
+    try {
+      setIsLoading(true);
+      geocoderRef.current.geocode(
+        {
+          address: query,
+          componentRestrictions: { country: "us" },
+        },
+        (results: any, status: any) => {
+          setIsLoading(false);
+          if (status === "OK" && results && results.length > 0) {
+            const place = results[0];
+            const { city, state, postal_code } = parseAddressComponents(
+              place.address_components
+            );
+            const lat = place.geometry?.location?.lat() || 0;
+            const lng = place.geometry?.location?.lng() || 0;
+            const locationData: LocationData = {
+              formatted_address: place.formatted_address || query,
+              place_id: place.place_id || "",
+              lat,
+              lng,
+              city,
+              state,
+              postal_code,
+            };
+            setInputValue(locationData.formatted_address);
+            onChange(locationData);
+            pendingPlaceRef.current = locationData;
+          } else {
+            console.warn("[LocationPicker] Geocode fallback failed", { query, status });
+          }
+        }
+      );
+    } catch (err) {
+      setIsLoading(false);
+      console.error("[LocationPicker] Geocode fallback error", err);
+    }
+  };
+
   return (
     <div className="w-full relative">
       {/* Input Field */}
@@ -166,6 +216,22 @@ export default function LocationPicker({
           type="text"
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleGeocodeFallback();
+            }
+          }}
+          onBlur={() => {
+            // Use a timeout to allow click on dropdown; fallback if no selection
+            setTimeout(() => {
+              if (!pendingPlaceRef.current) {
+                handleGeocodeFallback();
+              }
+              // reset pending flag after blur attempt
+              pendingPlaceRef.current = null;
+            }, 150);
+          }}
           className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
