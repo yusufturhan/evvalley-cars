@@ -365,7 +365,15 @@ export async function POST(request: Request) {
     const range_miles = json.range_miles as string;
     const max_speed = json.max_speed as string;
     const battery_capacity = json.battery_capacity as string;
-    const location = json.location as string;
+    // Location data from LocationPicker (new format)
+    const location_text = json.location_text as string || json.location as string;
+    const location = location_text; // Backward compatibility: use location_text as location
+    const place_id = json.place_id as string | undefined;
+    const lat = json.lat as number | undefined;
+    const lng = json.lng as number | undefined;
+    const city = json.city as string | undefined;
+    const state = json.state as string | undefined;
+    const postal_code = json.postal_code as string | undefined;
     const seller_id = json.seller_id as string;
     const seller_type_from_form = (json.seller_type as string) === 'dealer' ? 'dealer' : 'private';
     const vehicle_condition = json.vehicle_condition as string;
@@ -507,7 +515,7 @@ export async function POST(request: Request) {
     }
 
     // Create vehicle data
-    const vehicleData = {
+    const vehicleData: any = {
       title,
       description,
       price: parseFloat(price),
@@ -520,7 +528,7 @@ export async function POST(request: Request) {
       range_miles: range_miles ? parseInt(range_miles) : null,
       max_speed: max_speed ? parseInt(max_speed) : null,
       battery_capacity: battery_capacity || null,
-      location: location || null,
+      location: location || null, // Backward compatibility: main location field
       seller_id: actualSellerId,
       seller_email: seller_email,
       vehicle_condition: json.vehicle_condition as string || null,
@@ -539,7 +547,15 @@ export async function POST(request: Request) {
       vin: json.vin as string || null,
       images: Array.isArray(json.images) ? json.images : [],
       video_url: video_url && typeof video_url === 'string' && video_url.trim() ? video_url : null,
-      is_active: true
+      is_active: true,
+      // New location fields (if provided)
+      ...(location_text && { location_text }),
+      ...(place_id && { place_id }),
+      ...(lat !== undefined && lat !== null && { lat }),
+      ...(lng !== undefined && lng !== null && { lng }),
+      ...(city && { city }),
+      ...(state && { state }),
+      ...(postal_code && { postal_code }),
     };
 
     console.log('=== VEHICLE DATA DEBUG ===');

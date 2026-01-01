@@ -7,6 +7,8 @@ import { Car, Zap, Battery, Bike, Upload, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
 import VideoUpload from "@/components/VideoUpload";
+import LocationPicker from "@/components/LocationPicker";
+import type { LocationData } from "@/lib/googleMaps";
 
 export default function SellPage() {
   const { isSignedIn, user } = useUser();
@@ -61,6 +63,7 @@ export default function SellPage() {
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [locationData, setLocationData] = useState<LocationData | null>(null);
 
   // Save form data to localStorage to prevent data loss on page refresh
   useEffect(() => {
@@ -268,6 +271,11 @@ export default function SellPage() {
       newErrors.images = 'Maximum 15 images allowed';
     }
 
+    // Location validation - must select from suggestions
+    if (!locationData) {
+      newErrors.location = 'Please select a location from the suggestions.';
+    }
+
     setErrors(newErrors);
     
     // If there are general errors, show them
@@ -368,7 +376,15 @@ export default function SellPage() {
         category: formData.category,
         range_miles: formData.range_miles || '',
         max_speed: formData.max_speed || '',
-        location: formData.location.trim() || '',
+        // Location data from LocationPicker
+        location: locationData?.formatted_address || '',
+        location_text: locationData?.formatted_address || '',
+        place_id: locationData?.place_id || '',
+        lat: locationData?.lat || null,
+        lng: locationData?.lng || null,
+        city: locationData?.city || '',
+        state: locationData?.state || '',
+        postal_code: locationData?.postal_code || '',
         seller_id: sellerIdToUse,
         seller_email: userEmail, // Use the email from Clerk directly
         seller_type: formData.seller_type, // propagate selection to API
@@ -1341,19 +1357,14 @@ export default function SellPage() {
             {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
+                Location *
               </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500"
-                  placeholder="e.g., New York, NY"
-                />
-              </div>
+              <LocationPicker
+                value={locationData}
+                onChange={setLocationData}
+                error={errors.location}
+                placeholder="Enter ZIP code, city, or address"
+              />
             </div>
 
             {/* Image Upload */}
