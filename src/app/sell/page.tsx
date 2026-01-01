@@ -10,6 +10,8 @@ import VideoUpload from "@/components/VideoUpload";
 import LocationPicker from "@/components/LocationPicker";
 import type { LocationData } from "@/lib/googleMaps";
 
+export const dynamic = 'force-dynamic';
+
 export default function SellPage() {
   const { isSignedIn, user } = useUser();
   const router = useRouter();
