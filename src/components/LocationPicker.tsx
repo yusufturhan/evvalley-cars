@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
 import { MapPin } from "lucide-react";
 import type { LocationData } from "@/lib/googleMaps";
 import { resolvePlaceDetails } from "@/lib/googleMaps";
+import { getGoogleMaps } from "@/lib/mapsLoader";
 
 interface LocationPickerProps {
   value: LocationData | null;
@@ -35,24 +35,11 @@ export default function LocationPicker({
   const mapRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Google Maps API
+  // Initialize Google Maps API (singleton loader)
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      console.error("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not set");
-      return;
-    }
-
     let hiddenMapDiv: HTMLDivElement | null = null;
 
-    const loader = new Loader({
-      apiKey,
-      version: "weekly",
-      libraries: ["places"],
-    });
-
-    loader
-      .load()
+    getGoogleMaps()
       .then((google: any) => {
         // Initialize AutocompleteService
         autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
@@ -100,7 +87,7 @@ export default function LocationPicker({
         document.body.removeChild(hiddenMapDiv);
       }
     };
-  }, []);
+  }, [value]);
 
   // Update map when location changes
   useEffect(() => {
