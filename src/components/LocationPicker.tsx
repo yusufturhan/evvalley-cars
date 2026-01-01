@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 import type { LocationData } from "@/lib/googleMaps";
-import { resolvePlaceDetails } from "@/lib/googleMaps";
+import { parseAddressComponents } from "@/lib/googleMaps";
 import { getGoogleMaps } from "@/lib/mapsLoader";
 
 interface LocationPickerProps {
@@ -22,22 +22,16 @@ export default function LocationPicker({
   const [inputValue, setInputValue] = useState(
     value?.formatted_address || ""
   );
-  const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
-  const [noResults, setNoResults] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteServiceRef = useRef<any>(null);
-  const placesServiceRef = useRef<any>(null);
-  const sessionTokenRef = useRef<any>(null);
+  const autocompleteRef = useRef<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Google Maps API (singleton loader)
+  // Initialize Google Maps API (singleton loader) and Autocomplete
   useEffect(() => {
     let hiddenMapDiv: HTMLDivElement | null = null;
 
@@ -45,18 +39,54 @@ export default function LocationPicker({
       try {
         const google = await getGoogleMaps();
 
-        // Initialize AutocompleteService
-        autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
-        sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
+        // Initialize Places Autocomplete on the input
+        if (inputRef.current && !autocompleteRef.current) {
+          autocompleteRef.current = new google.maps.places.Autocomplete(
+            inputRef.current,
+            {
+              componentRestrictions: { country: "us" },
+              types: ["(cities)", "geocode"], // Cities + addresses/ZIP
+              fields: [
+                "formatted_address",
+                "place_id",
+                "geometry",
+                "address_components",
+              ],
+            }
+          );
 
-        // Initialize PlacesService (needs a map, so we'll create a hidden one)
+          autocompleteRef.current.addListener("place_changed", () => {
+            const place = autocompleteRef.current.getPlace();
+            if (!place || !place.place_id || !place.formatted_address) {
+              return;
+            }
+            const { city, state, postal_code } = parseAddressComponents(
+              place.address_components
+            );
+            const lat = place.geometry?.location?.lat() || 0;
+            const lng = place.geometry?.location?.lng() || 0;
+            const locationData: LocationData = {
+              formatted_address: place.formatted_address,
+              place_id: place.place_id,
+              lat,
+              lng,
+              city,
+              state,
+              postal_code,
+            };
+            setInputValue(place.formatted_address);
+            onChange(locationData);
+          });
+        }
+
+        // Initialize preview map
         hiddenMapDiv = document.createElement("div");
         hiddenMapDiv.style.display = "none";
         document.body.appendChild(hiddenMapDiv);
-        const hiddenMap = new google.maps.Map(hiddenMapDiv);
-        placesServiceRef.current = new google.maps.places.PlacesService(hiddenMap);
 
-        // Initialize preview map
+        const hiddenMap = new google.maps.Map(hiddenMapDiv);
+        // hidden map only to satisfy API; not used directly
+        // Initialize visible preview map
         if (mapRef.current) {
           const previewMap = new google.maps.Map(mapRef.current, {
             center: { lat: 37.7749, lng: -122.4194 }, // Default: San Francisco
@@ -81,18 +111,22 @@ export default function LocationPicker({
             setMarker(newMarker);
           }
         }
-      } catch (error) {
-        console.error("Error loading Google Maps API:", error);
+      } catch (err) {
+        console.error("Error loading Google Maps API:", err);
       }
     })();
 
     return () => {
-      // Cleanup hidden map div
       if (hiddenMapDiv && document.body.contains(hiddenMapDiv)) {
         document.body.removeChild(hiddenMapDiv);
       }
+      if (autocompleteRef.current && (window as any).google?.maps?.event) {
+        (window as any).google.maps.event.clearInstanceListeners(
+          autocompleteRef.current
+        );
+      }
     };
-  }, [value]);
+  }, [value, onChange]);
 
   // Update map when location changes
   useEffect(() => {
@@ -113,111 +147,14 @@ export default function LocationPicker({
         setMarker(newMarker);
       }
     }
-  }, [value, map, mapLoaded]);
+  }, [value, map, mapLoaded, marker]);
 
-  // Handle input change and fetch suggestions
+  // Handle input change (clear selection)
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setInputValue(query);
     onChange(null); // Clear selection when user types
-
-    if (!query.trim()) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setNoResults(false);
-      return;
-    }
-
-    if (!autocompleteServiceRef.current || !sessionTokenRef.current) {
-      return;
-    }
-
-    // Require at least 2 chars for suggestions
-    if (query.trim().length < 2) {
-      setSuggestions([]);
-      setShowSuggestions(false);
-      setNoResults(false);
-      return;
-    }
-
-    setIsLoading(true);
-    autocompleteServiceRef.current.getPlacePredictions(
-      {
-        input: query,
-        componentRestrictions: { country: "us" }, // US-only
-        types: ["(cities)", "geocode"], // Cities + addresses/ZIP
-        sessionToken: sessionTokenRef.current,
-      },
-      (predictions: any, status: any) => {
-        setIsLoading(false);
-        if (
-          status === "OK" &&
-          predictions &&
-          predictions.length > 0
-        ) {
-          setSuggestions(predictions);
-          setShowSuggestions(true);
-          setNoResults(false);
-        } else {
-          setSuggestions([]);
-          setShowSuggestions(true);
-          setNoResults(true);
-        }
-      }
-    );
   };
-
-  // Handle suggestion selection
-  const handleSelectSuggestion = async (
-    prediction: any
-  ) => {
-    setInputValue(prediction.description);
-    setShowSuggestions(false);
-    setSuggestions([]);
-    setNoResults(false);
-
-    if (!placesServiceRef.current) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const locationData = await resolvePlaceDetails(
-        prediction.place_id,
-        placesServiceRef.current
-      );
-      if (locationData) {
-        onChange(locationData);
-      }
-      // Refresh token for next session
-      if ((window as any).google?.maps?.places?.AutocompleteSessionToken) {
-        sessionTokenRef.current = new (window as any).google.maps.places.AutocompleteSessionToken();
-      }
-    } catch (error) {
-      console.error("Error resolving place details:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Close suggestions when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node) &&
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
-        setShowSuggestions(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="w-full relative">
@@ -229,11 +166,6 @@ export default function LocationPicker({
           type="text"
           value={inputValue}
           onChange={handleInputChange}
-          onFocus={() => {
-            if (suggestions.length > 0) {
-              setShowSuggestions(true);
-            }
-          }}
           className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
@@ -250,35 +182,6 @@ export default function LocationPicker({
       {/* Error Message */}
       {error && (
         <p className="text-red-500 text-xs mt-1">{error}</p>
-      )}
-
-      {/* Suggestions Dropdown */}
-      {showSuggestions && (
-        <div
-          ref={suggestionsRef}
-          className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
-        >
-          {noResults && (
-            <div className="px-4 py-3 text-sm text-gray-500">
-              No results. Please type a ZIP code, city, or full address and select a suggestion.
-            </div>
-          )}
-          {suggestions.map((prediction) => (
-            <button
-              key={prediction.place_id}
-              type="button"
-              onClick={() => handleSelectSuggestion(prediction)}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-            >
-              <div className="font-medium text-gray-900">
-                {prediction.structured_formatting.main_text}
-              </div>
-              <div className="text-sm text-gray-500">
-                {prediction.structured_formatting.secondary_text}
-              </div>
-            </button>
-          ))}
-        </div>
       )}
 
       {/* Map Preview */}
