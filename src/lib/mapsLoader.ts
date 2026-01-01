@@ -1,10 +1,8 @@
-import { Loader } from "@googlemaps/js-api-loader";
-
 let googlePromise: Promise<any> | null = null;
-let loader: Loader | null = null;
 
 /**
- * Load Google Maps JS API once (client-side only).
+ * Load Google Maps JS API once using the new importLibrary flow.
+ * No deprecated Loader API is used.
  */
 export function getGoogleMaps(): Promise<any> {
   if (typeof window === "undefined") {
@@ -22,19 +20,32 @@ export function getGoogleMaps(): Promise<any> {
     );
   }
 
-  if (!loader) {
-    loader = new Loader({
-      apiKey,
-      version: "weekly",
-      libraries: ["places"],
-    });
-  }
+  googlePromise = new Promise((resolve, reject) => {
+    // If already available (e.g., another script), resolve immediately
+    if ((window as any).google?.maps?.importLibrary) {
+      resolve((window as any).google);
+      return;
+    }
 
-  googlePromise = (async () => {
-    await loader!.importLibrary("places");
-    await loader!.importLibrary("maps");
-    return (window as any).google;
-  })();
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+    script.async = true;
+    script.defer = true;
+    script.onerror = (err) => reject(err);
+    script.onload = () => {
+      if ((window as any).google?.maps?.importLibrary) {
+        resolve((window as any).google);
+      } else {
+        reject(new Error("Google Maps failed to load importLibrary"));
+      }
+    };
+    document.head.appendChild(script);
+  }).then(async (google: any) => {
+    // Ensure maps and places are loaded via importLibrary
+    await google.maps.importLibrary("maps");
+    await google.maps.importLibrary("places");
+    return google;
+  });
 
   return googlePromise;
 }
