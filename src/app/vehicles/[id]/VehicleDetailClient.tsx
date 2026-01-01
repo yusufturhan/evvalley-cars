@@ -50,7 +50,11 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     '';
   const lat = (vehicle as any)?.lat;
   const lng = (vehicle as any)?.lng;
-  const mapQuery = lat && lng ? `${lat},${lng}` : locationText;
+  const mapQuery = lat && lng
+    ? `${lat},${lng}`
+    : locationText
+      ? `${locationText}, USA`
+      : "";
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showMessaging, setShowMessaging] = useState(false);
   const [sellerInfo, setSellerInfo] = useState<any>(null);
