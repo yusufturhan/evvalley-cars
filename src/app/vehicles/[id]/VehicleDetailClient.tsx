@@ -43,6 +43,14 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     ...(vehicle?.video_url ? [vehicle.video_url] : []),
     ...(vehicle?.images || [])
   ];
+  const mapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const locationText =
+    (vehicle as any)?.location_text ||
+    vehicle?.location ||
+    '';
+  const lat = (vehicle as any)?.lat;
+  const lng = (vehicle as any)?.lng;
+  const mapQuery = lat && lng ? `${lat},${lng}` : locationText;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showMessaging, setShowMessaging] = useState(false);
   const [sellerInfo, setSellerInfo] = useState<any>(null);
@@ -647,12 +655,31 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   <span className="text-gray-800 font-medium">VIN:</span>
                   <p className="font-semibold text-gray-900 font-mono text-xs">{vehicle.vin || 'N/A'}</p>
                 </div>
-                <div className="col-span-2">
-                  <span className="text-gray-800 font-medium">Location:</span>
-                  <div className="flex items-center mt-1">
-                    <MapPin className="h-4 w-4 text-gray-600 mr-1" />
-                    <p className="font-semibold text-gray-900">{vehicle.location}</p>
+                <div className="col-span-2 space-y-3">
+                  <div>
+                    <span className="text-gray-800 font-medium">Location:</span>
+                    <div className="flex items-center mt-1">
+                      <MapPin className="h-4 w-4 text-gray-600 mr-1" />
+                      <p className="font-semibold text-gray-900">
+                        {locationText || 'Location not specified'}
+                      </p>
+                    </div>
                   </div>
+                  {mapsApiKey && mapQuery ? (
+                    <div className="w-full rounded-lg overflow-hidden border border-gray-200">
+                      <iframe
+                        title="Location map"
+                        width="100%"
+                        height="240"
+                        loading="lazy"
+                        allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
+                        src={`https://www.google.com/maps/embed/v1/place?key=${mapsApiKey}&q=${encodeURIComponent(
+                          mapQuery
+                        )}`}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

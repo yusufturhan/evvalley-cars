@@ -76,6 +76,14 @@ export interface Vehicle {
   seller_id: string;
   seller_email?: string;
   location: string;
+  // Optional enhanced location fields
+  location_text?: string | null;
+  place_id?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  city?: string | null;
+  state?: string | null;
+  postal_code?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
