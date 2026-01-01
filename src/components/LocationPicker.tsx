@@ -39,8 +39,10 @@ export default function LocationPicker({
   useEffect(() => {
     let hiddenMapDiv: HTMLDivElement | null = null;
 
-    getGoogleMaps()
-      .then((google: any) => {
+    (async () => {
+      try {
+        const google = await getGoogleMaps();
+
         // Initialize AutocompleteService
         autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
 
@@ -76,10 +78,10 @@ export default function LocationPicker({
             setMarker(newMarker);
           }
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error loading Google Maps API:", error);
-      });
+      }
+    })();
 
     return () => {
       // Cleanup hidden map div
