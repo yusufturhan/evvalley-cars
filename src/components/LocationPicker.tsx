@@ -28,10 +28,12 @@ export default function LocationPicker({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
+  const [noResults, setNoResults] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteServiceRef = useRef<any>(null);
   const placesServiceRef = useRef<any>(null);
+  const sessionTokenRef = useRef<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +47,7 @@ export default function LocationPicker({
 
         // Initialize AutocompleteService
         autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
+        sessionTokenRef.current = new google.maps.places.AutocompleteSessionToken();
 
         // Initialize PlacesService (needs a map, so we'll create a hidden one)
         hiddenMapDiv = document.createElement("div");
@@ -121,10 +124,19 @@ export default function LocationPicker({
     if (!query.trim()) {
       setSuggestions([]);
       setShowSuggestions(false);
+      setNoResults(false);
       return;
     }
 
-    if (!autocompleteServiceRef.current) {
+    if (!autocompleteServiceRef.current || !sessionTokenRef.current) {
+      return;
+    }
+
+    // Require at least 2 chars for suggestions
+    if (query.trim().length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      setNoResults(false);
       return;
     }
 
@@ -133,19 +145,23 @@ export default function LocationPicker({
       {
         input: query,
         componentRestrictions: { country: "us" }, // US-only
-        types: ["(regions)", "geocode"], // Allow cities, ZIP codes, and addresses
+        types: ["(cities)", "geocode"], // Cities + addresses/ZIP
+        sessionToken: sessionTokenRef.current,
       },
       (predictions: any, status: any) => {
         setIsLoading(false);
         if (
           status === "OK" &&
-          predictions
+          predictions &&
+          predictions.length > 0
         ) {
           setSuggestions(predictions);
           setShowSuggestions(true);
+          setNoResults(false);
         } else {
           setSuggestions([]);
-          setShowSuggestions(false);
+          setShowSuggestions(true);
+          setNoResults(true);
         }
       }
     );
@@ -158,6 +174,7 @@ export default function LocationPicker({
     setInputValue(prediction.description);
     setShowSuggestions(false);
     setSuggestions([]);
+    setNoResults(false);
 
     if (!placesServiceRef.current) {
       return;
@@ -171,6 +188,10 @@ export default function LocationPicker({
       );
       if (locationData) {
         onChange(locationData);
+      }
+      // Refresh token for next session
+      if ((window as any).google?.maps?.places?.AutocompleteSessionToken) {
+        sessionTokenRef.current = new (window as any).google.maps.places.AutocompleteSessionToken();
       }
     } catch (error) {
       console.error("Error resolving place details:", error);
@@ -232,11 +253,16 @@ export default function LocationPicker({
       )}
 
       {/* Suggestions Dropdown */}
-      {showSuggestions && suggestions.length > 0 && (
+      {showSuggestions && (
         <div
           ref={suggestionsRef}
           className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
         >
+          {noResults && (
+            <div className="px-4 py-3 text-sm text-gray-500">
+              No results. Please type a ZIP code, city, or full address and select a suggestion.
+            </div>
+          )}
           {suggestions.map((prediction) => (
             <button
               key={prediction.place_id}
