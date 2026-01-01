@@ -16,7 +16,7 @@ export interface LocationData {
  * Parse Google Places address_components to extract city, state, and postal_code
  */
 export function parseAddressComponents(
-  addressComponents: google.maps.places.PlaceResult['address_components']
+  addressComponents: any
 ): { city: string; state: string; postal_code: string } {
   let city = '';
   let state = '';
@@ -55,7 +55,7 @@ export function parseAddressComponents(
  */
 export async function resolvePlaceDetails(
   placeId: string,
-  placesService: google.maps.places.PlacesService
+  placesService: any
 ): Promise<LocationData | null> {
   return new Promise((resolve, reject) => {
     placesService.getDetails(
@@ -63,8 +63,8 @@ export async function resolvePlaceDetails(
         placeId,
         fields: ['formatted_address', 'geometry', 'address_components'],
       },
-      (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+      (place: any, status: any) => {
+        if (status === "OK" && place) {
           const { city, state, postal_code } = parseAddressComponents(
             place.address_components
           );

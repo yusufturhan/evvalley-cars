@@ -22,18 +22,16 @@ export default function LocationPicker({
   const [inputValue, setInputValue] = useState(
     value?.formatted_address || ""
   );
-  const [suggestions, setSuggestions] = useState<
-    google.maps.places.AutocompletePrediction[]
-  >([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [map, setMap] = useState<any>(null);
+  const [marker, setMarker] = useState<any>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
-  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
+  const autocompleteServiceRef = useRef<any>(null);
+  const placesServiceRef = useRef<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +53,7 @@ export default function LocationPicker({
 
     loader
       .load()
-      .then((google) => {
+      .then((google: any) => {
         // Initialize AutocompleteService
         autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
 
@@ -77,6 +75,19 @@ export default function LocationPicker({
           });
           setMap(previewMap);
           setMapLoaded(true);
+          
+          // If we already have a location, create marker immediately
+          if (value) {
+            const position = { lat: value.lat, lng: value.lng };
+            previewMap.setCenter(position);
+            previewMap.setZoom(13);
+            const newMarker = new google.maps.Marker({
+              position,
+              map: previewMap,
+              title: value.formatted_address,
+            });
+            setMarker(newMarker);
+          }
         }
       })
       .catch((error) => {
@@ -93,7 +104,7 @@ export default function LocationPicker({
 
   // Update map when location changes
   useEffect(() => {
-    if (map && value && mapLoaded) {
+    if (map && value && mapLoaded && typeof window !== 'undefined' && (window as any).google) {
       const position = { lat: value.lat, lng: value.lng };
       map.setCenter(position);
       map.setZoom(13);
@@ -102,7 +113,7 @@ export default function LocationPicker({
       if (marker) {
         marker.setPosition(position);
       } else {
-        const newMarker = new google.maps.Marker({
+        const newMarker = new (window as any).google.maps.Marker({
           position,
           map,
           title: value.formatted_address,
@@ -135,10 +146,10 @@ export default function LocationPicker({
         componentRestrictions: { country: "us" }, // US-only
         types: ["(regions)", "geocode"], // Allow cities, ZIP codes, and addresses
       },
-      (predictions, status) => {
+      (predictions: any, status: any) => {
         setIsLoading(false);
         if (
-          status === google.maps.places.PlacesServiceStatus.OK &&
+          status === "OK" &&
           predictions
         ) {
           setSuggestions(predictions);
@@ -153,7 +164,7 @@ export default function LocationPicker({
 
   // Handle suggestion selection
   const handleSelectSuggestion = async (
-    prediction: google.maps.places.AutocompletePrediction
+    prediction: any
   ) => {
     setInputValue(prediction.description);
     setShowSuggestions(false);
