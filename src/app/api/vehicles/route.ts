@@ -131,27 +131,31 @@ export async function GET(request: Request) {
       const cityOnly = raw.split(',')[0].trim();
       const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
 
-      const patterns: string[] = [];
-      if (isZip) {
-        patterns.push(`location.eq.${cityOnly}`);
-        patterns.push(`location.ilike.%${cityOnly}%`);
-      } else {
-        // Match full city or city with state suffix
-        patterns.push(`location.eq.${cityOnly}`);
-        patterns.push(`location.ilike.${cityOnly},%`);
-        patterns.push(`location.ilike.%${cityOnly}%`);
-        // Also try full raw input (e.g., "San Francisco, CA")
-        patterns.push(`location.ilike.%${raw}%`);
-        // Word-level match for tokens >=4 chars (avoid "san" hitting Pleasanton)
-        const words = cityOnly.split(/\s+/).filter(Boolean);
-        words.forEach((w) => {
-          if (w.length >= 4) {
-            patterns.push(`location.ilike.%${w}%`);
-          }
-        });
-      }
+      const cols = ['location', 'location_text'];
+      const allPatterns: string[] = [];
 
-      query = query.or(patterns.join(','));
+      cols.forEach((col) => {
+        if (isZip) {
+          allPatterns.push(`${col}.eq.${cityOnly}`);
+          allPatterns.push(`${col}.ilike.%${cityOnly}%`);
+        } else {
+          // Match full city or city with state suffix
+          allPatterns.push(`${col}.eq.${cityOnly}`);
+          allPatterns.push(`${col}.ilike.${cityOnly},%`);
+          allPatterns.push(`${col}.ilike.%${cityOnly}%`);
+          // Also try full raw input (e.g., "San Francisco, CA")
+          allPatterns.push(`${col}.ilike.%${raw}%`);
+          // Word-level match for tokens >=4 chars
+          const words = cityOnly.split(/\s+/).filter(Boolean);
+          words.forEach((w) => {
+            if (w.length >= 4) {
+              allPatterns.push(`${col}.ilike.%${w}%`);
+            }
+          });
+        }
+      });
+
+      query = query.or(allPatterns.join(','));
     }
 
     // Get total count USING THE SAME FILTERS as the data query
