@@ -239,6 +239,34 @@ export async function GET(request: Request) {
       if (location && location.trim().length > 0) {
         const raw = location.trim().substring(0, 100);
         const cityOnly = raw.split(',')[0].trim();
+        const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
+        const cols = ['location', 'location_text'];
+        const allPatterns: string[] = [];
+
+        cols.forEach((col) => {
+          if (isZip) {
+            allPatterns.push(`${col}.eq.${cityOnly}`);
+            allPatterns.push(`${col}.ilike.%${cityOnly}%`);
+          } else {
+            allPatterns.push(`${col}.eq.${cityOnly}`);
+            allPatterns.push(`${col}.ilike.${cityOnly},%`);
+            allPatterns.push(`${col}.ilike.%${cityOnly}%`);
+            allPatterns.push(`${col}.ilike.%${raw}%`);
+            const words = cityOnly.split(/\s+/).filter(Boolean);
+            words.forEach((w) => {
+              if (w.length >= 4) {
+                allPatterns.push(`${col}.ilike.%${w}%`);
+              }
+            });
+          }
+        });
+
+        countQuery = countQuery.or(allPatterns.join(','));
+      }
+
+      if (location && location.trim().length > 0) {
+        const raw = location.trim().substring(0, 100);
+        const cityOnly = raw.split(',')[0].trim();
         const patterns = [
           `location.eq.${cityOnly}`,
           `location.ilike.${cityOnly},%`,
