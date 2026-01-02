@@ -125,7 +125,7 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - stricter city/zip matching to avoid false positives
+    // Location search - stricter city/zip matching (skip short tokens like "san" to avoid Pleasanton false hits)
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
@@ -142,6 +142,13 @@ export async function GET(request: Request) {
         patterns.push(`location.ilike.%${cityOnly}%`);
         // Also try full raw input (e.g., "San Francisco, CA")
         patterns.push(`location.ilike.%${raw}%`);
+        // Word-level match for tokens >=4 chars (avoid "san" hitting Pleasanton)
+        const words = cityOnly.split(/\s+/).filter(Boolean);
+        words.forEach((w) => {
+          if (w.length >= 4) {
+            patterns.push(`location.ilike.%${w}%`);
+          }
+        });
       }
 
       query = query.or(patterns.join(','));
