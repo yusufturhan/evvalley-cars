@@ -125,17 +125,29 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - robust city matching
+    // Location search - city/zip/address matching
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
-      // Exact city (before comma) by patterns: "City", "City,", "City ", "City, ST"
-      const patterns = [
+      const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
+
+      const patterns: string[] = [
         `location.eq.${cityOnly}`,
-        `location.ilike.${cityOnly},%`,
-        `location.ilike.${cityOnly} %`,
-        `location.ilike.${cityOnly}`,
+        `location.ilike.%${cityOnly}%`,
+        `location.ilike.%${raw}%`,
       ];
+
+      // If ZIP, try direct match in location string
+      if (isZip) {
+        patterns.push(`location.ilike.%${cityOnly}%`);
+      } else {
+        // Partial word matching for cities (e.g., "Sunnyvale")
+        const words = cityOnly.split(/\s+/).filter(Boolean);
+        words.forEach((w) => {
+          patterns.push(`location.ilike.%${w}%`);
+        });
+      }
+
       query = query.or(patterns.join(','));
     }
 
