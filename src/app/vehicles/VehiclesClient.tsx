@@ -154,8 +154,17 @@ export function VehiclesClient() {
     }
   };
 
-  const handleSearch = async () => {
-    // Reset to page 1 when searching
+  const applyLocationFilter = (loc: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const trimmed = loc.trim();
+    if (trimmed) {
+      params.set('location', trimmed);
+    } else {
+      params.delete('location');
+    }
+    // Preserve pagination reset
+    params.delete('page');
+    router.push(`/vehicles?${params.toString()}`);
     setCurrentPage(1);
   };
 
@@ -181,47 +190,6 @@ export function VehiclesClient() {
             <p className="text-xl text-white/90">
               Discover the future of transportation with zero emissions
             </p>
-
-            {/* Search Bar */}
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-lg p-4 shadow-lg">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search electric vehicles..."
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
-                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                      <input
-                        type="text"
-                        value={locationQuery}
-                        onChange={(e) => setLocationQuery(e.target.value)}
-                        placeholder="Select location..."
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent text-gray-900"
-                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                      />
-                    </div>
-                  </div>
-                  <button 
-                    onClick={handleSearch}
-                    className="bg-[#1C1F4A] text-white px-8 py-3 rounded-lg hover:bg-[#2A2F6B] flex items-center justify-center transition-colors"
-                  >
-                    <Filter className="mr-2 h-5 w-5" />
-                    Search
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -329,7 +297,7 @@ export function VehiclesClient() {
               <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Category Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Category</label>
@@ -417,6 +385,29 @@ export function VehiclesClient() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
+                </div>
+              </div>
+
+              {/* Location Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    value={locationQuery}
+                    onChange={(e) => {
+                      setLocationQuery(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        applyLocationFilter(locationQuery);
+                      }
+                    }}
+                    onBlur={() => applyLocationFilter(locationQuery)}
+                    placeholder="ZIP, city, or address"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 hover:border-[#3AB0FF]"
+                  />
                 </div>
               </div>
 
