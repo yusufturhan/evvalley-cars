@@ -125,37 +125,19 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - stricter city/zip matching (skip short tokens like "san" to avoid Pleasanton false hits)
+    // Location search - simple and reliable city/ZIP matching
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
-      const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
+      const isZip = /^\d{5}(-\d{4})?$/.test(raw);
 
-      const cols = ['location', 'location_text'];
-      const allPatterns: string[] = [];
-
-      cols.forEach((col) => {
-        if (isZip) {
-          allPatterns.push(`${col}.eq.${cityOnly}`);
-          allPatterns.push(`${col}.ilike.%${cityOnly}%`);
-        } else {
-          // Match full city or city with state suffix
-          allPatterns.push(`${col}.eq.${cityOnly}`);
-          allPatterns.push(`${col}.ilike.${cityOnly},%`);
-          allPatterns.push(`${col}.ilike.%${cityOnly}%`);
-          // Also try full raw input (e.g., "San Francisco, CA")
-          allPatterns.push(`${col}.ilike.%${raw}%`);
-          // Word-level match for tokens >=4 chars
-          const words = cityOnly.split(/\s+/).filter(Boolean);
-          words.forEach((w) => {
-            if (w.length >= 4) {
-              allPatterns.push(`${col}.ilike.%${w}%`);
-            }
-          });
-        }
-      });
-
-      query = query.or(allPatterns.join(','));
+      if (isZip) {
+        // ZIP code search: match in both location fields
+        query = query.or(`location.ilike.%${raw}%,location_text.ilike.%${raw}%`);
+      } else {
+        // City/address search: use city name without state (e.g., "Mountain View" from "Mountain View, CA")
+        query = query.or(`location.ilike.%${cityOnly}%,location_text.ilike.%${cityOnly}%`);
+      }
     }
 
     // Get total count USING THE SAME FILTERS as the data query
@@ -239,29 +221,15 @@ export async function GET(request: Request) {
       if (location && location.trim().length > 0) {
         const raw = location.trim().substring(0, 100);
         const cityOnly = raw.split(',')[0].trim();
-        const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
-        const cols = ['location', 'location_text'];
-        const allPatterns: string[] = [];
+        const isZip = /^\d{5}(-\d{4})?$/.test(raw);
 
-        cols.forEach((col) => {
-          if (isZip) {
-            allPatterns.push(`${col}.eq.${cityOnly}`);
-            allPatterns.push(`${col}.ilike.%${cityOnly}%`);
-          } else {
-            allPatterns.push(`${col}.eq.${cityOnly}`);
-            allPatterns.push(`${col}.ilike.${cityOnly},%`);
-            allPatterns.push(`${col}.ilike.%${cityOnly}%`);
-            allPatterns.push(`${col}.ilike.%${raw}%`);
-            const words = cityOnly.split(/\s+/).filter(Boolean);
-            words.forEach((w) => {
-              if (w.length >= 4) {
-                allPatterns.push(`${col}.ilike.%${w}%`);
-              }
-            });
-          }
-        });
-
-        countQuery = countQuery.or(allPatterns.join(','));
+        if (isZip) {
+          // ZIP code search: match in both location fields
+          countQuery = countQuery.or(`location.ilike.%${raw}%,location_text.ilike.%${raw}%`);
+        } else {
+          // City/address search: use city name without state
+          countQuery = countQuery.or(`location.ilike.%${cityOnly}%,location_text.ilike.%${cityOnly}%`);
+        }
       }
 
       if (location && location.trim().length > 0) {
