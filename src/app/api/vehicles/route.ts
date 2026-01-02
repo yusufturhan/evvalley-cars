@@ -125,27 +125,23 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - city/zip/address matching
+    // Location search - stricter city/zip matching to avoid false positives
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
       const isZip = /^\d{5}(-\d{4})?$/.test(cityOnly);
 
-      const patterns: string[] = [
-        `location.eq.${cityOnly}`,
-        `location.ilike.%${cityOnly}%`,
-        `location.ilike.%${raw}%`,
-      ];
-
-      // If ZIP, try direct match in location string
+      const patterns: string[] = [];
       if (isZip) {
+        patterns.push(`location.eq.${cityOnly}`);
         patterns.push(`location.ilike.%${cityOnly}%`);
       } else {
-        // Partial word matching for cities (e.g., "Sunnyvale")
-        const words = cityOnly.split(/\s+/).filter(Boolean);
-        words.forEach((w) => {
-          patterns.push(`location.ilike.%${w}%`);
-        });
+        // Match full city or city with state suffix
+        patterns.push(`location.eq.${cityOnly}`);
+        patterns.push(`location.ilike.${cityOnly},%`);
+        patterns.push(`location.ilike.%${cityOnly}%`);
+        // Also try full raw input (e.g., "San Francisco, CA")
+        patterns.push(`location.ilike.%${raw}%`);
       }
 
       query = query.or(patterns.join(','));
