@@ -610,12 +610,21 @@ export function VehiclesClient() {
                     <Link href={`/vehicles/${vehicle.id}`} className="block cursor-pointer">
                       <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
                         {vehicle.video_url ? (
-                          <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+                        <video
+                          src={vehicle.video_url}
+                          playsInline
+                          controls
+                          className="w-full h-full object-contain bg-black"
+                          preload="metadata"
+                        />
                         ) : vehicle.images && vehicle.images.length > 0 ? (
                           <img
                             src={vehicle.images[0]}
                             alt={vehicle.title}
                             className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          fetchPriority="low"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
