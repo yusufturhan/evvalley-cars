@@ -388,6 +388,56 @@ export function VehiclesClient() {
                 </div>
               </div>
 
+              {/* Year Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Year</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value={filters.year}
+                    onChange={(e) => {
+                      const newYear = e.target.value;
+                      const currentCategory = searchParams.get('category') || 'all';
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      if (currentCategory !== 'all') params.append('category', currentCategory);
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (newYear !== 'all') params.append('year', newYear);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles?${params.toString()}`);
+                    }}
+                  >
+                    <option value="all" className="text-gray-900">All Years</option>
+                    <option value="2025" className="text-gray-900">2025</option>
+                    <option value="2024" className="text-gray-900">2024</option>
+                    <option value="2023" className="text-gray-900">2023</option>
+                    <option value="2022" className="text-gray-900">2022</option>
+                    <option value="2021" className="text-gray-900">2021</option>
+                    <option value="2020" className="text-gray-900">2020</option>
+                    <option value="2019" className="text-gray-900">2019</option>
+                    <option value="2018" className="text-gray-900">2018</option>
+                    <option value="2017" className="text-gray-900">2017</option>
+                    <option value="2016" className="text-gray-900">2016</option>
+                    <option value="2015" className="text-gray-900">2015</option>
+                    <option value="2014" className="text-gray-900">2014</option>
+                    <option value="2013" className="text-gray-900">2013</option>
+                    <option value="2012" className="text-gray-900">2012</option>
+                    <option value="2011" className="text-gray-900">2011</option>
+                    <option value="2010" className="text-gray-900">2010</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
               {/* Location Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Location</label>
@@ -411,12 +461,7 @@ export function VehiclesClient() {
                 </div>
               </div>
 
-              {/* Year Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Year</label>
-                <div className="relative">
-                  <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+              {/* Min Price Filter */}
                     value={filters.year}
                     onChange={(e) => {
                       const newYear = e.target.value;
