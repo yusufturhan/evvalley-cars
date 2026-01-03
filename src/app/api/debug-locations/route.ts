@@ -8,7 +8,7 @@ export async function GET() {
     const { data: vehicles, error } = await supabase
       .from('vehicles')
       .select('id, title, location, location_text, city, state, postal_code')
-      .limit(50);
+      .order('created_at', { ascending: false });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -17,7 +17,7 @@ export async function GET() {
     return NextResponse.json({ 
       count: vehicles?.length || 0,
       vehicles: vehicles || [],
-      note: 'Showing location fields for first 50 vehicles'
+      note: 'Showing location fields for all vehicles'
     });
   } catch (error) {
     console.error('Debug locations error:', error);
