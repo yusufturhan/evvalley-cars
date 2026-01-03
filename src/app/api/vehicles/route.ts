@@ -21,6 +21,7 @@ export async function GET(request: Request) {
     const location = searchParams.get('location');
     const includeSold = searchParams.get('includeSold');
     const soldParam = searchParams.get('sold');
+    const debugLocations = searchParams.get('debugLocations'); // Add debug parameter
 
     // Add caching headers for better performance
     const response = new Response();
@@ -339,7 +340,16 @@ export async function GET(request: Request) {
         parsedLimit: parsedLimit,
         parsedOffset: parsedOffset,
         rangeApplied: parsedLimit ? `range(${parsedOffset}, ${parsedOffset + parsedLimit - 1})` : 'range(0, 9999)',
-        note: parsedLimit ? `Pagination mode: ${vehiclesCount} vehicles returned for page ${page || 1}` : 'No limit: fetching all vehicles'
+        note: parsedLimit ? `Pagination mode: ${vehiclesCount} vehicles returned for page ${page || 1}` : 'No limit: fetching all vehicles',
+        locationDebug: debugLocations === 'true' ? serializedData.map((v: any) => ({ 
+          id: v.id, 
+          title: v.title, 
+          location: v.location, 
+          location_text: v.location_text,
+          city: v.city,
+          state: v.state,
+          postal_code: v.postal_code
+        })) : undefined
       }
     });
   } catch (error) {
