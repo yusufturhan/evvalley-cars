@@ -126,19 +126,13 @@ export async function GET(request: Request) {
       query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
     }
 
-    // Location search - simple and reliable city/ZIP matching
+    // Location search - search in location field (all vehicles have this)
     if (location && location.trim().length > 0) {
       const raw = location.trim().substring(0, 100);
       const cityOnly = raw.split(',')[0].trim();
-      const isZip = /^\d{5}(-\d{4})?$/.test(raw);
-
-      if (isZip) {
-        // ZIP code search: match in both location fields
-        query = query.or(`location.ilike.%${raw}%,location_text.ilike.%${raw}%`);
-      } else {
-        // City/address search: use city name without state (e.g., "Mountain View" from "Mountain View, CA")
-        query = query.or(`location.ilike.%${cityOnly}%,location_text.ilike.%${cityOnly}%`);
-      }
+      
+      // Simply search for city name in location field (case-insensitive)
+      query = query.ilike('location', `%${cityOnly}%`);
     }
 
     // Get total count USING THE SAME FILTERS as the data query
@@ -219,18 +213,13 @@ export async function GET(request: Request) {
         countQuery = countQuery.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%,model.ilike.%${sanitizedSearch}%`);
       }
 
+      // Location search - search in location field (same as data query)
       if (location && location.trim().length > 0) {
         const raw = location.trim().substring(0, 100);
         const cityOnly = raw.split(',')[0].trim();
-        const isZip = /^\d{5}(-\d{4})?$/.test(raw);
-
-        if (isZip) {
-          // ZIP code search: match in both location fields
-          countQuery = countQuery.or(`location.ilike.%${raw}%,location_text.ilike.%${raw}%`);
-        } else {
-          // City/address search: use city name without state
-          countQuery = countQuery.or(`location.ilike.%${cityOnly}%,location_text.ilike.%${cityOnly}%`);
-        }
+        
+        // Simply search for city name in location field (case-insensitive)
+        countQuery = countQuery.ilike('location', `%${cityOnly}%`);
       }
 
       if (location && location.trim().length > 0) {
