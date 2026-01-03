@@ -222,18 +222,6 @@ export async function GET(request: Request) {
         countQuery = countQuery.ilike('location', `%${cityOnly}%`);
       }
 
-      if (location && location.trim().length > 0) {
-        const raw = location.trim().substring(0, 100);
-        const cityOnly = raw.split(',')[0].trim();
-        const patterns = [
-          `location.eq.${cityOnly}`,
-          `location.ilike.${cityOnly},%`,
-          `location.ilike.${cityOnly} %`,
-          `location.ilike.${cityOnly}`,
-        ];
-        countQuery = countQuery.or(patterns.join(','));
-      }
-
       const { count, error: countError } = await countQuery;
 
       if (countError) {
