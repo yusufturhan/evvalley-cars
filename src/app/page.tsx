@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
