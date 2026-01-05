@@ -51,11 +51,11 @@ export default function VehiclesPage() {
   return (
     <>
       <Suspense fallback={
-        <div className="min-h-screen bg-[#F5F9FF]">
+        <div className="min-h-screen bg-muted">
           <div className="max-w-7xl mx-auto px-4 py-16">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading vehicles...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+              <p className="mt-4 text-muted-foreground">Loading vehicles...</p>
             </div>
           </div>
         </div>

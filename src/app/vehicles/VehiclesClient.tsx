@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -202,11 +204,10 @@ export function VehiclesClient() {
               <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Selling your EV?</p>
               <p className="text-base text-gray-800">List for free in minutes. No commissions.</p>
             </div>
-            <Link
-              href="/sell-your-ev"
-              className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition-colors"
-            >
-              Start free listing
+            <Link href="/sell-your-ev">
+              <Button variant="primary" size="lg">
+                Start free listing
+              </Button>
             </Link>
           </div>
         </div>
@@ -235,55 +236,55 @@ export function VehiclesClient() {
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button 
-              onClick={() => {
-                router.push('/vehicles');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
+            <Button 
+              variant="primary"
+              size="md"
+              onClick={() => router.push('/vehicles')}
+              className="flex items-center gap-2"
             >
-              <Zap className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium">All Electric Vehicles</span>
-            </button>
+              <Zap className="w-4 h-4" />
+              All Electric Vehicles
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/ev-cars');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/ev-cars')}
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Cars</span>
-            </button>
+              <Car className="w-4 h-4" />
+              Electric Cars
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/hybrid-cars');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/hybrid-cars')}
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Hybrid Cars</span>
-            </button>
+              <Car className="w-4 h-4" />
+              Hybrid Cars
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/ev-scooters');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/ev-scooters')}
+              className="flex items-center gap-2"
             >
-              <Bike className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Scooters</span>
-            </button>
+              <Bike className="w-4 h-4" />
+              Electric Scooters
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/e-bikes');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/e-bikes')}
+              className="flex items-center gap-2"
             >
-              <Bike className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Bikes</span>
-            </button>
+              <Bike className="w-4 h-4" />
+              Electric Bikes
+            </Button>
           </div>
         </div>
       </section>
@@ -291,13 +292,13 @@ export function VehiclesClient() {
       {/* Filters Section */}
       <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <Card className="p-6">
             <div className="flex items-center mb-4">
               <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+              <h3 className="text-base font-semibold text-foreground">Filters</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Category Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Category</label>
@@ -524,17 +525,17 @@ export function VehiclesClient() {
 
             {/* Clear Filters Button */}
             <div className="flex justify-end mt-4">
-              <button
-                onClick={() => {
-                  router.push('/vehicles');
-                }}
-                className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/vehicles')}
+                className="flex items-center gap-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 Clear all filters
-              </button>
+              </Button>
             </div>
             
             {/* Show Sold Vehicles Toggle */}
@@ -559,7 +560,7 @@ export function VehiclesClient() {
                 )}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -666,14 +667,19 @@ export function VehiclesClient() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller">
-                          <button className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center" title="Contact Seller">
+                          <Button 
+                            variant="primary" 
+                            size="sm" 
+                            className="p-2"
+                            title="Contact Seller"
+                          >
                             <MessageCircle className="h-4 w-4" />
-                          </button>
+                          </Button>
                         </Link>
                         <Link href={`/vehicles/${vehicle.id}`}>
-                          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                          <Button variant="secondary" size="md">
                             View Details
-                          </button>
+                          </Button>
                         </Link>
                       </div>
                     </div>
@@ -689,36 +695,39 @@ export function VehiclesClient() {
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12 px-4">
             {/* Mobile: Show only current page info */}
             <div className="sm:hidden flex items-center space-x-2">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
               >
                 ← Prev
-              </button>
+              </Button>
               
-              <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">
+              <span className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm">
                 {currentPage} / {totalPages}
               </span>
               
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
               >
                 Next →
-              </button>
+              </Button>
             </div>
 
             {/* Desktop: Show full pagination */}
             <div className="hidden sm:flex items-center space-x-3">
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
               >
                 Previous
-              </button>
+              </Button>
               
               {/* Page Numbers */}
               {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
@@ -734,27 +743,25 @@ export function VehiclesClient() {
                 }
                 
                 return (
-                  <button
+                  <Button
                     key={pageNum}
+                    variant={currentPage === pageNum ? "primary" : "outline"}
+                    size="sm"
                     onClick={() => setCurrentPage(pageNum)}
-                    className={`px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      currentPage === pageNum
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg transform scale-105'
-                        : 'border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 hover:shadow-md'
-                    }`}
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
               
-              <button
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
         )}
