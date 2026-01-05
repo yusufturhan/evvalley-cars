@@ -588,14 +588,19 @@ export function HomeContent() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller">
-                          <button className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 flex items-center justify-center" title="Contact Seller">
+                          <Button 
+                            variant="primary" 
+                            size="sm" 
+                            className="p-2"
+                            title="Contact Seller"
+                          >
                             <MessageCircle className="h-4 w-4" />
-                          </button>
+                          </Button>
                         </Link>
                         <Link href={`/vehicles/${vehicle.id}`}>
-                          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                          <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a]">
                             View Details
-                          </button>
+                          </Button>
                         </Link>
                       </div>
                     </div>

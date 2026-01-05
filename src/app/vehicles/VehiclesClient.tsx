@@ -677,7 +677,7 @@ export function VehiclesClient() {
                           </Button>
                         </Link>
                         <Link href={`/vehicles/${vehicle.id}`}>
-                          <Button variant="secondary" size="md">
+                          <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a]">
                             View Details
                           </Button>
                         </Link>
