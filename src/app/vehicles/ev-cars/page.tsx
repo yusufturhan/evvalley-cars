@@ -600,28 +600,30 @@ function EVCarsContent() {
               {vehicles.map((vehicle) => (
                 <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                   <div className="relative">
-                    <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                      {vehicle.video_url ? (
-                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
-                      ) : vehicle.images && vehicle.images.length > 0 ? (
-                        <img
-                          src={vehicle.images[0]}
-                          alt={vehicle.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
-                        <div className="text-4xl mb-2">🚗</div>
-                        <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
+                    <Link href={`/vehicles/${vehicle.id}`} className="block relative">
+                      <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+                        {vehicle.video_url ? (
+                          <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+                        ) : vehicle.images && vehicle.images.length > 0 ? (
+                          <img
+                            src={vehicle.images[0]}
+                            alt={vehicle.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const fallback = target.nextElementSibling as HTMLElement;
+                              if (fallback) fallback.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
+                          <div className="text-4xl mb-2">🚗</div>
+                          <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="absolute top-2 right-2">
+                    </Link>
+                    <div className="absolute top-2 right-2 z-10">
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
