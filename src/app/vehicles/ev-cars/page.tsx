@@ -368,7 +368,37 @@ function EVCarsContent() {
               <h3 className="text-base font-semibold text-foreground">Filters</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Category Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Category</label>
+                <div className="relative">
+                  <select 
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    value="ev-car"
+                    onChange={(e) => {
+                      const category = e.target.value;
+                      if (category === 'all') router.push('/vehicles');
+                      else if (category === 'ev-car') router.push('/vehicles/ev-cars');
+                      else if (category === 'hybrid-car') router.push('/vehicles/hybrid-cars');
+                      else if (category === 'ev-scooter') router.push('/vehicles/ev-scooters');
+                      else if (category === 'e-bike') router.push('/vehicles/e-bikes');
+                    }}
+                  >
+                    <option value="all" className="text-gray-900">All Categories</option>
+                    <option value="ev-car" className="text-gray-900">Electric Cars</option>
+                    <option value="hybrid-car" className="text-gray-900">Hybrid Cars</option>
+                    <option value="ev-scooter" className="text-gray-900">Electric Scooters</option>
+                    <option value="e-bike" className="text-gray-900">Electric Bikes</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
               {/* Brand Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Brand</label>
@@ -466,6 +496,37 @@ function EVCarsContent() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
+                </div>
+              </div>
+
+              {/* Location Filter */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
+                  <input
+                    type="text"
+                    placeholder="ZIP, city, or address"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    value={filters.location}
+                    onChange={(e) => {
+                      const newLocation = e.target.value;
+                      const currentBrand = searchParams.get('brand') || 'all';
+                      const currentYear = searchParams.get('year') || 'all';
+                      const currentMinPrice = searchParams.get('minPrice') || '';
+                      const currentMaxPrice = searchParams.get('maxPrice') || '';
+                      
+                      const params = new URLSearchParams();
+                      params.append('category', 'ev-car');
+                      if (currentBrand !== 'all') params.append('brand', currentBrand);
+                      if (currentYear !== 'all') params.append('year', currentYear);
+                      if (newLocation) params.append('location', newLocation);
+                      if (currentMinPrice) params.append('minPrice', currentMinPrice);
+                      if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
+                      
+                      router.push(`/vehicles/ev-cars?${params.toString()}`);
+                    }}
+                  />
                 </div>
               </div>
 
