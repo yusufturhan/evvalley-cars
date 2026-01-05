@@ -7,6 +7,8 @@ import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 function EBikesContent() {
   const searchParams = useSearchParams();
@@ -263,66 +265,66 @@ function EBikesContent() {
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button 
-              onClick={() => {
-                router.push('/vehicles');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles')}
+              className="flex items-center gap-2"
             >
-              <Zap className="w-4 h-4 text-gray-600" />
+              <Zap className="w-4 h-4" />
               <span className="text-sm font-medium">All Electric Vehicles</span>
-            </button>
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/ev-cars');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/ev-cars')}
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
+              <Car className="w-4 h-4" />
               <span className="text-sm font-medium">Electric Cars</span>
-            </button>
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/hybrid-cars');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/hybrid-cars')}
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
+              <Car className="w-4 h-4" />
               <span className="text-sm font-medium">Hybrid Cars</span>
-            </button>
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/ev-scooters');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+            <Button 
+              variant="outline"
+              size="md"
+              onClick={() => router.push('/vehicles/ev-scooters')}
+              className="flex items-center gap-2"
             >
-              <Bike className="w-4 h-4 text-gray-600" />
+              <Bike className="w-4 h-4" />
               <span className="text-sm font-medium">Electric Scooters</span>
-            </button>
+            </Button>
             
-            <button 
-              onClick={() => {
-                router.push('/vehicles/e-bikes');
-              }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
+            <Button 
+              variant="primary"
+              size="md"
+              onClick={() => router.push('/vehicles/e-bikes')}
+              className="flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] shadow-md"
             >
-              <Bike className="w-4 h-4 text-white" />
+              <Bike className="w-4 h-4" />
               <span className="text-sm font-medium">Electric Bikes</span>
-            </button>
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Filters Section */}
-      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
+      <section className="py-8 bg-gradient-to-r from-muted to-white border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <Card className="p-6">
             <div className="flex items-center mb-4">
               <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+              <h3 className="text-base font-semibold text-foreground">Filters</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -474,17 +476,17 @@ function EBikesContent() {
 
             {/* Clear Filters Button */}
             <div className="flex justify-end mt-4">
-              <button
-                onClick={() => {
-                  router.push('/vehicles/e-bikes');
-                }}
-                className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push('/vehicles/e-bikes')}
+                className="flex items-center gap-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 Clear all filters
-              </button>
+              </Button>
             </div>
             
             {/* Show Sold Vehicles Toggle */}
@@ -509,7 +511,7 @@ function EBikesContent() {
                 )}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -588,9 +590,9 @@ function EBikesContent() {
                         ${vehicle.price.toLocaleString()}
                       </span>
                       <Link href={`/vehicles/${vehicle.id}`}>
-                        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                        <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a]">
                           View Details
-                        </button>
+                        </Button>
                       </Link>
                     </div>
                   </div>
