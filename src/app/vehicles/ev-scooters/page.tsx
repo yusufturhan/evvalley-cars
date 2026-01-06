@@ -242,22 +242,25 @@ function EVScootersContent() {
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="py-8 bg-gradient-to-r from-muted to-white border-b border-border">
+      {/* Main Content: Sidebar + Listings */}
+      <section className="py-8 bg-gradient-to-r from-muted to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="p-6">
-            <div className="flex items-center mb-4">
-              <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-bold text-gray-900">Filters</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Sidebar: Filters */}
+            <aside className="w-full lg:w-80 flex-shrink-0">
+              <Card className="p-5 sticky top-4">
+                <div className="flex items-center mb-5">
+                  <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
+                  <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                </div>
+                
+                <div className="space-y-4">
               {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Category</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Category</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value="ev-scooter"
                     onChange={(e) => {
                       const category = e.target.value;
@@ -283,11 +286,11 @@ function EVScootersContent() {
               </div>
 
               {/* Brand Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Brand</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Brand</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.brand}
                     onChange={(e) => {
                       const newBrand = e.target.value;
@@ -327,11 +330,11 @@ function EVScootersContent() {
               </div>
 
               {/* Year Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Year</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Year</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.year}
                     onChange={(e) => {
                       const newYear = e.target.value;
@@ -367,14 +370,14 @@ function EVScootersContent() {
               </div>
 
               {/* Location Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Location</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 z-10" />
                   <input
                     type="text"
                     placeholder="ZIP, city, or address"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.location}
                     onChange={(e) => {
                       const newLocation = e.target.value;
@@ -398,14 +401,14 @@ function EVScootersContent() {
               </div>
 
               {/* Min Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Min Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Min Price</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
                   <input
                     type="number"
                     placeholder="0"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.minPrice}
                     onChange={(e) => {
                       const newMinPrice = e.target.value;
@@ -426,14 +429,14 @@ function EVScootersContent() {
               </div>
 
               {/* Max Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Max Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Max Price</label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
                   <input
                     type="number"
                     placeholder="5,000"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.maxPrice}
                     onChange={(e) => {
                       const newMaxPrice = e.target.value;
@@ -454,68 +457,55 @@ function EVScootersContent() {
               </div>
             </div>
 
-            {/* Filter Actions - Separate Row */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                {/* Show Sold Vehicles Toggle - Left Side */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showSoldVehicles"
-                      checked={showSoldVehicles}
-                      onChange={(e) => setShowSoldVehicles(e.target.checked)}
-                      className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
-                    />
-                    <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
-                      Show sold vehicles
-                    </label>
-                  </div>
-                  {showSoldVehicles && (
-                    <span className="text-xs text-gray-500 hidden sm:inline">
-                      Showing all vehicles including sold ones
-                    </span>
-                  )}
-                </div>
+            {/* Filter Actions - Bottom of Sidebar */}
+            <div className="mt-5 pt-5 border-t border-gray-200 space-y-3">
+              {/* Show Sold Vehicles Toggle */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showSoldVehicles"
+                  checked={showSoldVehicles}
+                  onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                  className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                />
+                <label htmlFor="showSoldVehicles" className="ml-2 text-xs font-medium text-gray-700">Show sold vehicles</label>
+              </div>
 
-                {/* Action Buttons - Right Side */}
-                <div className="flex items-center gap-3 self-end sm:self-auto">
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => router.push('/vehicles/ev-scooters')}
-                    className="flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear all filters
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => {
-                      const vehiclesSection = document.querySelector('.vehicles-grid');
-                      if (vehiclesSection) {
-                        vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    Apply Filters
-                  </Button>
-                </div>
+              {/* Action Buttons - Stacked */}
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/vehicles/ev-scooters')}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear all filters
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    const vehiclesSection = document.querySelector('.vehicles-grid');
+                    if (vehiclesSection) {
+                      vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Apply Filters
+                </Button>
               </div>
             </div>
-          </Card>
-        </div>
-      </section>
+              </Card>
+            </aside>
 
-      {/* Vehicles Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Right: Vehicle Listings */}
+            <main className="flex-1 vehicles-grid">
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
                   <div className="h-64 bg-gray-200"></div>
@@ -531,14 +521,14 @@ function EVScootersContent() {
                 </div>
               ))}
             </div>
-          ) : vehicles.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">🛴</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No electric scooters found</h3>
-              <p className="text-gray-600">Try adjusting your filters or check back later.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              ) : vehicles.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-6xl mb-4">🛴</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No electric scooters found</h3>
+                  <p className="text-gray-600">Try adjusting your filters or check back later.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {vehicles.map((vehicle) => (
                 <div 
                   key={vehicle.id} 
@@ -632,13 +622,15 @@ function EVScootersContent() {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+            </main>
+          </div>
         </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section - Below Vehicles Grid */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
