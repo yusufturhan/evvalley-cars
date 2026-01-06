@@ -614,7 +614,14 @@ export function VehiclesClient() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vehicles.map((vehicle) => (
-                <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div 
+                  key={vehicle.id} 
+                  className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
+                    vehicle.sold 
+                      ? 'opacity-75 hover:opacity-80' 
+                      : 'hover:shadow-xl hover:-translate-y-1'
+                  }`}
+                >
                   <div className="relative">
                     <Link href={`/vehicles/${vehicle.id}`} className="block cursor-pointer">
                       <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -710,7 +717,10 @@ export function VehiclesClient() {
                         </Button>
                       </Link>
                       <Link href={`/vehicles/${vehicle.id}`} className="flex-1">
-                        <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] w-full">
+                        <Button 
+                          size="md" 
+                          className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] hover:scale-105 transition-transform duration-200 w-full"
+                        >
                           View Details
                         </Button>
                       </Link>
