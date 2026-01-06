@@ -457,51 +457,52 @@ export function HomeContent() {
               </div>
             </div>
 
-            {/* Clear Filters Button */}
-            <div className="flex justify-end mt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setFilters({
-                    category: 'all',
-                    brand: 'all',
-                    year: 'all',
-                    minPrice: '',
-                    maxPrice: '',
-                    color: 'all',
-                    maxMileage: ''
-                  });
-                }}
-                className="flex items-center gap-1"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Clear all filters
-              </Button>
-            </div>
-            
-            {/* Show Sold Vehicles Toggle */}
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="showSoldVehicles"
-                    checked={showSoldVehicles}
-                    onChange={(e) => setShowSoldVehicles(e.target.checked)}
-                    className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
-                  />
-                  <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
-                    Show sold vehicles
-                  </label>
+            {/* Filter Actions - Separate Row */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Show Sold Vehicles Toggle - Left Side */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="showSoldVehicles"
+                      checked={showSoldVehicles}
+                      onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                      className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                    />
+                    <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
+                      Show sold vehicles
+                    </label>
+                  </div>
+                  {showSoldVehicles && (
+                    <span className="text-xs text-gray-500 hidden sm:inline">
+                      Showing all vehicles including sold ones
+                    </span>
+                  )}
                 </div>
-                {showSoldVehicles && (
-                  <span className="text-xs text-gray-500">
-                    Showing all vehicles including sold ones
-                  </span>
-                )}
+
+                {/* Clear Filters Button - Right Side */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFilters({
+                      category: 'all',
+                      brand: 'all',
+                      year: 'all',
+                      minPrice: '',
+                      maxPrice: '',
+                      color: 'all',
+                      maxMileage: ''
+                    });
+                  }}
+                  className="flex items-center gap-1 self-end sm:self-auto"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear all filters
+                </Button>
               </div>
             </div>
           </Card>
