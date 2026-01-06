@@ -195,39 +195,6 @@ export function HomeContent() {
 
       <Header />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Electric Vehicles
-            </h1>
-            <p className="text-xl text-white/90">
-              Discover the future of transportation with zero emissions
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Category Info */}
-      <section className="py-8 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Zap className="w-8 h-8 text-[#3AB0FF] mr-3" />
-              <h2 className="text-3xl font-bold text-gray-900">All Electric Vehicles</h2>
-            </div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Browse our complete selection of electric vehicles including cars, scooters, and bikes. 
-              Find the perfect EV for your lifestyle and budget.
-            </p>
-            <div className="mt-4 text-2xl font-bold text-green-600">
-              {loading ? 'Loading...' : `${totalVehicles} Electric Vehicles`} Currently Available
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Category Filters */}
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
