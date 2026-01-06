@@ -9,6 +9,7 @@ import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export default function Home() {
   return (
@@ -231,60 +232,70 @@ export function HomeContent() {
       <section className="py-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button 
+            <Button 
+              variant="primary"
+              size="md"
               onClick={() => {
                 setFilters(prev => ({ ...prev, category: 'all' }));
-                setShowSoldVehicles(true); // Ensure all vehicles (including sold) are shown for "All"
+                setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] text-white shadow-md"
+              className="flex items-center gap-2"
             >
-              <Zap className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium">All Electric Vehicles</span>
-            </button>
+              <Zap className="w-4 h-4" />
+              All Electric Vehicles
+            </Button>
             
-            <button 
+            <Button 
+              variant="outline"
+              size="md"
               onClick={() => {
                 setFilters(prev => ({ ...prev, category: 'ev-car' }));
                 setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Cars</span>
-            </button>
+              <Car className="w-4 h-4" />
+              Electric Cars
+            </Button>
             
-            <button 
+            <Button 
+              variant="outline"
+              size="md"
               onClick={() => {
                 setFilters(prev => ({ ...prev, category: 'hybrid-car' }));
                 setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+              className="flex items-center gap-2"
             >
-              <Car className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Hybrid Cars</span>
-            </button>
+              <Car className="w-4 h-4" />
+              Hybrid Cars
+            </Button>
             
-            <button 
+            <Button 
+              variant="outline"
+              size="md"
               onClick={() => {
                 setFilters(prev => ({ ...prev, category: 'ev-scooter' }));
                 setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+              className="flex items-center gap-2"
             >
-              <Bike className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Scooters</span>
-            </button>
+              <Bike className="w-4 h-4" />
+              Electric Scooters
+            </Button>
             
-            <button 
+            <Button 
+              variant="outline"
+              size="md"
               onClick={() => {
                 setFilters(prev => ({ ...prev, category: 'e-bike' }));
                 setShowSoldVehicles(true);
               }}
-              className="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 bg-white border border-gray-300 hover:border-[#3AB0FF] hover:bg-[#F5F9FF] text-gray-900"
+              className="flex items-center gap-2"
             >
-              <Bike className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium">Electric Bikes</span>
-            </button>
+              <Bike className="w-4 h-4" />
+              Electric Bikes
+            </Button>
           </div>
         </div>
       </section>
@@ -292,13 +303,13 @@ export function HomeContent() {
       {/* Filters Section */}
       <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          <Card className="p-6">
             <div className="flex items-center mb-4">
               <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+              <h3 className="text-base font-semibold text-foreground">Filters</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Category Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">Category</label>
@@ -448,7 +459,9 @@ export function HomeContent() {
 
             {/* Clear Filters Button */}
             <div className="flex justify-end mt-4">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   setFilters({
                     category: 'all',
@@ -460,13 +473,13 @@ export function HomeContent() {
                     maxMileage: ''
                   });
                 }}
-                className="text-sm text-gray-500 hover:text-[#3AB0FF] transition-colors duration-200 flex items-center gap-1"
+                className="flex items-center gap-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 Clear all filters
-              </button>
+              </Button>
             </div>
             
             {/* Show Sold Vehicles Toggle */}
@@ -491,7 +504,7 @@ export function HomeContent() {
                 )}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
