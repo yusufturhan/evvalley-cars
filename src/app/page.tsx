@@ -267,22 +267,25 @@ export function HomeContent() {
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
+      {/* Main Content: Sidebar + Listings */}
+      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="p-6">
-            <div className="flex items-center mb-4">
-              <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-bold text-gray-900">Filters</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Sidebar: Filters */}
+            <aside className="w-full lg:w-80 flex-shrink-0">
+              <Card className="p-5 sticky top-4">
+                <div className="flex items-center mb-5">
+                  <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
+                  <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                </div>
+                
+                <div className="space-y-4">
               {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Category</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Category</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.category}
                     onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
                   >
@@ -301,11 +304,11 @@ export function HomeContent() {
               </div>
 
               {/* Brand Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Brand</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Brand</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.brand}
                     onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}
                   >
@@ -338,11 +341,11 @@ export function HomeContent() {
               </div>
 
               {/* Year Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Year</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Year</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.year}
                     onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value }))}
                   >
@@ -373,10 +376,10 @@ export function HomeContent() {
               </div>
 
               {/* Location Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Location</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Location</label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <input
                     type="text"
                     value={locationQuery}
@@ -388,20 +391,20 @@ export function HomeContent() {
                     }}
                     onBlur={() => setCurrentPage(1)}
                     placeholder="ZIP, city, or address"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 hover:border-[#3AB0FF]"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 hover:border-[#3AB0FF]"
                   />
                 </div>
               </div>
 
               {/* Min Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Min Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Min Price</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">$</span>
                   <input
                     type="number"
                     placeholder="0"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.minPrice}
                     onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
                   />
@@ -409,14 +412,14 @@ export function HomeContent() {
               </div>
 
               {/* Max Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Max Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Max Price</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">$</span>
                   <input
                     type="number"
                     placeholder="100,000"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.maxPrice}
                     onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
                   />
@@ -424,76 +427,68 @@ export function HomeContent() {
               </div>
             </div>
 
-            {/* Filter Actions - Separate Row */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                {/* Show Sold Vehicles Toggle - Left Side */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showSoldVehicles"
-                      checked={showSoldVehicles}
-                      onChange={(e) => setShowSoldVehicles(e.target.checked)}
-                      className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
-                    />
-                    <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
-                      Show sold vehicles
-                    </label>
-                  </div>
-                  {showSoldVehicles && (
-                    <span className="text-xs text-gray-500 hidden sm:inline">
-                      Showing all vehicles including sold ones
-                    </span>
-                  )}
-                </div>
+            {/* Filter Actions - Bottom of Sidebar */}
+            <div className="mt-5 pt-5 border-t border-gray-200 space-y-3">
+              {/* Show Sold Vehicles Toggle */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showSoldVehicles"
+                  checked={showSoldVehicles}
+                  onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                  className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                />
+                <label htmlFor="showSoldVehicles" className="ml-2 text-xs font-medium text-gray-700">
+                  Show sold vehicles
+                </label>
+              </div>
 
-                {/* Action Buttons - Right Side */}
-                <div className="flex items-center gap-3 self-end sm:self-auto">
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => {
-                      setFilters({
-                        category: 'all',
-                        brand: 'all',
-                        year: 'all',
-                        minPrice: '',
-                        maxPrice: '',
-                        color: 'all',
-                        maxMileage: ''
-                      });
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear all filters
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => {
-                      // Filters are already applied via onChange, this is for UX feedback
-                      window.scrollTo({ top: document.querySelector('.vehicles-grid')?.getBoundingClientRect().top, behavior: 'smooth' });
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    Apply Filters
-                  </Button>
-                </div>
+              {/* Action Buttons - Stacked */}
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setFilters({
+                      category: 'all',
+                      brand: 'all',
+                      year: 'all',
+                      minPrice: '',
+                      maxPrice: '',
+                      color: 'all',
+                      maxMileage: ''
+                    });
+                  }}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear all filters
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    // Scroll to vehicles grid
+                    const vehiclesSection = document.querySelector('.vehicles-grid');
+                    if (vehiclesSection) {
+                      vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Apply Filters
+                </Button>
               </div>
             </div>
-          </Card>
-        </div>
-      </section>
+              </Card>
+            </aside>
 
-      {/* Vehicles Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Right: Vehicle Listings */}
+            <main className="flex-1 vehicles-grid">
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
                   <div className="h-64 bg-gray-200"></div>
@@ -510,17 +505,17 @@ export function HomeContent() {
               ))}
             </div>
           ) : vehicles.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">🚗</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No vehicles found
-              </h3>
-              <p className="text-gray-600">
-                Try adjusting your filters or check back later.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="text-center py-12">
+                <div className="text-gray-400 text-6xl mb-4">🚗</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  No vehicles found
+                </h3>
+                <p className="text-gray-600">
+                  Try adjusting your filters or check back later.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {vehicles.map((vehicle) => (
                 <div 
                   key={vehicle.id} 
@@ -626,88 +621,90 @@ export function HomeContent() {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-        
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12 px-4">
-            {/* Mobile: Show only current page info */}
-            <div className="sm:hidden flex items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
-              >
-                ← Prev
-              </button>
+                ))}
+              </div>
+            )}
               
-              <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">
-                {currentPage} / {totalPages}
-              </span>
-              
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
-              >
-                Next →
-              </button>
-            </div>
-
-            {/* Desktop: Show full pagination */}
-            <div className="hidden sm:flex items-center space-x-3">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
-              >
-                Previous
-              </button>
-              
-              {/* Page Numbers */}
-              {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 7) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 4) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 3) {
-                  pageNum = totalPages - 6 + i;
-                } else {
-                  pageNum = currentPage - 3 + i;
-                }
-                
-                return (
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12">
+                {/* Mobile: Show only current page info */}
+                <div className="sm:hidden flex items-center space-x-2">
                   <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      currentPage === pageNum
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-lg transform scale-105'
-                        : 'border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 hover:shadow-md'
-                    }`}
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
                   >
-                    {pageNum}
+                    ← Prev
                   </button>
-                );
-              })}
-              
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
-              >
-                Next
-              </button>
-            </div>
+                  
+                  <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm">
+                    {currentPage} / {totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200 text-sm"
+                  >
+                    Next →
+                  </button>
+                </div>
+
+                {/* Desktop: Show full pagination */}
+                <div className="hidden sm:flex items-center space-x-3">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+                  >
+                    Previous
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 7) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 4) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 3) {
+                      pageNum = totalPages - 6 + i;
+                    } else {
+                      pageNum = currentPage - 3 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`px-4 py-2 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                          currentPage === pageNum
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-lg transform scale-105'
+                            : 'border-gray-400 text-gray-700 hover:bg-gray-100 hover:border-gray-500 hover:shadow-md'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-lg border-2 border-gray-400 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700 hover:border-gray-500 transition-all duration-200"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+            </main>
           </div>
-        )}
+        </div>
       </section>
 
-      {/* About Section */}
+      {/* About Section - Below Vehicles Grid */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
