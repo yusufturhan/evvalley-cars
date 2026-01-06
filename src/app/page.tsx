@@ -306,7 +306,7 @@ export function HomeContent() {
           <Card className="p-6">
             <div className="flex items-center mb-4">
               <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-base font-semibold text-foreground">Filters</h3>
+              <h3 className="text-lg font-bold text-gray-900">Filters</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -481,28 +481,41 @@ export function HomeContent() {
                   )}
                 </div>
 
-                {/* Clear Filters Button - Right Side */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setFilters({
-                      category: 'all',
-                      brand: 'all',
-                      year: 'all',
-                      minPrice: '',
-                      maxPrice: '',
-                      color: 'all',
-                      maxMileage: ''
-                    });
-                  }}
-                  className="flex items-center gap-1 self-end sm:self-auto"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Clear all filters
-                </Button>
+                {/* Action Buttons - Right Side */}
+                <div className="flex items-center gap-3 self-end sm:self-auto">
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onClick={() => {
+                      setFilters({
+                        category: 'all',
+                        brand: 'all',
+                        year: 'all',
+                        minPrice: '',
+                        maxPrice: '',
+                        color: 'all',
+                        maxMileage: ''
+                      });
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear all filters
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={() => {
+                      // Filters are already applied via onChange, this is for UX feedback
+                      window.scrollTo({ top: document.querySelector('.vehicles-grid')?.getBoundingClientRect().top, behavior: 'smooth' });
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
               </div>
             </div>
           </Card>
