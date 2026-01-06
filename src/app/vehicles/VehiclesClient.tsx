@@ -256,22 +256,25 @@ export function VehiclesClient() {
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white border-b border-gray-100">
+      {/* Main Content: Sidebar + Listings */}
+      <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="p-6">
-            <div className="flex items-center mb-4">
-              <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
-              <h3 className="text-lg font-bold text-gray-900">Filters</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Left Sidebar: Filters */}
+            <aside className="w-full lg:w-80 flex-shrink-0">
+              <Card className="p-5 sticky top-4">
+                <div className="flex items-center mb-5">
+                  <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
+                  <h3 className="text-lg font-bold text-gray-900">Filters</h3>
+                </div>
+                
+                <div className="space-y-4">
               {/* Category Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Category</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Category</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.category}
                     onChange={(e) => {
                       const newCategory = e.target.value;
@@ -305,11 +308,11 @@ export function VehiclesClient() {
               </div>
 
               {/* Brand Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Brand</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Brand</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.brand}
                     onChange={(e) => {
                       const newBrand = e.target.value;
@@ -357,11 +360,11 @@ export function VehiclesClient() {
               </div>
 
               {/* Year Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Year</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Year</label>
                 <div className="relative">
                   <select 
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
                     value={filters.year}
                     onChange={(e) => {
                       const newYear = e.target.value;
@@ -407,10 +410,10 @@ export function VehiclesClient() {
               </div>
 
               {/* Location Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Location</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Location</label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <input
                     type="text"
                     value={locationQuery}
@@ -424,20 +427,20 @@ export function VehiclesClient() {
                     }}
                     onBlur={() => applyLocationFilter(locationQuery)}
                     placeholder="ZIP, city, or address"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 hover:border-[#3AB0FF]"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-500 hover:border-[#3AB0FF]"
                   />
                 </div>
               </div>
 
               {/* Min Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Min Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Min Price</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">$</span>
                   <input
                     type="number"
                     placeholder="0"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.minPrice}
                     onChange={(e) => {
                       const newMinPrice = e.target.value;
@@ -460,14 +463,14 @@ export function VehiclesClient() {
               </div>
 
               {/* Max Price Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Max Price</label>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Max Price</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs">$</span>
                   <input
                     type="number"
                     placeholder="100,000"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
+                    className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.maxPrice}
                     onChange={(e) => {
                       const newMaxPrice = e.target.value;
@@ -490,65 +493,286 @@ export function VehiclesClient() {
               </div>
             </div>
 
-            {/* Filter Actions - Separate Row */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                {/* Show Sold Vehicles Toggle - Left Side */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showSoldVehicles"
-                      checked={showSoldVehicles}
-                      onChange={(e) => setShowSoldVehicles(e.target.checked)}
-                      className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
-                    />
-                    <label htmlFor="showSoldVehicles" className="ml-2 text-sm font-medium text-gray-700">
-                      Show sold vehicles
-                    </label>
-                  </div>
-                  {showSoldVehicles && (
-                    <span className="text-xs text-gray-500 hidden sm:inline">
-                      Showing all vehicles including sold ones
-                    </span>
-                  )}
-                </div>
+            {/* Filter Actions - Bottom of Sidebar */}
+            <div className="mt-5 pt-5 border-t border-gray-200 space-y-3">
+              {/* Show Sold Vehicles Toggle */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showSoldVehicles"
+                  checked={showSoldVehicles}
+                  onChange={(e) => setShowSoldVehicles(e.target.checked)}
+                  className="w-4 h-4 text-[#3AB0FF] bg-gray-100 border-gray-300 rounded focus:ring-[#3AB0FF] focus:ring-2"
+                />
+                <label htmlFor="showSoldVehicles" className="ml-2 text-xs font-medium text-gray-700">
+                  Show sold vehicles
+                </label>
+              </div>
 
-                {/* Action Buttons - Right Side */}
-                <div className="flex items-center gap-3 self-end sm:self-auto">
-                  <Button
-                    variant="outline"
-                    size="md"
-                    onClick={() => router.push('/vehicles')}
-                    className="flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Clear all filters
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => {
-                      // Scroll to vehicles grid
-                      const vehiclesSection = document.querySelector('.vehicles-grid');
-                      if (vehiclesSection) {
-                        vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      }
-                    }}
-                    className="flex items-center gap-2"
-                  >
-                    Apply Filters
-                  </Button>
-                </div>
+              {/* Action Buttons - Stacked */}
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/vehicles')}
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Clear all filters
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    // Scroll to vehicles grid
+                    const vehiclesSection = document.querySelector('.vehicles-grid');
+                    if (vehiclesSection) {
+                      vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }}
+                  className="w-full"
+                >
+                  Apply Filters
+                </Button>
               </div>
             </div>
-          </Card>
+              </Card>
+            </aside>
+
+            {/* Right: Vehicle Listings */}
+            <main className="flex-1 vehicles-grid">
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                      <div className="h-64 bg-gray-200"></div>
+                      <div className="p-6">
+                        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-6 bg-gray-200 rounded mb-4"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                        <div className="flex justify-between">
+                          <div className="h-6 bg-gray-200 rounded w-20"></div>
+                          <div className="h-8 bg-gray-200 rounded w-24"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : vehicles.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-6xl mb-4">🚗</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {'No vehicles found'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {'Try adjusting your filters or check back later.'}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {vehicles.map((vehicle) => (
+                      <div 
+                        key={vehicle.id} 
+                        className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
+                          vehicle.sold 
+                            ? 'opacity-75 hover:opacity-80' 
+                            : 'hover:shadow-xl hover:-translate-y-1'
+                        }`}
+                      >
+                        <div className="relative">
+                          <Link href={`/vehicles/${vehicle.id}`} className="block cursor-pointer">
+                            <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+                              {vehicle.video_url ? (
+                              <video
+                                src={vehicle.video_url}
+                                playsInline
+                                controls
+                                className="w-full h-full object-contain bg-black"
+                                preload="metadata"
+                              />
+                              ) : vehicle.images && vehicle.images.length > 0 ? (
+                                <img
+                                  src={vehicle.images[0]}
+                                  alt={vehicle.title}
+                                  className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
+                                fetchPriority="low"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.display = 'none';
+                                    const fallback = target.nextElementSibling as HTMLElement;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
+                                <div className="text-4xl mb-2">🚗</div>
+                                <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="absolute top-2 right-2 z-10">
+                            <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <div className="flex items-center mb-3 gap-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
+                              {vehicle.category.replace('-', ' ').toUpperCase()}
+                            </span>
+                            {vehicle.sold && (
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                SOLD
+                              </span>
+                            )}
+                          </div>
+                          
+                          {/* Title - Most Dominant */}
+                          <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{vehicle.title}</h3>
+                          
+                          {/* Secondary Info - Muted Group */}
+                          <div className="flex items-center gap-2 mb-5 text-sm text-muted-foreground">
+                            <span>{vehicle.year}</span>
+                            <span>•</span>
+                            <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}</span>
+                            {vehicle.range_miles && (
+                              <>
+                                <span>•</span>
+                                <span>{vehicle.range_miles}mi range</span>
+                              </>
+                            )}
+                          </div>
+                          
+                          {/* Price - Second Most Important */}
+                          <div className="mb-5">
+                            <div className="flex items-center gap-2">
+                              {(() => {
+                                const rawOld = (vehicle as any).old_price;
+                                const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                                const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                                return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                                  <span className="text-muted-foreground line-through text-base">${oldP.toLocaleString()}</span>
+                                ) : null;
+                              })()}
+                              <span className="text-3xl font-bold text-green-600">
+                                ${vehicle.price.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* CTA Buttons */}
+                          <div className="flex items-center justify-between gap-3">
+                            <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller" className="flex-shrink-0">
+                              <Button 
+                                variant="primary" 
+                                size="sm" 
+                                className="p-2"
+                                title="Contact Seller"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Link href={`/vehicles/${vehicle.id}`} className="flex-1">
+                              <Button 
+                                size="md" 
+                                className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] hover:scale-105 transition-transform duration-200 w-full"
+                              >
+                                View Details
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-3 mt-12">
+                      {/* Mobile: Show only current page info */}
+                      <div className="sm:hidden flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          ← Prev
+                        </Button>
+                        
+                        <span className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold text-sm">
+                          {currentPage} / {totalPages}
+                        </span>
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          Next →
+                        </Button>
+                      </div>
+
+                      {/* Desktop: Show full pagination */}
+                      <div className="hidden sm:flex items-center space-x-3">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+                        
+                        {/* Page Numbers */}
+                        {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                          let pageNum;
+                          if (totalPages <= 7) {
+                            pageNum = i + 1;
+                          } else if (currentPage <= 4) {
+                            pageNum = i + 1;
+                          } else if (currentPage >= totalPages - 3) {
+                            pageNum = totalPages - 6 + i;
+                          } else {
+                            pageNum = currentPage - 3 + i;
+                          }
+                          
+                          return (
+                            <Button
+                              key={pageNum}
+                              variant={currentPage === pageNum ? "primary" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(pageNum)}
+                            >
+                              {pageNum}
+                            </Button>
+                          );
+                        })}
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </main>
+          </div>
         </div>
       </section>
 
-      {/* Vehicles Grid */}
+      {/* About Section - Below Vehicles Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
