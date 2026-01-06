@@ -643,7 +643,7 @@ function EVScootersContent() {
                     </div>
                   </div>
                   <div className="p-6">
-                    <div className="flex items-center mb-2 gap-2">
+                    <div className="flex items-center mb-3 gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
                         {vehicle.category?.replace('-', ' ').toUpperCase() || 'EV SCOOTER'}
                       </span>
@@ -653,32 +653,47 @@ function EVScootersContent() {
                         </span>
                       )}
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.title}</h3>
-                    <p className="text-gray-600 mb-4">
-                      {vehicle.year} • {vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'} 
-                      {vehicle.range_miles && ` • ${vehicle.range_miles}mi range`}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-green-600">
+                    
+                    {/* Title - Most Dominant */}
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{vehicle.title}</h3>
+                    
+                    {/* Secondary Info - Muted Group */}
+                    <div className="flex items-center gap-2 mb-5 text-sm text-muted-foreground">
+                      <span>{vehicle.year}</span>
+                      <span>•</span>
+                      <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}</span>
+                      {vehicle.range_miles && (
+                        <>
+                          <span>•</span>
+                          <span>{vehicle.range_miles}mi range</span>
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Price - Second Most Important */}
+                    <div className="mb-5">
+                      <span className="text-3xl font-bold text-green-600">
                         ${vehicle.price.toLocaleString()}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller">
-                          <Button 
-                            variant="primary" 
-                            size="sm" 
-                            className="p-2"
-                            title="Contact Seller"
-                          >
-                            <MessageCircle className="h-4 w-4" />
-                          </Button>
-                        </Link>
-                        <Link href={`/vehicles/${vehicle.id}`}>
-                          <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a]">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
+                    </div>
+                    
+                    {/* CTA Buttons */}
+                    <div className="flex items-center justify-between gap-3">
+                      <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller" className="flex-shrink-0">
+                        <Button 
+                          variant="primary" 
+                          size="sm" 
+                          className="p-2"
+                          title="Contact Seller"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Link href={`/vehicles/${vehicle.id}`} className="flex-1">
+                        <Button size="md" className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] w-full">
+                          View Details
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>
