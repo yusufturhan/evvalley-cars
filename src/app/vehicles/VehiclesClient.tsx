@@ -42,6 +42,20 @@ export function VehiclesClient() {
   const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
   const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
 
+  // Load messageSent from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('evvalley_messageSent');
+      if (stored) {
+        try {
+          setMessageSent(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse messageSent from localStorage:', e);
+        }
+      }
+    }
+  }, []);
+
   // Sync filters state with URL params for UI
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category') || 'all';
@@ -187,8 +201,14 @@ export function VehiclesClient() {
       });
 
       if (response.ok) {
-        // Mark as sent
-        setMessageSent(prev => ({ ...prev, [vehicleId]: true }));
+        // Mark as sent and save to localStorage
+        const updatedMessageSent = { ...messageSent, [vehicleId]: true };
+        setMessageSent(updatedMessageSent);
+        
+        // Persist to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('evvalley_messageSent', JSON.stringify(updatedMessageSent));
+        }
       } else {
         alert('Failed to send message. Please try again.');
       }
