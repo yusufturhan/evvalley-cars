@@ -674,26 +674,38 @@ function EVCarsContent() {
                       </div>
                     </div>
                     
-                    {/* CTA Buttons */}
-                    <div className="flex items-center justify-between gap-3">
-                      <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller" className="flex-shrink-0">
-                        <Button 
-                          variant="primary" 
-                          size="sm" 
-                          className="p-2"
-                          title="Contact Seller"
+                    {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
+                    <div className="w-full">
+                      {/* Mobile Only: Inline Message Composer */}
+                      <div className="flex gap-2 md:hidden">
+                        <input
+                          type="text"
+                          defaultValue="Hi, is this still available?"
+                          onClick={(e) => e.preventDefault()}
+                          onFocus={(e) => e.stopPropagation()}
+                          className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href = `/vehicles/${vehicle.id}#contact`;
+                          }}
+                          className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap"
                         >
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Link href={`/vehicles/${vehicle.id}`} className="flex-1">
-                        <Button 
-                          size="md" 
-                          className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] hover:scale-105 transition-transform duration-200 w-full"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
+                          Send
+                        </button>
+                      </div>
+                      
+                      {/* Desktop Only: View Details Button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          window.location.href = `/vehicles/${vehicle.id}`;
+                        }}
+                        className="hidden md:block w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
+                      >
+                        View Details
+                      </button>
                     </div>
                   </div>
                 </div>

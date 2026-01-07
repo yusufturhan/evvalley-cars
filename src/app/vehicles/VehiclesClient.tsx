@@ -661,16 +661,39 @@ export function VehiclesClient() {
                             </div>
                           </div>
                           
-                          {/* Primary CTA - Full Width */}
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              window.location.href = `/vehicles/${vehicle.id}`;
-                            }}
-                            className="w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
-                          >
-                            View Details
-                          </button>
+                          {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
+                          <div className="w-full">
+                            {/* Mobile Only: Inline Message Composer */}
+                            <div className="flex gap-2 md:hidden">
+                              <input
+                                type="text"
+                                defaultValue="Hi, is this still available?"
+                                onClick={(e) => e.preventDefault()}
+                                onFocus={(e) => e.stopPropagation()}
+                                className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                              />
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  window.location.href = `/vehicles/${vehicle.id}#contact`;
+                                }}
+                                className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap"
+                              >
+                                Send
+                              </button>
+                            </div>
+                            
+                            {/* Desktop Only: View Details Button */}
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                window.location.href = `/vehicles/${vehicle.id}`;
+                              }}
+                              className="hidden md:block w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
+                            >
+                              View Details
+                            </button>
+                          </div>
                         </div>
                       </Link>
                     ))}
