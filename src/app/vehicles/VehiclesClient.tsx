@@ -749,7 +749,7 @@ export function VehiclesClient() {
                                   }}
                                   onClick={(e) => e.preventDefault()}
                                   onFocus={(e) => e.stopPropagation()}
-                                  className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                                  className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-black font-medium placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                                 />
                                 <button
                                   onClick={(e) => {
