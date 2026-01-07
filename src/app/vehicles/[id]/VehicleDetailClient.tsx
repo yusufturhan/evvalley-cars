@@ -432,6 +432,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   currentUserEmail={user?.emailAddresses[0]?.emailAddress || ''}
                   sellerEmail={vehicle.seller_email || ''}
                   isCurrentUserSeller={user?.emailAddresses[0]?.emailAddress === vehicle.seller_email}
+                  initialMessage="Hi, is this still available?"
                 />
               </div>
             )}

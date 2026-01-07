@@ -30,9 +30,9 @@ interface Conversation {
   unreadCount: number;
 }
 
-export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, isCurrentUserSeller }: SimpleChatProps) {
+export default function SimpleChat({ vehicleId, currentUserEmail, sellerEmail, isCurrentUserSeller, initialMessage = '' }: SimpleChatProps & { initialMessage?: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState(initialMessage || '');
   const [loading, setLoading] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
