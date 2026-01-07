@@ -62,6 +62,11 @@ function HybridCarsContent() {
       return;
     }
 
+    if (!sellerEmail || sellerEmail === '') {
+      alert('Seller contact information not available');
+      return;
+    }
+
     setSendingMessage(prev => ({ ...prev, [vehicleId]: true }));
 
     try {
@@ -72,11 +77,14 @@ function HybridCarsContent() {
           vehicleId,
           senderEmail: currentUserEmail,
           receiverEmail: sellerEmail,
-          message,
+          content: message, // API expects 'content', not 'message'
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to send message');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send message');
+      }
 
       const updatedSent = { ...messageSent, [vehicleId]: true };
       setMessageSent(updatedSent);
