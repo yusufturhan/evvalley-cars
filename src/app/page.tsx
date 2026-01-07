@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useUser } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
 
 export function HomeContent() {
   const router = useRouter();
+  const { user } = useUser();
   
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,11 @@ export function HomeContent() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalVehicles, setTotalVehicles] = useState(0);
   const vehiclesPerPage = 12;
+
+  // Message composer states
+  const [messageSent, setMessageSent] = useState<Record<string, boolean>>({});
+  const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
+  const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
 
   // Fetch vehicles with pagination
   useEffect(() => {
@@ -135,6 +142,43 @@ export function HomeContent() {
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleSendMessage = async (vehicleId: string, vehicleTitle: string, sellerEmail: string) => {
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      alert('Please sign in to send a message');
+      return;
+    }
+
+    const message = messageInputs[vehicleId] || 'Hi, is this still available?';
+    
+    // Set sending state
+    setSendingMessage(prev => ({ ...prev, [vehicleId]: true }));
+
+    try {
+      const response = await fetch('/api/simple-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vehicleId,
+          senderEmail: user.primaryEmailAddress.emailAddress,
+          receiverEmail: sellerEmail,
+          content: message.trim()
+        })
+      });
+
+      if (response.ok) {
+        // Mark as sent
+        setMessageSent(prev => ({ ...prev, [vehicleId]: true }));
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setSendingMessage(prev => ({ ...prev, [vehicleId]: false }));
     }
   };
 
@@ -600,24 +644,44 @@ export function HomeContent() {
                     
                     {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
                     <div className="w-full">
-                      {/* Mobile Only: Inline Message Composer */}
-                      <div className="flex gap-2 md:hidden">
-                        <input
-                          type="text"
-                          defaultValue="Hi, is this still available?"
-                          onClick={(e) => e.preventDefault()}
-                          onFocus={(e) => e.stopPropagation()}
-                          className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            window.location.href = `/vehicles/${vehicle.id}#contact`;
-                          }}
-                          className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap"
-                        >
-                          Send
-                        </button>
+                      {/* Mobile Only: Message Composer or See Conversation */}
+                      <div className="md:hidden">
+                        {messageSent[vehicle.id] ? (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              window.location.href = `/vehicles/${vehicle.id}#contact`;
+                            }}
+                            className="w-full h-11 px-4 bg-green-600 text-white rounded-lg font-medium active:opacity-80 flex items-center justify-center gap-2"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            See conversation
+                          </button>
+                        ) : (
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={messageInputs[vehicle.id] || 'Hi, is this still available?'}
+                              onChange={(e) => {
+                                e.stopPropagation();
+                                setMessageInputs(prev => ({ ...prev, [vehicle.id]: e.target.value }));
+                              }}
+                              onClick={(e) => e.preventDefault()}
+                              onFocus={(e) => e.stopPropagation()}
+                              className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                            />
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleSendMessage(vehicle.id, vehicle.title, vehicle.seller_email);
+                              }}
+                              disabled={sendingMessage[vehicle.id]}
+                              className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap disabled:opacity-50"
+                            >
+                              {sendingMessage[vehicle.id] ? 'Sending...' : 'Send'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                       
                       {/* Desktop Only: View Details Button */}
