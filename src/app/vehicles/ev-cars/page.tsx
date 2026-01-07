@@ -10,6 +10,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useUser } from "@clerk/nextjs";
 
 export default function EVCarsPage() {
   return (
@@ -31,6 +32,7 @@ export default function EVCarsPage() {
 function EVCarsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useUser();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +44,25 @@ function EVCarsContent() {
     maxPrice: ''
   });
   const [showSoldVehicles, setShowSoldVehicles] = useState(false);
+
+  // Message composer states
+  const [messageSent, setMessageSent] = useState<Record<string, boolean>>({});
+  const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
+  const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
+
+  // Load messageSent from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('evvalley_messageSent');
+      if (stored) {
+        try {
+          setMessageSent(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse messageSent from localStorage:', e);
+        }
+      }
+    }
+  }, []);
 
   // Sync filters state with URL params for UI
   useEffect(() => {
@@ -194,6 +215,46 @@ function EVCarsContent() {
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleSendMessage = async (vehicleId: string, vehicleTitle: string, sellerEmail: string) => {
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      alert('Please sign in to send a message');
+      return;
+    }
+
+    const message = messageInputs[vehicleId] || 'Hi, is this still available?';
+    
+    setSendingMessage(prev => ({ ...prev, [vehicleId]: true }));
+
+    try {
+      const response = await fetch('/api/simple-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vehicleId,
+          senderEmail: user.primaryEmailAddress.emailAddress,
+          receiverEmail: sellerEmail,
+          content: message.trim()
+        })
+      });
+
+      if (response.ok) {
+        const updatedMessageSent = { ...messageSent, [vehicleId]: true };
+        setMessageSent(updatedMessageSent);
+        
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('evvalley_messageSent', JSON.stringify(updatedMessageSent));
+        }
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setSendingMessage(prev => ({ ...prev, [vehicleId]: false }));
     }
   };
 
@@ -674,38 +735,44 @@ function EVCarsContent() {
                       </div>
                     </div>
                     
-                    {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
+                    {/* CTA: Inline Message Composer (All Screen Sizes) */}
                     <div className="w-full">
-                      {/* Mobile Only: Inline Message Composer */}
-                      <div className="flex gap-2 md:hidden">
-                        <input
-                          type="text"
-                          defaultValue="Hi, is this still available?"
-                          onClick={(e) => e.preventDefault()}
-                          onFocus={(e) => e.stopPropagation()}
-                          className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        />
+                      {messageSent[vehicle.id] ? (
                         <button
                           onClick={(e) => {
                             e.preventDefault();
                             window.location.href = `/vehicles/${vehicle.id}#contact`;
                           }}
-                          className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap"
+                          className="w-full h-11 px-4 bg-green-600 text-white rounded-lg font-medium active:opacity-80 flex items-center justify-center gap-2"
                         >
-                          Send
+                          <MessageCircle className="h-4 w-4" />
+                          See conversation
                         </button>
-                      </div>
-                      
-                      {/* Desktop Only: View Details Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.location.href = `/vehicles/${vehicle.id}`;
-                        }}
-                        className="hidden md:block w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
-                      >
-                        View Details
-                      </button>
+                      ) : (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={messageInputs[vehicle.id] || 'Hi, is this still available?'}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              setMessageInputs(prev => ({ ...prev, [vehicle.id]: e.target.value }));
+                            }}
+                            onClick={(e) => e.preventDefault()}
+                            onFocus={(e) => e.stopPropagation()}
+                            className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleSendMessage(vehicle.id, vehicle.title, vehicle.seller_email);
+                            }}
+                            disabled={sendingMessage[vehicle.id]}
+                            className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap disabled:opacity-50"
+                          >
+                            {sendingMessage[vehicle.id] ? 'Sending...' : 'Send'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
