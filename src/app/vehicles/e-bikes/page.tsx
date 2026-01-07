@@ -14,6 +14,7 @@ import { useUser } from "@clerk/nextjs";
 function EBikesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useUser();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,25 @@ function EBikesContent() {
     maxPrice: ''
   });
   const [showSoldVehicles, setShowSoldVehicles] = useState(false);
+
+  // Message composer states
+  const [messageSent, setMessageSent] = useState<Record<string, boolean>>({});
+  const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
+  const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
+
+  // Load messageSent from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('evvalley_messageSent');
+      if (stored) {
+        try {
+          setMessageSent(JSON.parse(stored));
+        } catch (e) {
+          console.error('Failed to parse messageSent from localStorage:', e);
+        }
+      }
+    }
+  }, []);
 
   // Sync filters state with URL params for UI
   useEffect(() => {
