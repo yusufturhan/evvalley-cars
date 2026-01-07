@@ -662,58 +662,44 @@ export function HomeContent() {
                       </div>
                     </div>
                     
-                    {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
+                    {/* CTA: Inline Message Composer (All Screen Sizes) */}
                     <div className="w-full">
-                      {/* Mobile Only: Message Composer or See Conversation */}
-                      <div className="md:hidden">
-                        {messageSent[vehicle.id] ? (
+                      {messageSent[vehicle.id] ? (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            window.location.href = `/vehicles/${vehicle.id}#contact`;
+                          }}
+                          className="w-full h-11 px-4 bg-green-600 text-white rounded-lg font-medium active:opacity-80 flex items-center justify-center gap-2"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          See conversation
+                        </button>
+                      ) : (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={messageInputs[vehicle.id] || 'Hi, is this still available?'}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              setMessageInputs(prev => ({ ...prev, [vehicle.id]: e.target.value }));
+                            }}
+                            onClick={(e) => e.preventDefault()}
+                            onFocus={(e) => e.stopPropagation()}
+                            className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          />
                           <button
                             onClick={(e) => {
                               e.preventDefault();
-                              window.location.href = `/vehicles/${vehicle.id}#contact`;
+                              handleSendMessage(vehicle.id, vehicle.title, vehicle.seller_email);
                             }}
-                            className="w-full h-11 px-4 bg-green-600 text-white rounded-lg font-medium active:opacity-80 flex items-center justify-center gap-2"
+                            disabled={sendingMessage[vehicle.id]}
+                            className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap disabled:opacity-50"
                           >
-                            <MessageCircle className="h-4 w-4" />
-                            See conversation
+                            {sendingMessage[vehicle.id] ? 'Sending...' : 'Send'}
                           </button>
-                        ) : (
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              value={messageInputs[vehicle.id] || 'Hi, is this still available?'}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                setMessageInputs(prev => ({ ...prev, [vehicle.id]: e.target.value }));
-                              }}
-                              onClick={(e) => e.preventDefault()}
-                              onFocus={(e) => e.stopPropagation()}
-                              className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                            />
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                handleSendMessage(vehicle.id, vehicle.title, vehicle.seller_email);
-                              }}
-                              disabled={sendingMessage[vehicle.id]}
-                              className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap disabled:opacity-50"
-                            >
-                              {sendingMessage[vehicle.id] ? 'Sending...' : 'Send'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Desktop Only: View Details Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.location.href = `/vehicles/${vehicle.id}`;
-                        }}
-                        className="hidden md:block w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
-                      >
-                        View Details
-                      </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </Link>
