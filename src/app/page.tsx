@@ -488,22 +488,20 @@ export function HomeContent() {
             {/* Right: Vehicle Listings */}
             <main className="flex-1 vehicles-grid">
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                  <div className="h-64 bg-gray-200"></div>
-                  <div className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="flex justify-between">
-                      <div className="h-6 bg-gray-200 rounded w-20"></div>
-                      <div className="h-8 bg-gray-200 rounded w-24"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-pulse">
+                      <div className="aspect-[4/3] bg-gray-200"></div>
+                      <div className="p-4">
+                        <div className="h-3 bg-gray-200 rounded mb-2 w-20"></div>
+                        <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                        <div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div>
+                        <div className="h-6 bg-gray-200 rounded mb-4 w-32"></div>
+                        <div className="h-11 bg-gray-200 rounded"></div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
           ) : vehicles.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">🚗</div>
@@ -515,46 +513,46 @@ export function HomeContent() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {vehicles.map((vehicle) => (
-                <div 
-                  key={vehicle.id} 
-                  className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
-                    vehicle.sold 
-                      ? 'opacity-75 hover:opacity-80' 
-                      : 'hover:shadow-xl hover:-translate-y-1'
+                <Link 
+                  key={vehicle.id}
+                  href={`/vehicles/${vehicle.id}`}
+                  className={`block bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-opacity ${
+                    vehicle.sold ? 'opacity-75' : ''
                   }`}
                 >
                   <div className="relative">
-                    <Link href={`/vehicles/${vehicle.id}`} className="block cursor-pointer">
-                      <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
-                        {vehicle.video_url ? (
-                          <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
-                        ) : vehicle.images && vehicle.images.length > 0 ? (
-                          <img
-                            src={vehicle.images[0]}
-                            alt={vehicle.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const fallback = target.nextElementSibling as HTMLElement;
-                              if (fallback) fallback.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
-                          <div className="text-4xl mb-2">🚗</div>
-                          <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
-                        </div>
+                    <div className="aspect-[4/3] bg-gray-200 flex items-center justify-center overflow-hidden">
+                      {vehicle.video_url ? (
+                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-cover" preload="metadata" />
+                      ) : vehicle.images && vehicle.images.length > 0 ? (
+                        <img
+                          src={vehicle.images[0]}
+                          alt={vehicle.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const fallback = target.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className={`absolute inset-0 flex flex-col items-center justify-center text-gray-400 ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : ''}`}>
+                        <div className="text-4xl mb-2">🚗</div>
+                        <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                       </div>
-                    </Link>
-                    <div className="absolute top-2 right-2 z-10">
+                    </div>
+                    <div className="absolute top-3 right-3 z-10" onClick={(e) => e.preventDefault()}>
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center mb-3 gap-2">
+                  <div className="p-4">
+                    {/* Badges */}
+                    <div className="flex items-center mb-2 gap-2 flex-wrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
                         {vehicle.category.replace('-', ' ').toUpperCase()}
                       </span>
@@ -565,14 +563,16 @@ export function HomeContent() {
                       )}
                     </div>
                     
-                    {/* Title - Most Dominant */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{vehicle.title}</h3>
+                    {/* Title */}
+                    <h3 className="text-lg font-medium text-card-foreground mb-2 line-clamp-2 leading-tight">
+                      {vehicle.title}
+                    </h3>
                     
-                    {/* Secondary Info - Muted Group */}
-                    <div className="flex items-center gap-2 mb-5 text-sm text-muted-foreground">
+                    {/* Meta Info */}
+                    <div className="flex items-center gap-1.5 mb-3 text-sm text-muted-foreground flex-wrap">
                       <span>{vehicle.year}</span>
                       <span>•</span>
-                      <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}</span>
+                      <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'New'}</span>
                       {vehicle.range_miles && (
                         <>
                           <span>•</span>
@@ -581,46 +581,35 @@ export function HomeContent() {
                       )}
                     </div>
                     
-                    {/* Price - Second Most Important */}
-                    <div className="mb-5">
-                      <div className="flex items-center gap-2">
+                    {/* Price - Most Prominent */}
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 flex-wrap">
                         {(() => {
                           const rawOld = (vehicle as any).old_price;
                           const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
                           const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
                           return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
-                            <span className="text-muted-foreground line-through text-base">${oldP.toLocaleString()}</span>
+                            <span className="text-muted-foreground line-through text-sm">${oldP.toLocaleString()}</span>
                           ) : null;
                         })()}
-                        <span className="text-3xl font-bold text-green-600">
+                        <span className="text-2xl font-bold text-green-600">
                           ${vehicle.price.toLocaleString()}
                         </span>
                       </div>
                     </div>
                     
-                    {/* CTA Buttons */}
-                    <div className="flex items-center justify-between gap-3">
-                      <Link href={`/vehicles/${vehicle.id}#contact`} aria-label="Contact Seller" className="flex-shrink-0">
-                        <Button 
-                          variant="primary" 
-                          size="sm" 
-                          className="p-2"
-                          title="Contact Seller"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Link href={`/vehicles/${vehicle.id}`} className="flex-1">
-                        <Button 
-                          size="md" 
-                          className="bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] hover:scale-105 transition-transform duration-200 w-full"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    </div>
+                    {/* Primary CTA - Full Width */}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = `/vehicles/${vehicle.id}`;
+                      }}
+                      className="w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
+                    >
+                      View Details
+                    </button>
                   </div>
-                </div>
+                </Link>
                 ))}
               </div>
             )}

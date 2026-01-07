@@ -7,11 +7,10 @@ import FavoriteButton from "@/components/FavoriteButton";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
-import Head from "next/head";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-function HybridCarsContent() {
+function EBikesContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -46,20 +45,21 @@ function HybridCarsContent() {
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
     
-    // Redirect if category=hybrid-car is in URL (duplicate canonical issue)
-    if (categoryFromUrl === 'hybrid-car') {
+    // Redirect if category=e-bike is in URL (duplicate canonical issue)
+    // The canonical URL is /vehicles/e-bikes without query params
+    if (categoryFromUrl === 'e-bike') {
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.delete('category');
       const newUrl = newParams.toString() 
-        ? `/vehicles/hybrid-cars?${newParams.toString()}`
-        : '/vehicles/hybrid-cars';
+        ? `/vehicles/e-bikes?${newParams.toString()}`
+        : '/vehicles/e-bikes';
       router.replace(newUrl, { scroll: false });
     }
   }, [searchParams, router]);
   
   // Set canonical URL - always point to clean URL without redundant category param
   useEffect(() => {
-    const canonicalUrl = 'https://www.evvalley.com/vehicles/hybrid-cars';
+    const canonicalUrl = 'https://www.evvalley.com/vehicles/e-bikes';
     let existingCanonical = document.querySelector('link[rel="canonical"]');
     if (existingCanonical) {
       existingCanonical.setAttribute('href', canonicalUrl);
@@ -85,20 +85,18 @@ function HybridCarsContent() {
         const currentSearch = searchParams.get('search') || '';
         const currentLocation = searchParams.get('location') || '';
 
-        // Fetch hybrid cars
+        // Fetch E-bikes
         const params = new URLSearchParams();
-        params.append('category', 'hybrid-car');
-        params.append('limit', '100'); // Show all hybrid cars
         if (currentBrand !== 'all') params.append('brand', currentBrand);
         if (currentYear !== 'all') params.append('year', currentYear);
         if (currentMinPrice) params.append('minPrice', currentMinPrice);
         if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
         if (showSoldVehicles) params.append('includeSold', 'true');
 
-        const response = await fetch(`/api/vehicles?${params.toString()}`);
+        const response = await fetch(`/api/e-bikes?${params.toString()}`);
         const data = await response.json();
         
-        let filteredVehicles = data.vehicles || [];
+        let filteredVehicles = data.bikes || [];
         
         // Apply search filtering
         if (currentSearch.trim()) {
@@ -186,29 +184,6 @@ function HybridCarsContent() {
 
   return (
     <div className="min-h-screen bg-[#F5F9FF]">
-      <Head>
-        {(() => {
-          const brand = filters.brand && filters.brand !== 'all' ? filters.brand : '';
-          const loc = (locationQuery || '').trim();
-          const title = `${brand ? brand + ' ' : ''}Hybrid Cars for Sale${loc ? ' in ' + loc : ''} | Evvalley`;
-          const desc = `Browse ${brand ? brand + ' ' : ''}hybrid cars${loc ? ' in ' + loc : ''}. Filter by price and year. Verified listings on Evvalley.`;
-          return (
-            <>
-              <title>{title}</title>
-              <meta name="description" content={desc} />
-              <link rel="canonical" href="https://www.evvalley.com/vehicles/hybrid-cars" />
-              {(
-                (filters.brand && filters.brand !== 'all') ||
-                (filters.year && filters.year !== 'all') ||
-                (filters.minPrice && filters.minPrice !== '') ||
-                (filters.maxPrice && filters.maxPrice !== '') ||
-                (searchQuery && searchQuery.trim() !== '') ||
-                (locationQuery && locationQuery.trim() !== '')
-              ) ? <meta name="robots" content="noindex,follow" /> : null}
-            </>
-          );
-        })()}
-      </Head>
       <Header />
 
       {/* Category Filters */}
@@ -236,10 +211,10 @@ function HybridCarsContent() {
             </Button>
             
             <Button 
-              variant="primary"
+              variant="outline"
               size="md"
               onClick={() => router.push('/vehicles/hybrid-cars')}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] shadow-md"
+              className="flex items-center gap-2"
             >
               <Car className="w-4 h-4" />
               <span className="text-sm font-medium">Hybrid Cars</span>
@@ -256,10 +231,10 @@ function HybridCarsContent() {
             </Button>
             
             <Button 
-              variant="outline"
+              variant="primary"
               size="md"
               onClick={() => router.push('/vehicles/e-bikes')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-gradient-to-r from-[#3AB0FF] to-[#78D64B] shadow-md"
             >
               <Bike className="w-4 h-4" />
               <span className="text-sm font-medium">Electric Bikes</span>
@@ -287,7 +262,7 @@ function HybridCarsContent() {
                 <div className="relative">
                   <select 
                     className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 appearance-none cursor-pointer hover:border-[#3AB0FF]"
-                    value="hybrid-car"
+                    value="e-bike"
                     onChange={(e) => {
                       const category = e.target.value;
                       if (category === 'all') router.push('/vehicles');
@@ -325,31 +300,28 @@ function HybridCarsContent() {
                       const currentMaxPrice = searchParams.get('maxPrice') || '';
                       
                       const params = new URLSearchParams();
-                      params.append('category', 'hybrid-car');
                       if (newBrand !== 'all') params.append('brand', newBrand);
                       if (currentYear !== 'all') params.append('year', currentYear);
                       if (currentMinPrice) params.append('minPrice', currentMinPrice);
                       if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
                       
-                      router.push(`/vehicles/hybrid-cars?${params.toString()}`);
+                      router.push(`/vehicles/e-bikes?${params.toString()}`);
                     }}
                   >
                     <option value="all" className="text-gray-900">All Brands</option>
-                    <option value="Toyota" className="text-gray-900">Toyota</option>
-                    <option value="Honda" className="text-gray-900">Honda</option>
-                    <option value="Ford" className="text-gray-900">Ford</option>
-                    <option value="Hyundai" className="text-gray-900">Hyundai</option>
-                    <option value="Kia" className="text-gray-900">Kia</option>
-                    <option value="Lexus" className="text-gray-900">Lexus</option>
-                    <option value="BMW" className="text-gray-900">BMW</option>
-                    <option value="Mercedes-Benz" className="text-gray-900">Mercedes-Benz</option>
-                    <option value="Audi" className="text-gray-900">Audi</option>
-                    <option value="Volkswagen" className="text-gray-900">Volkswagen</option>
-                    <option value="Nissan" className="text-gray-900">Nissan</option>
-                    <option value="Chevrolet" className="text-gray-900">Chevrolet</option>
-                    <option value="Mazda" className="text-gray-900">Mazda</option>
-                    <option value="Mitsubishi" className="text-gray-900">Mitsubishi</option>
-                    <option value="Subaru" className="text-gray-900">Subaru</option>
+                    <option value="Trek" className="text-gray-900">Trek</option>
+                    <option value="Specialized" className="text-gray-900">Specialized</option>
+                    <option value="Giant" className="text-gray-900">Giant</option>
+                    <option value="Cannondale" className="text-gray-900">Cannondale</option>
+                    <option value="Rad Power Bikes" className="text-gray-900">Rad Power Bikes</option>
+                    <option value="Aventon" className="text-gray-900">Aventon</option>
+                    <option value="Lectric" className="text-gray-900">Lectric</option>
+                    <option value="Juiced" className="text-gray-900">Juiced</option>
+                    <option value="Super73" className="text-gray-900">Super73</option>
+                    <option value="VanMoof" className="text-gray-900">VanMoof</option>
+                    <option value="Cowboy" className="text-gray-900">Cowboy</option>
+                    <option value="Gazelle" className="text-gray-900">Gazelle</option>
+                    <option value="Riese & Müller" className="text-gray-900">Riese & Müller</option>
                     <option value="Other" className="text-gray-900">Other</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -374,13 +346,12 @@ function HybridCarsContent() {
                       const currentMaxPrice = searchParams.get('maxPrice') || '';
                       
                       const params = new URLSearchParams();
-                      params.append('category', 'hybrid-car');
                       if (currentBrand !== 'all') params.append('brand', currentBrand);
                       if (newYear !== 'all') params.append('year', newYear);
                       if (currentMinPrice) params.append('minPrice', currentMinPrice);
                       if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
                       
-                      router.push(`/vehicles/hybrid-cars?${params.toString()}`);
+                      router.push(`/vehicles/e-bikes?${params.toString()}`);
                     }}
                   >
                     <option value="all" className="text-gray-900">All Years</option>
@@ -395,21 +366,6 @@ function HybridCarsContent() {
                     <option value="2017" className="text-gray-900">2017</option>
                     <option value="2016" className="text-gray-900">2016</option>
                     <option value="2015" className="text-gray-900">2015</option>
-                    <option value="2014" className="text-gray-900">2014</option>
-                    <option value="2013" className="text-gray-900">2013</option>
-                    <option value="2012" className="text-gray-900">2012</option>
-                    <option value="2011" className="text-gray-900">2011</option>
-                    <option value="2010" className="text-gray-900">2010</option>
-                    <option value="2009" className="text-gray-900">2009</option>
-                    <option value="2008" className="text-gray-900">2008</option>
-                    <option value="2007" className="text-gray-900">2007</option>
-                    <option value="2006" className="text-gray-900">2006</option>
-                    <option value="2005" className="text-gray-900">2005</option>
-                    <option value="2004" className="text-gray-900">2004</option>
-                    <option value="2003" className="text-gray-900">2003</option>
-                    <option value="2002" className="text-gray-900">2002</option>
-                    <option value="2001" className="text-gray-900">2001</option>
-                    <option value="2000" className="text-gray-900">2000</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -437,14 +393,14 @@ function HybridCarsContent() {
                       const currentMaxPrice = searchParams.get('maxPrice') || '';
                       
                       const params = new URLSearchParams();
-                      params.append('category', 'hybrid-car');
+                      params.append('category', 'e-bike');
                       if (currentBrand !== 'all') params.append('brand', currentBrand);
                       if (currentYear !== 'all') params.append('year', currentYear);
                       if (newLocation) params.append('location', newLocation);
                       if (currentMinPrice) params.append('minPrice', currentMinPrice);
                       if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
                       
-                      router.push(`/vehicles/hybrid-cars?${params.toString()}`);
+                      router.push(`/vehicles/e-bikes?${params.toString()}`);
                     }}
                   />
                 </div>
@@ -467,13 +423,12 @@ function HybridCarsContent() {
                       const currentMaxPrice = searchParams.get('maxPrice') || '';
                       
                       const params = new URLSearchParams();
-                      params.append('category', 'hybrid-car');
                       if (currentBrand !== 'all') params.append('brand', currentBrand);
                       if (currentYear !== 'all') params.append('year', currentYear);
                       if (newMinPrice) params.append('minPrice', newMinPrice);
                       if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
                       
-                      router.push(`/vehicles/hybrid-cars?${params.toString()}`);
+                      router.push(`/vehicles/e-bikes?${params.toString()}`);
                     }}
                   />
                 </div>
@@ -486,7 +441,7 @@ function HybridCarsContent() {
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">$</span>
                   <input
                     type="number"
-                    placeholder="100,000"
+                    placeholder="10,000"
                     className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all duration-200 bg-white text-gray-900 placeholder-gray-400 hover:border-[#3AB0FF]"
                     value={filters.maxPrice}
                     onChange={(e) => {
@@ -496,13 +451,12 @@ function HybridCarsContent() {
                       const currentMinPrice = searchParams.get('minPrice') || '';
                       
                       const params = new URLSearchParams();
-                      params.append('category', 'hybrid-car');
                       if (currentBrand !== 'all') params.append('brand', currentBrand);
                       if (currentYear !== 'all') params.append('year', currentYear);
                       if (currentMinPrice) params.append('minPrice', currentMinPrice);
                       if (newMaxPrice) params.append('maxPrice', newMaxPrice);
                       
-                      router.push(`/vehicles/hybrid-cars?${params.toString()}`);
+                      router.push(`/vehicles/e-bikes?${params.toString()}`);
                     }}
                   />
                 </div>
@@ -528,7 +482,7 @@ function HybridCarsContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push('/vehicles/hybrid-cars')}
+                  onClick={() => router.push('/vehicles/e-bikes')}
                   className="w-full flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -559,8 +513,8 @@ function HybridCarsContent() {
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-pulse">
-                  <div className="aspect-[4/3] bg-gray-200"></div>
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="h-64 bg-gray-200"></div>
                   <div className="p-4">
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-6 bg-gray-200 rounded mb-4"></div>
@@ -575,8 +529,8 @@ function HybridCarsContent() {
             </div>
               ) : vehicles.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="text-gray-400 text-6xl mb-4">🚗</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No hybrid vehicles found</h3>
+                  <div className="text-gray-400 text-6xl mb-4">🚴</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No electric bikes found</h3>
                   <p className="text-gray-600">Try adjusting your filters or check back later.</p>
                 </div>
               ) : (
@@ -607,7 +561,7 @@ function HybridCarsContent() {
                           />
                         ) : null}
                         <div className={`text-gray-400 text-center ${vehicle.images && vehicle.images.length > 0 ? 'hidden' : 'flex'}`}>
-                          <div className="text-4xl mb-2">🚗</div>
+                          <div className="text-4xl mb-2">🚴</div>
                           <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                         </div>
                       </div>
@@ -617,9 +571,9 @@ function HybridCarsContent() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="flex items-center mb-2 gap-2 flex-wrap">
+                    <div className="flex items-center mb-3 gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
-                        {vehicle.category.replace('-', ' ').toUpperCase()}
+                        {vehicle.category?.replace('-', ' ').toUpperCase() || 'E-BIKE'}
                       </span>
                       {vehicle.sold && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -632,7 +586,7 @@ function HybridCarsContent() {
                     <h3 className="text-lg font-medium text-card-foreground mb-2 line-clamp-2 leading-tight">{vehicle.title}</h3>
                     
                     {/* Secondary Info - Muted Group */}
-                    <div className="flex items-center gap-1.5 mb-3 text-sm text-muted-foreground flex-wrap">
+                    <div className="flex items-center gap-2 mb-5 text-sm text-muted-foreground">
                       <span>{vehicle.year}</span>
                       <span>•</span>
                       <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}</span>
@@ -645,20 +599,10 @@ function HybridCarsContent() {
                     </div>
                     
                     {/* Price - Second Most Important */}
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2">
-                        {(() => {
-                          const rawOld = (vehicle as any).old_price;
-                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
-                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
-                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
-                            <span className="text-muted-foreground line-through text-sm">${oldP.toLocaleString()}</span>
-                          ) : null;
-                        })()}
-                        <span className="text-2xl font-bold text-green-600">
-                          ${vehicle.price.toLocaleString()}
-                        </span>
-                      </div>
+                    <div className="mb-5">
+                      <span className="text-3xl font-bold text-green-600">
+                        ${vehicle.price.toLocaleString()}
+                      </span>
                     </div>
                     
                     {/* CTA Buttons */}
@@ -696,32 +640,32 @@ function HybridCarsContent() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">About Hybrid Vehicles</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8">About Electric Bikes</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Smart Technology for Efficiency</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Enhanced Cycling Experience</h3>
                 <p className="text-gray-600 mb-4">
-                  Hybrid vehicles combine the best of both worlds by integrating gasoline and electric 
-                  power systems. They use intelligent technology to automatically switch between power 
-                  sources for optimal efficiency and performance.
+                  Electric bikes combine the health benefits of traditional cycling with the convenience 
+                  of electric assistance. They're perfect for commuting, recreational riding, and 
+                  exploring new terrains while reducing physical strain and increasing range.
                 </p>
                 <p className="text-gray-600">
-                  In city driving, hybrids primarily use their electric motor for zero-emission operation, 
-                  while on highways, the gasoline engine provides power for long-distance travel. This 
-                  dual-system approach delivers exceptional fuel economy without compromising convenience.
+                  Modern e-bikes feature sophisticated motor systems, long-lasting batteries, and 
+                  intelligent pedal assistance that adapts to your riding style and terrain conditions. 
+                  They offer ranges of 20-100+ miles depending on the model and usage.
                 </p>
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Popular Hybrid Models & Benefits</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Versatile & Eco-Friendly</h3>
                 <p className="text-gray-600 mb-4">
-                  At Evvalley, you'll find popular hybrid models like Toyota Prius, Ford Fusion Hybrid, 
-                  Honda Insight, and Hyundai Ioniq. These vehicles offer significant fuel savings, 
-                  reduced emissions, and various government incentives.
+                  At Evvalley, you'll find electric bikes for every need - from city commuters and 
+                  mountain bikes to cargo bikes and folding models. Popular brands include Trek, 
+                  Specialized, Rad Power Bikes, and Aventon.
                 </p>
                 <p className="text-gray-600">
-                  Our expert team can help you find the perfect hybrid vehicle for your needs, whether 
-                  you're looking to purchase or sell. We offer competitive pricing and comprehensive 
-                  support throughout the buying and selling process.
+                  Electric bikes offer significant environmental benefits by reducing car dependency 
+                  and carbon emissions. They also provide health benefits through active transportation 
+                  while making cycling accessible to riders of all fitness levels and ages.
                 </p>
               </div>
             </div>
@@ -732,7 +676,7 @@ function HybridCarsContent() {
   );
 }
 
-export default function HybridCarsPage() {
+export default function EBikesPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-[#F5F9FF]">
@@ -740,12 +684,12 @@ export default function HybridCarsPage() {
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3AB0FF] mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading hybrid cars...</p>
+            <p className="mt-4 text-gray-600">Loading electric bikes...</p>
           </div>
         </div>
       </div>
     }>
-      <HybridCarsContent />
+      <EBikesContent />
     </Suspense>
   );
 }

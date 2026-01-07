@@ -511,11 +511,11 @@ function EBikesContent() {
             {/* Right: Vehicle Listings */}
             <main className="flex-1 vehicles-grid">
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
-                  <div className="h-64 bg-gray-200"></div>
-                  <div className="p-6">
+                <div key={i} className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-pulse">
+                  <div className="aspect-[4/3] bg-gray-200"></div>
+                  <div className="p-4">
                     <div className="h-4 bg-gray-200 rounded mb-2"></div>
                     <div className="h-6 bg-gray-200 rounded mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded mb-4"></div>
@@ -534,11 +534,11 @@ function EBikesContent() {
                   <p className="text-gray-600">Try adjusting your filters or check back later.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {vehicles.map((vehicle) => (
                 <div 
                   key={vehicle.id} 
-                  className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ${
+                  className={`bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-opacity ${
                     vehicle.sold 
                       ? 'opacity-75 hover:opacity-80' 
                       : 'hover:shadow-xl hover:-translate-y-1'
@@ -546,7 +546,7 @@ function EBikesContent() {
                 >
                   <div className="relative">
                     <Link href={`/vehicles/${vehicle.id}`} className="block relative">
-                      <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+                      <div className="aspect-[4/3] bg-gray-200 flex items-center justify-center overflow-hidden">
                         {vehicle.images && vehicle.images.length > 0 ? (
                           <img
                             src={vehicle.images[0]}
@@ -570,8 +570,8 @@ function EBikesContent() {
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center mb-3 gap-2">
+                  <div className="p-4">
+                    <div className="flex items-center mb-2 gap-2 flex-wrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
                         {vehicle.category?.replace('-', ' ').toUpperCase() || 'E-BIKE'}
                       </span>
@@ -583,10 +583,10 @@ function EBikesContent() {
                     </div>
                     
                     {/* Title - Most Dominant */}
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-tight">{vehicle.title}</h3>
+                    <h3 className="text-lg font-medium text-card-foreground mb-2 line-clamp-2 leading-tight">{vehicle.title}</h3>
                     
                     {/* Secondary Info - Muted Group */}
-                    <div className="flex items-center gap-2 mb-5 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5 mb-3 text-sm text-muted-foreground flex-wrap">
                       <span>{vehicle.year}</span>
                       <span>•</span>
                       <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} miles` : 'New'}</span>
@@ -599,8 +599,8 @@ function EBikesContent() {
                     </div>
                     
                     {/* Price - Second Most Important */}
-                    <div className="mb-5">
-                      <span className="text-3xl font-bold text-green-600">
+                    <div className="mb-4">
+                      <span className="text-2xl font-bold text-green-600">
                         ${vehicle.price.toLocaleString()}
                       </span>
                     </div>
