@@ -47,6 +47,50 @@ function HybridCarsContent() {
     }
   }, []);
 
+  // Handle sending message
+  const handleSendMessage = async (vehicleId: string, sellerEmail: string) => {
+    if (!user) {
+      window.location.href = `/sign-in?redirect_url=${encodeURIComponent(window.location.pathname)}`;
+      return;
+    }
+
+    const message = messageInputs[vehicleId] || 'Hi, is this still available?';
+    const currentUserEmail = user.emailAddresses[0]?.emailAddress;
+
+    if (!currentUserEmail) {
+      alert('Please sign in to send messages');
+      return;
+    }
+
+    setSendingMessage(prev => ({ ...prev, [vehicleId]: true }));
+
+    try {
+      const response = await fetch('/api/simple-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vehicleId,
+          senderEmail: currentUserEmail,
+          receiverEmail: sellerEmail,
+          message,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+
+      const updatedSent = { ...messageSent, [vehicleId]: true };
+      setMessageSent(updatedSent);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('evvalley_messageSent', JSON.stringify(updatedSent));
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setSendingMessage(prev => ({ ...prev, [vehicleId]: false }));
+    }
+  };
+
   // Sync filters state with URL params for UI
   useEffect(() => {
     const brandFromUrl = searchParams.get('brand') || 'all';
@@ -682,38 +726,43 @@ function HybridCarsContent() {
                       </div>
                     </div>
                     
-                    {/* CTA: Mobile = Message Composer | Desktop = View Details Button */}
+                    {/* CTA: Inline Message Composer (Mobile & Desktop) */}
                     <div className="w-full">
-                      {/* Mobile Only: Inline Message Composer */}
-                      <div className="flex gap-2 md:hidden">
-                        <input
-                          type="text"
-                          defaultValue="Hi, is this still available?"
-                          onClick={(e) => e.preventDefault()}
-                          onFocus={(e) => e.stopPropagation()}
-                          className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                        />
+                      {messageSent[vehicle.id] ? (
                         <button
                           onClick={(e) => {
-                            e.preventDefault();
+                            e.stopPropagation();
                             window.location.href = `/vehicles/${vehicle.id}#contact`;
                           }}
-                          className="h-11 px-4 bg-primary text-white rounded-lg font-medium active:opacity-80 whitespace-nowrap"
+                          className="w-full h-11 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 active:opacity-80 transition-colors"
                         >
-                          Send
+                          See conversation
                         </button>
-                      </div>
-                      
-                      {/* Desktop Only: View Details Button */}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          window.location.href = `/vehicles/${vehicle.id}`;
-                        }}
-                        className="hidden md:block w-full h-11 px-4 bg-[#1a1a1a] text-white rounded-lg font-medium active:bg-[#2a2a2a] transition-colors"
-                      >
-                        View Details
-                      </button>
+                      ) : (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={messageInputs[vehicle.id] || 'Hi, is this still available?'}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              setMessageInputs(prev => ({ ...prev, [vehicle.id]: e.target.value }));
+                            }}
+                            onClick={(e) => e.preventDefault()}
+                            onFocus={(e) => e.stopPropagation()}
+                            className="flex-1 h-11 px-3 border border-gray-300 rounded-lg text-sm text-black font-medium placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSendMessage(vehicle.id, vehicle.seller_email || '');
+                            }}
+                            disabled={sendingMessage[vehicle.id]}
+                            className="h-11 px-4 bg-primary text-white rounded-lg font-medium hover:bg-blue-600 active:opacity-80 whitespace-nowrap disabled:opacity-50 transition-colors"
+                          >
+                            {sendingMessage[vehicle.id] ? 'Sending...' : 'Send'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
