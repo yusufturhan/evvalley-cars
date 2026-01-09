@@ -32,19 +32,23 @@ function EBikesContent() {
   const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
   const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
 
-  // Load messageSent from localStorage on mount
+  // Load messageSent from localStorage on mount (user-specific)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('evvalley_messageSent');
+    if (typeof window !== 'undefined' && user?.id) {
+      const userKey = `evvalley_messageSent_${user.id}`;
+      const stored = localStorage.getItem(userKey);
       if (stored) {
         try {
           setMessageSent(JSON.parse(stored));
         } catch (e) {
           console.error('Failed to parse messageSent from localStorage:', e);
         }
+      } else {
+        // Clear state if no data for this user
+        setMessageSent({});
       }
     }
-  }, []);
+  }, [user?.id]);
 
   // Sync filters state with URL params for UI
   useEffect(() => {

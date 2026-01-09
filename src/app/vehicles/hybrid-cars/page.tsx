@@ -33,19 +33,24 @@ function HybridCarsContent() {
   const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
   const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
 
-  // Load messageSent from localStorage on mount
+  // Load messageSent from localStorage on mount (user-specific)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('evvalley_messageSent');
+    if (typeof window !== 'undefined' && user?.emailAddresses?.[0]?.emailAddress) {
+      const userId = user.id;
+      const userKey = `evvalley_messageSent_${userId}`;
+      const stored = localStorage.getItem(userKey);
       if (stored) {
         try {
           setMessageSent(JSON.parse(stored));
         } catch (e) {
           console.error('Failed to parse messageSent from localStorage:', e);
         }
+      } else {
+        // Clear state if no data for this user
+        setMessageSent({});
       }
     }
-  }, []);
+  }, [user?.id]);
 
   // Handle sending message
   const handleSendMessage = async (vehicleId: string, sellerEmail: string) => {
@@ -88,8 +93,9 @@ function HybridCarsContent() {
 
       const updatedSent = { ...messageSent, [vehicleId]: true };
       setMessageSent(updatedSent);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('evvalley_messageSent', JSON.stringify(updatedSent));
+      if (typeof window !== 'undefined' && user?.id) {
+        const userKey = `evvalley_messageSent_${user.id}`;
+        localStorage.setItem(userKey, JSON.stringify(updatedSent));
       }
     } catch (error) {
       console.error('Error sending message:', error);

@@ -59,19 +59,23 @@ export function HomeContent() {
   const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
   const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
 
-  // Load messageSent from localStorage on mount
+  // Load messageSent from localStorage on mount (user-specific)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('evvalley_messageSent');
+    if (typeof window !== 'undefined' && user?.id) {
+      const userKey = `evvalley_messageSent_${user.id}`;
+      const stored = localStorage.getItem(userKey);
       if (stored) {
         try {
           setMessageSent(JSON.parse(stored));
         } catch (e) {
           console.error('Failed to parse messageSent from localStorage:', e);
         }
+      } else {
+        // Clear state if no data for this user
+        setMessageSent({});
       }
     }
-  }, []);
+  }, [user?.id]);
 
   // Fetch vehicles with pagination
   useEffect(() => {
@@ -183,13 +187,14 @@ export function HomeContent() {
       });
 
       if (response.ok) {
-        // Mark as sent and save to localStorage
+        // Mark as sent and save to localStorage (user-specific)
         const updatedMessageSent = { ...messageSent, [vehicleId]: true };
         setMessageSent(updatedMessageSent);
         
-        // Persist to localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('evvalley_messageSent', JSON.stringify(updatedMessageSent));
+        // Persist to localStorage with user-specific key
+        if (typeof window !== 'undefined' && user?.id) {
+          const userKey = `evvalley_messageSent_${user.id}`;
+          localStorage.setItem(userKey, JSON.stringify(updatedMessageSent));
         }
       } else {
         alert('Failed to send message. Please try again.');
