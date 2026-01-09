@@ -852,7 +852,7 @@ export function HomeContent() {
         onClose={() => setIsFilterOpen(false)}
         title="Filters"
       >
-        <div className="space-y-4 pb-24">
+        <div className="space-y-4 px-4 py-4 pb-28">
           {/* Category Filter */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-900">Category</label>

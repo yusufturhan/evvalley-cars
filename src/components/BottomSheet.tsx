@@ -93,8 +93,8 @@ export default function BottomSheet({ isOpen, onClose, title, children }: Bottom
           </button>
         </div>
 
-        {/* Content */}
-        <div className="overflow-y-auto h-[calc(85vh-80px)] px-4 py-4">
+        {/* Content - Scrollable area with bottom padding for fixed buttons */}
+        <div className="overflow-y-auto h-[calc(85vh-80px)] overscroll-contain">
           {children}
         </div>
       </div>

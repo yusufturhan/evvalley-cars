@@ -726,7 +726,7 @@ function EVScootersContent() {
         onClose={() => setIsFilterOpen(false)}
         title="Filters"
       >
-        <div className="space-y-4 pb-24">
+        <div className="space-y-4 px-4 py-4 pb-28">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-900">Category</label>
             <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.category} onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}>
