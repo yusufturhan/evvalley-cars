@@ -98,32 +98,21 @@ export function VehiclesClient() {
       try {
         setLoading(true);
         
-        // Get current filters from URL params
-        const currentCategory = searchParams.get('category') || 'all';
-        const currentBrand = searchParams.get('brand') || 'all';
-        const currentYear = searchParams.get('year') || 'all';
-        const currentMinPrice = searchParams.get('minPrice') || '';
-        const currentMaxPrice = searchParams.get('maxPrice') || '';
-        const currentColor = searchParams.get('color') || 'all';
-        const currentMaxMileage = searchParams.get('maxMileage') || '';
-        const currentSearch = searchParams.get('search') || '';
-        const currentLocation = searchParams.get('location') || '';
-
-        // Build API params with pagination
+        // Build API params with pagination - use filters state directly
         const params = new URLSearchParams();
         params.append('page', currentPage.toString());
         params.append('limit', vehiclesPerPage.toString());
         
-        if (currentCategory !== 'all') params.append('category', currentCategory);
-        if (currentBrand !== 'all') params.append('brand', currentBrand);
-        if (currentYear !== 'all') params.append('year', currentYear);
-        if (currentMinPrice) params.append('minPrice', currentMinPrice);
-        if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
-        if (currentColor !== 'all') params.append('color', currentColor);
-        if (currentMaxMileage) params.append('maxMileage', currentMaxMileage);
+        if (filters.category !== 'all') params.append('category', filters.category);
+        if (filters.brand !== 'all') params.append('brand', filters.brand);
+        if (filters.year !== 'all') params.append('year', filters.year);
+        if (filters.minPrice) params.append('minPrice', filters.minPrice);
+        if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+        if (filters.color !== 'all') params.append('color', filters.color);
+        if (filters.maxMileage) params.append('maxMileage', filters.maxMileage);
         // Always show all vehicles (both sold and unsold) - no sold filter
-        if (currentSearch.trim()) params.append('search', currentSearch.trim());
-        if (currentLocation.trim()) params.append('location', currentLocation.trim());
+        if (searchQuery.trim()) params.append('search', searchQuery.trim());
+        if (locationQuery.trim()) params.append('location', locationQuery.trim());
 
         console.log('🔍 Fetching vehicles for page:', currentPage, 'with params:', params.toString());
 
@@ -170,7 +159,7 @@ export function VehiclesClient() {
     };
 
     fetchVehicles();
-  }, [currentPage, searchParams, searchQuery, locationQuery, vehiclesPerPage]);
+  }, [currentPage, filters, searchQuery, locationQuery, vehiclesPerPage]);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
