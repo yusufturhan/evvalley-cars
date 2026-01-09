@@ -415,6 +415,15 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                 </div>
               )}
 
+              {/* Photo Counter - Facebook Marketplace Style */}
+              {hasImages && media.length > 1 && (
+                <div className="absolute bottom-4 right-4 z-10">
+                  <span className="bg-black/70 text-white text-sm font-medium px-3 py-1.5 rounded-lg">
+                    {selectedImageIndex + 1} of {media.length}
+                  </span>
+                </div>
+              )}
+
               {/* Navigation Arrows (Desktop Only) */}
               {hasImages && media.length > 1 && (
                 <>
