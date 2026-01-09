@@ -719,7 +719,6 @@ function EVScootersContent() {
           </div>
         </div>
       </section>
-    </div>
 
       {/* Mobile Bottom Sheet Filters */}
       <BottomSheet
@@ -784,6 +783,7 @@ function EVScootersContent() {
           <button onClick={() => { setIsFilterOpen(false); }} className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform">Apply ({totalVehicles} results)</button>
         </div>
       </BottomSheet>
+    </div>
   );
 }
 

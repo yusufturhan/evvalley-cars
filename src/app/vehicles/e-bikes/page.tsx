@@ -725,7 +725,6 @@ function EBikesContent() {
           </div>
         </div>
       </section>
-    </div>
 
       {/* Mobile Bottom Sheet Filters */}
       <BottomSheet
@@ -736,13 +735,13 @@ function EBikesContent() {
         <div className="space-y-4 pb-24">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-900">Category</label>
-            <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.category} onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}>
-              <option value="all">All Categories</option>
-              <option value="ev-car">Electric Cars</option>
-              <option value="hybrid-car">Hybrid Cars</option>
-              <option value="e-bike">Electric Bikes</option>
-              <option value="e-bike">Electric Bikes</option>
-            </select>
+             <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.category} onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}>
+               <option value="all">All Categories</option>
+               <option value="ev-car">Electric Cars</option>
+               <option value="hybrid-car">Hybrid Cars</option>
+               <option value="ev-scooter">Electric Scooters</option>
+               <option value="e-bike">Electric Bikes</option>
+             </select>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-900">Brand</label>
@@ -790,6 +789,7 @@ function EBikesContent() {
           <button onClick={() => { setIsFilterOpen(false); }} className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform">Apply ({totalVehicles} results)</button>
         </div>
       </BottomSheet>
+    </div>
   );
 }
 
