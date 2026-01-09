@@ -18,7 +18,9 @@ import {
   User,
   Clock,
   CheckCircle,
-  Trash2
+  Trash2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -61,6 +63,10 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const [markingAsSold, setMarkingAsSold] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [userSupabaseId, setUserSupabaseId] = useState<string | null>(null);
+  
+  // Touch swipe states for mobile gallery navigation
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   // Debug vehicle data on component mount (development only)
   useEffect(() => {
@@ -311,6 +317,36 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
     }
   };
 
+  // Minimum swipe distance (in px) to trigger navigation
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && selectedImageIndex < media.length - 1) {
+      // Swipe left - next image
+      setSelectedImageIndex(prev => prev + 1);
+    }
+    
+    if (isRightSwipe && selectedImageIndex > 0) {
+      // Swipe right - previous image
+      setSelectedImageIndex(prev => prev - 1);
+    }
+  };
+
   const hasImages = media.length > 0;
 
   return (
@@ -333,7 +369,12 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           {/* Vehicle Images */}
           <div className="space-y-4">
             {/* Main Media (Video or Image) */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden relative">
+            <div 
+              className="bg-white rounded-lg shadow-lg overflow-hidden relative group"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
               <div className="h-[500px] lg:h-[600px] bg-gray-200 flex items-center justify-center">
                 {hasImages && media[selectedImageIndex] ? (
                   selectedImageIndex === 0 && vehicle.video_url ? (
@@ -372,6 +413,33 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                     SOLD
                   </span>
                 </div>
+              )}
+
+              {/* Navigation Arrows (Desktop Only) */}
+              {hasImages && media.length > 1 && (
+                <>
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => setSelectedImageIndex(prev => Math.max(0, prev - 1))}
+                    disabled={selectedImageIndex === 0}
+                    className={`hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 z-20 ${
+                      selectedImageIndex === 0 ? 'opacity-0 cursor-not-allowed' : 'opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <ChevronLeft className="w-6 h-6 text-gray-800" />
+                  </button>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => setSelectedImageIndex(prev => Math.min(media.length - 1, prev + 1))}
+                    disabled={selectedImageIndex === media.length - 1}
+                    className={`hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center bg-white/90 hover:bg-white rounded-full shadow-lg transition-all duration-200 z-20 ${
+                      selectedImageIndex === media.length - 1 ? 'opacity-0 cursor-not-allowed' : 'opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <ChevronRight className="w-6 h-6 text-gray-800" />
+                  </button>
+                </>
               )}
             </div>
 
