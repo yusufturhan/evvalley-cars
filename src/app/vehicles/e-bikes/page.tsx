@@ -559,10 +559,8 @@ function EBikesContent() {
               {vehicles.map((vehicle) => (
                 <div 
                   key={vehicle.id} 
-                  className={`bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-opacity ${
-                    vehicle.sold 
-                      ? 'opacity-75 hover:opacity-80' 
-                      : 'hover:shadow-xl hover:-translate-y-1'
+                  className={`group bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-all duration-200 ease-out md:hover:-translate-y-1 md:hover:shadow-lg ${
+                    vehicle.sold ? 'opacity-75' : ''
                   }`}
                 >
                   <div className="relative">
@@ -572,7 +570,7 @@ function EBikesContent() {
                           <img
                             src={vehicle.images[0]}
                             alt={vehicle.title}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-200 ease-out md:group-hover:scale-105"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';

@@ -582,19 +582,19 @@ export function HomeContent() {
                 <Link 
                   key={vehicle.id}
                   href={`/vehicles/${vehicle.id}`}
-                  className={`block bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-opacity ${
+                  className={`group block bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-all duration-200 ease-out md:hover:-translate-y-1 md:hover:shadow-lg ${
                     vehicle.sold ? 'opacity-75' : ''
                   }`}
                 >
                   <div className="relative">
                     <div className="aspect-[4/3] bg-gray-200 flex items-center justify-center overflow-hidden">
                       {vehicle.video_url ? (
-                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-cover" preload="metadata" />
+                        <video src={vehicle.video_url} playsInline controls className="w-full h-full object-cover transition-transform duration-200 ease-out md:group-hover:scale-105" preload="metadata" />
                       ) : vehicle.images && vehicle.images.length > 0 ? (
                         <img
                           src={vehicle.images[0]}
                           alt={vehicle.title}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-200 ease-out md:group-hover:scale-105"
                           loading="lazy"
                           decoding="async"
                           onError={(e) => {
