@@ -95,15 +95,15 @@ export default function BottomSheet({ isOpen, onClose, title, children, actions 
         </div>
 
         {/* Content - Scrollable area */}
-        <div className={`overflow-y-auto overscroll-contain ${actions ? 'h-[calc(85vh-160px)]' : 'h-[calc(85vh-80px)]'}`}>
+        <div className={`overflow-y-auto overscroll-contain ${actions ? 'h-[calc(85vh-224px)]' : 'h-[calc(85vh-80px)]'}`}>
           <div className="px-4 py-4">
             {children}
           </div>
         </div>
 
-        {/* Fixed Actions (if provided) */}
+        {/* Fixed Actions (if provided) - Above bottom nav bar */}
         {actions && (
-          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+          <div className="absolute bottom-16 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
             {actions}
           </div>
         )}
