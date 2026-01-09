@@ -5,6 +5,7 @@ import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import BottomSheet from "@/components/BottomSheet";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
@@ -257,7 +258,7 @@ export function HomeContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F9FF]">
+    <div className="min-h-screen bg-[#F5F9FF] pb-16 md:pb-0">
       {/* SEO Head */}
       <head>
         <title>Evvalley - US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles</title>
@@ -1004,6 +1005,12 @@ export function HomeContent() {
           </button>
         </div>
       </BottomSheet>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav 
+        showFilters={true}
+        onFilterClick={() => setIsFilterOpen(true)}
+      />
 
       {/* Structured Data */}
       <Script

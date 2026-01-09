@@ -5,6 +5,7 @@ import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import BottomSheet from "@/components/BottomSheet";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
@@ -253,7 +254,7 @@ export function VehiclesClient() {
   }, [searchParams.get('category'), searchParams.get('brand'), searchParams.get('year'), searchParams.get('minPrice'), searchParams.get('maxPrice'), searchParams.get('color'), searchParams.get('maxMileage'), searchParams.get('search'), searchParams.get('location')]);
 
   return (
-    <div className="min-h-screen bg-[#F5F9FF]">
+    <div className="min-h-screen bg-[#F5F9FF] pb-16 md:pb-0">
       <Header />
 
       {/* Sell CTA Banner */}
@@ -1034,6 +1035,12 @@ export function VehiclesClient() {
           </button>
         </div>
       </BottomSheet>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav 
+        showFilters={true}
+        onFilterClick={() => setIsFilterOpen(true)}
+      />
 
     </div>
   );
