@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
+import BottomSheet from "@/components/BottomSheet";
 import Link from "next/link";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -31,6 +32,9 @@ function EBikesContent() {
   const [messageSent, setMessageSent] = useState<Record<string, boolean>>({});
   const [messageInputs, setMessageInputs] = useState<Record<string, string>>({});
   const [sendingMessage, setSendingMessage] = useState<Record<string, boolean>>({});
+  
+  // Mobile filter bottom sheet state
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Load messageSent from localStorage on mount (user-specific)
   useEffect(() => {
@@ -271,9 +275,23 @@ function EBikesContent() {
       {/* Main Content: Sidebar + Listings */}
       <section className="py-8 bg-gradient-to-r from-muted to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Mobile Filters Button */}
+          <div className="lg:hidden mb-4">
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#3AB0FF] text-[#3AB0FF] font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
+            >
+              <Filter className="w-5 h-5" />
+              <span>Filters</span>
+              <span className="ml-1 px-2 py-0.5 bg-[#3AB0FF] text-white text-xs rounded-full">
+                {totalVehicles}
+              </span>
+            </button>
+          </div>
+
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left Sidebar: Filters */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
+            {/* Left Sidebar: Filters (Desktop Only) */}
+            <aside className="hidden lg:block w-full lg:w-80 flex-shrink-0">
               <Card className="p-5 sticky top-4">
                 <div className="flex items-center mb-5">
                   <Filter className="w-5 h-5 text-[#3AB0FF] mr-2" />
@@ -708,6 +726,70 @@ function EBikesContent() {
         </div>
       </section>
     </div>
+
+      {/* Mobile Bottom Sheet Filters */}
+      <BottomSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        title="Filters"
+      >
+        <div className="space-y-4 pb-24">
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Category</label>
+            <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.category} onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}>
+              <option value="all">All Categories</option>
+              <option value="ev-car">Electric Cars</option>
+              <option value="hybrid-car">Hybrid Cars</option>
+              <option value="e-bike">Electric Bikes</option>
+              <option value="e-bike">Electric Bikes</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Brand</label>
+            <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.brand} onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}>
+              <option value="all">All Brands</option>
+              <option value="Trek">Trek</option>
+              <option value="Giant">Giant</option>
+              <option value="Specialized">Specialized</option>
+              <option value="Cannondale">Cannondale</option>
+              <option value="Rad Power">Rad Power</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Year</label>
+            <select className="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900" value={filters.year} onChange={(e) => setFilters(prev => ({ ...prev, year: e.target.value }))}>
+              <option value="all">All Years</option>
+              {Array.from({ length: 16 }, (_, i) => 2025 - i).map(year => (<option key={year} value={year}>{year}</option>))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Location</label>
+            <div className="relative">
+              <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input type="text" value={locationQuery} onChange={(e) => setLocationQuery(e.target.value)} placeholder="ZIP, city, or address" className="w-full pl-12 pr-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900 placeholder-gray-500" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Min Price</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-base">$</span>
+              <input type="number" placeholder="0" className="w-full pl-9 pr-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900 placeholder-gray-400" value={filters.minPrice} onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-900">Max Price</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-base">$</span>
+              <input type="number" placeholder="100,000" className="w-full pl-9 pr-4 py-3 text-base border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] bg-white text-gray-900 placeholder-gray-400" value={filters.maxPrice} onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))} />
+            </div>
+          </div>
+        </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3">
+          <button onClick={() => { setFilters({ category: 'e-bike', brand: 'all', year: 'all', minPrice: '', maxPrice: '' }); setLocationQuery(''); }} className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform">Clear</button>
+          <button onClick={() => { setIsFilterOpen(false); }} className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform">Apply ({totalVehicles} results)</button>
+        </div>
+      </BottomSheet>
   );
 }
 
