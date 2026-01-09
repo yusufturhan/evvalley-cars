@@ -8,9 +8,10 @@ interface BottomSheetProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  actions?: React.ReactNode;
 }
 
-export default function BottomSheet({ isOpen, onClose, title, children }: BottomSheetProps) {
+export default function BottomSheet({ isOpen, onClose, title, children, actions }: BottomSheetProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [currentY, setCurrentY] = useState(0);
@@ -93,10 +94,19 @@ export default function BottomSheet({ isOpen, onClose, title, children }: Bottom
           </button>
         </div>
 
-        {/* Content - Scrollable area with bottom padding for fixed buttons */}
-        <div className="overflow-y-auto h-[calc(85vh-80px)] overscroll-contain">
-          {children}
+        {/* Content - Scrollable area */}
+        <div className={`overflow-y-auto overscroll-contain ${actions ? 'h-[calc(85vh-160px)]' : 'h-[calc(85vh-80px)]'}`}>
+          <div className="px-4 py-4">
+            {children}
+          </div>
         </div>
+
+        {/* Fixed Actions (if provided) */}
+        {actions && (
+          <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+            {actions}
+          </div>
+        )}
       </div>
     </>
   );

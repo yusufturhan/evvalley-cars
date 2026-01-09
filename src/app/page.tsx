@@ -851,6 +851,37 @@ export function HomeContent() {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         title="Filters"
+        actions={
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                setFilters({
+                  category: 'all',
+                  brand: 'all',
+                  year: 'all',
+                  minPrice: '',
+                  maxPrice: '',
+                  color: 'all',
+                  maxMileage: ''
+                });
+                setLocationQuery('');
+                setShowSoldVehicles(true);
+              }}
+              className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform"
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => {
+                setIsFilterOpen(false);
+                setCurrentPage(1);
+              }}
+              className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
+            >
+              Apply ({totalVehicles} results)
+            </button>
+          </div>
+        }
       >
         <div className="space-y-4 px-4 py-4 pb-28">
           {/* Category Filter */}
@@ -972,37 +1003,6 @@ export function HomeContent() {
               Show sold vehicles
             </label>
           </div>
-        </div>
-
-        {/* Fixed Bottom Actions */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3">
-          <button
-            onClick={() => {
-              setFilters({
-                category: 'all',
-                brand: 'all',
-                year: 'all',
-                minPrice: '',
-                maxPrice: '',
-                color: 'all',
-                maxMileage: ''
-              });
-              setLocationQuery('');
-              setShowSoldVehicles(true);
-            }}
-            className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform"
-          >
-            Clear
-          </button>
-          <button
-            onClick={() => {
-              setIsFilterOpen(false);
-              setCurrentPage(1);
-            }}
-            className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
-          >
-            Apply ({totalVehicles} results)
-          </button>
         </div>
       </BottomSheet>
 
