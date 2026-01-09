@@ -575,6 +575,131 @@ export function HomeContent() {
 
             {/* Right: Vehicle Listings */}
             <main className="flex-1 vehicles-grid">
+              {/* Active Filter Chips */}
+              {(filters.category !== 'all' || filters.brand !== 'all' || filters.year !== 'all' || filters.minPrice || filters.maxPrice || locationQuery) && (
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  {/* Category Chip */}
+                  {filters.category !== 'all' && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">
+                        {filters.category === 'ev-car' && 'Electric Cars'}
+                        {filters.category === 'hybrid-car' && 'Hybrid Cars'}
+                        {filters.category === 'ev-scooter' && 'Electric Scooters'}
+                        {filters.category === 'e-bike' && 'Electric Bikes'}
+                      </span>
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, category: 'all' }))}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove category filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Brand Chip */}
+                  {filters.brand !== 'all' && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">Brand: {filters.brand}</span>
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, brand: 'all' }))}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove brand filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Year Chip */}
+                  {filters.year !== 'all' && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">Year: {filters.year}</span>
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, year: 'all' }))}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove year filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Min Price Chip */}
+                  {filters.minPrice && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">Min: ${parseInt(filters.minPrice).toLocaleString()}</span>
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, minPrice: '' }))}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove min price filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Max Price Chip */}
+                  {filters.maxPrice && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">Max: ${parseInt(filters.maxPrice).toLocaleString()}</span>
+                      <button
+                        onClick={() => setFilters(prev => ({ ...prev, maxPrice: '' }))}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove max price filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Location Chip */}
+                  {locationQuery && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
+                      <span className="font-medium">Location: {locationQuery}</span>
+                      <button
+                        onClick={() => setLocationQuery('')}
+                        className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
+                        aria-label="Remove location filter"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Clear All Button */}
+                  <button
+                    onClick={() => {
+                      setFilters({
+                        category: 'all',
+                        brand: 'all',
+                        year: 'all',
+                        minPrice: '',
+                        maxPrice: '',
+                        color: 'all',
+                        maxMileage: ''
+                      });
+                      setLocationQuery('');
+                    }}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[...Array(6)].map((_, i) => (
