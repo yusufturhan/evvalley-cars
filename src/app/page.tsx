@@ -855,17 +855,9 @@ export function HomeContent() {
           <div className="flex gap-3">
             <button
               onClick={() => {
-                setFilters({
-                  category: 'all',
-                  brand: 'all',
-                  year: 'all',
-                  minPrice: '',
-                  maxPrice: '',
-                  color: 'all',
-                  maxMileage: ''
-                });
-                setLocationQuery('');
-                setShowSoldVehicles(true);
+                // Clear filters and apply to URL
+                router.push('/');
+                setIsFilterOpen(false);
               }}
               className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform"
             >
@@ -873,8 +865,18 @@ export function HomeContent() {
             </button>
             <button
               onClick={() => {
+                // Apply filters to URL
+                const params = new URLSearchParams();
+                if (filters.category !== 'all') params.set('category', filters.category);
+                if (filters.brand !== 'all') params.set('brand', filters.brand);
+                if (filters.year !== 'all') params.set('year', filters.year);
+                if (filters.minPrice) params.set('minPrice', filters.minPrice);
+                if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+                if (locationQuery.trim()) params.set('location', locationQuery.trim());
+                
+                const queryString = params.toString();
+                router.push(`/${queryString ? `?${queryString}` : ''}`);
                 setIsFilterOpen(false);
-                setCurrentPage(1);
               }}
               className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
             >

@@ -785,8 +785,35 @@ function EBikesContent() {
           </div>
         </div>
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3">
-          <button onClick={() => { setFilters({ category: 'e-bike', brand: 'all', year: 'all', minPrice: '', maxPrice: '' }); setLocationQuery(''); }} className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform">Clear</button>
-          <button onClick={() => { setIsFilterOpen(false); }} className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform">Apply ({totalVehicles} results)</button>
+          <button
+            onClick={() => {
+              // Clear filters and apply to URL
+              router.push('/vehicles/e-bikes');
+              setIsFilterOpen(false);
+            }}
+            className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform"
+          >
+            Clear
+          </button>
+          <button
+            onClick={() => {
+              // Apply filters to URL
+              const params = new URLSearchParams();
+              params.set('category', 'e-bike'); // Always keep category for this page
+              if (filters.brand !== 'all') params.set('brand', filters.brand);
+              if (filters.year !== 'all') params.set('year', filters.year);
+              if (filters.minPrice) params.set('minPrice', filters.minPrice);
+              if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+              if (locationQuery.trim()) params.set('location', locationQuery.trim());
+              
+              const queryString = params.toString();
+              router.push(`/vehicles/e-bikes${queryString ? `?${queryString}` : ''}`);
+              setIsFilterOpen(false);
+            }}
+            className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
+          >
+            Apply ({totalVehicles} results)
+          </button>
         </div>
       </BottomSheet>
     </div>

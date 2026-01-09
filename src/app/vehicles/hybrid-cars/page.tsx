@@ -949,14 +949,9 @@ function HybridCarsContent() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex gap-3">
           <button
             onClick={() => {
-              setFilters({
-                category: 'hybrid-car',
-                brand: 'all',
-                year: 'all',
-                minPrice: '',
-                maxPrice: ''
-              });
-              setLocationQuery('');
+              // Clear filters and apply to URL
+              router.push('/vehicles/hybrid-cars');
+              setIsFilterOpen(false);
             }}
             className="flex-1 px-4 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg active:scale-95 transition-transform"
           >
@@ -964,6 +959,17 @@ function HybridCarsContent() {
           </button>
           <button
             onClick={() => {
+              // Apply filters to URL
+              const params = new URLSearchParams();
+              params.set('category', 'hybrid-car'); // Always keep category for this page
+              if (filters.brand !== 'all') params.set('brand', filters.brand);
+              if (filters.year !== 'all') params.set('year', filters.year);
+              if (filters.minPrice) params.set('minPrice', filters.minPrice);
+              if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
+              if (locationQuery.trim()) params.set('location', locationQuery.trim());
+              
+              const queryString = params.toString();
+              router.push(`/vehicles/hybrid-cars${queryString ? `?${queryString}` : ''}`);
               setIsFilterOpen(false);
             }}
             className="flex-[2] px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
