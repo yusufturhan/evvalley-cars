@@ -130,6 +130,7 @@ function EVCarsContent() {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
+        setError(null);
         
         // Get current filters from URL params
         const currentBrand = searchParams.get('brand') || 'all';
@@ -212,6 +213,7 @@ function EVCarsContent() {
         setVehicles(serializedVehicles);
       } catch (error) {
         console.error('Error fetching vehicles:', error);
+        setError('Failed to load vehicles. Please try again.');
       } finally {
         setLoading(false);
       }
