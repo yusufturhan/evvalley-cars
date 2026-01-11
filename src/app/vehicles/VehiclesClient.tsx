@@ -20,6 +20,7 @@ export function VehiclesClient() {
   
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
   const [filters, setFilters] = useState({
@@ -103,6 +104,7 @@ export function VehiclesClient() {
     const fetchVehicles = async () => {
       try {
         setLoading(true);
+        setError(null);
         
         // Build API params with pagination - use filters state directly
         const params = new URLSearchParams();
@@ -158,6 +160,7 @@ export function VehiclesClient() {
         }
       } catch (error) {
         console.error('Error fetching vehicles:', error);
+        setError('Failed to load vehicles. Please try again.');
         setVehicles([]);
         setTotalPages(1);
       } finally {
@@ -801,27 +804,95 @@ export function VehiclesClient() {
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[...Array(6)].map((_, i) => (
-                    <div key={i} className="bg-card rounded-xl border border-border shadow-sm overflow-hidden animate-pulse">
+                    <div key={i} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden animate-pulse">
+                      {/* Image Skeleton */}
                       <div className="aspect-[4/3] bg-gray-200"></div>
-                      <div className="p-4">
-                        <div className="h-3 bg-gray-200 rounded mb-2 w-20"></div>
-                        <div className="h-5 bg-gray-200 rounded mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded mb-3 w-3/4"></div>
-                        <div className="h-6 bg-gray-200 rounded mb-4 w-32"></div>
-                        <div className="h-11 bg-gray-200 rounded"></div>
+                      
+                      {/* Content Skeleton */}
+                      <div className="p-4 space-y-3">
+                        {/* Category Badge */}
+                        <div className="h-5 bg-gray-200 rounded-full w-24"></div>
+                        
+                        {/* Title */}
+                        <div className="space-y-2">
+                          <div className="h-6 bg-gray-200 rounded w-full"></div>
+                          <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                        </div>
+                        
+                        {/* Meta Info */}
+                        <div className="flex gap-3">
+                          <div className="h-4 bg-gray-200 rounded w-16"></div>
+                          <div className="h-4 bg-gray-200 rounded w-20"></div>
+                          <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        </div>
+                        
+                        {/* Price */}
+                        <div className="h-7 bg-gray-200 rounded w-32"></div>
+                        
+                        {/* CTA */}
+                        <div className="h-12 bg-gray-200 rounded"></div>
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : vehicles.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-400 text-6xl mb-4">🚗</div>
+              ) : error ? (
+                <div className="text-center py-16 px-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 mb-4">
+                    <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                  </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {'No vehicles found'}
+                    Something went wrong
                   </h3>
-                  <p className="text-gray-600">
-                    {'Try adjusting your filters or check back later.'}
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    {error}
                   </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg hover:bg-[#2A9FEF] transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Retry
+                  </button>
+                </div>
+              ) : vehicles.length === 0 ? (
+                <div className="text-center py-16 px-4">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
+                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    No vehicles found
+                  </h3>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    Try adjusting or clearing your filters to see more results.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setFilters({
+                        category: 'all',
+                        brand: 'all',
+                        year: 'all',
+                        minPrice: '',
+                        maxPrice: '',
+                        color: 'all',
+                        maxMileage: ''
+                      });
+                      setLocationQuery('');
+                      setSearchQuery('');
+                      router.push('/vehicles');
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear all filters
+                  </button>
                 </div>
               ) : (
                 <>
