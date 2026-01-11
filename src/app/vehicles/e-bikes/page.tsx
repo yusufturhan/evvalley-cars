@@ -35,6 +35,12 @@ function EBikesContent() {
   
   // Mobile filter bottom sheet state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  
+  // Sort state
+  const [sortBy, setSortBy] = useState('newest');
+  
+  // Mobile sort bottom sheet state
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   // Load messageSent from localStorage on mount (user-specific)
   useEffect(() => {
@@ -121,6 +127,7 @@ function EBikesContent() {
         if (currentMinPrice) params.append('minPrice', currentMinPrice);
         if (currentMaxPrice) params.append('maxPrice', currentMaxPrice);
         if (showSoldVehicles) params.append('includeSold', 'true');
+        if (sortBy) params.append('sortBy', sortBy);
 
         const response = await fetch(`/api/e-bikes?${params.toString()}`);
         const data = await response.json();
@@ -190,7 +197,7 @@ function EBikesContent() {
     };
 
     fetchVehicles();
-  }, [searchParams, showSoldVehicles, searchQuery, locationQuery]);
+  }, [searchParams, showSoldVehicles, searchQuery, locationQuery, sortBy]);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -275,17 +282,26 @@ function EBikesContent() {
       {/* Main Content: Sidebar + Listings */}
       <section className="py-8 bg-gradient-to-r from-muted to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile Filters Button */}
-          <div className="lg:hidden mb-4">
+          {/* Mobile Filters & Sort Buttons */}
+          <div className="lg:hidden mb-4 flex gap-3">
             <button
               onClick={() => setIsFilterOpen(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#3AB0FF] text-[#3AB0FF] font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#3AB0FF] text-[#3AB0FF] font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
             >
               <Filter className="w-5 h-5" />
               <span>Filters</span>
               <span className="ml-1 px-2 py-0.5 bg-[#3AB0FF] text-white text-xs rounded-full">
                 {totalVehicles}
               </span>
+            </button>
+            <button
+              onClick={() => setIsSortOpen(true)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+              </svg>
+              <span>Sort</span>
             </button>
           </div>
 
@@ -553,9 +569,11 @@ function EBikesContent() {
 
             {/* Right: Vehicle Listings */}
             <main className="flex-1 vehicles-grid">
-              {/* Active Filter Chips */}
-              {(filters.brand !== 'all' || filters.year !== 'all' || filters.minPrice || filters.maxPrice || locationQuery) && (
-                <div className="mb-4 flex flex-wrap items-center gap-2">
+              {/* Desktop Sort & Active Filter Chips Row */}
+              <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                {/* Active Filter Chips */}
+                {(filters.brand !== 'all' || filters.year !== 'all' || filters.minPrice || filters.maxPrice || locationQuery) && (
+                  <div className="flex flex-wrap items-center gap-2">
                   {/* Brand Chip */}
                   {filters.brand !== 'all' && (
                     <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-200">
@@ -652,8 +670,28 @@ function EBikesContent() {
                   >
                     Clear all
                   </button>
+                  </div>
+                )}
+
+                {/* Desktop Sort Dropdown */}
+                <div className="hidden md:flex items-center gap-2">
+                  <label htmlFor="sort-select-bike" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+                    Sort by:
+                  </label>
+                  <select
+                    id="sort-select-bike"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-[#3AB0FF] focus:border-[#3AB0FF] transition-all cursor-pointer hover:border-[#3AB0FF]"
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                    <option value="year-desc">Year: Newest</option>
+                    <option value="mileage-asc">Mileage: Low to High</option>
+                  </select>
                 </div>
-              )}
+              </div>
 
               {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -916,6 +954,56 @@ function EBikesContent() {
           >
             Apply ({totalVehicles} results)
           </button>
+        </div>
+      </BottomSheet>
+
+      {/* Mobile Bottom Sheet Sort */}
+      <BottomSheet
+        isOpen={isSortOpen}
+        onClose={() => setIsSortOpen(false)}
+        title="Sort by"
+        actions={
+          <button
+            onClick={() => setIsSortOpen(false)}
+            className="w-full px-4 py-3 bg-[#3AB0FF] text-white font-semibold rounded-lg active:scale-95 transition-transform"
+          >
+            Apply
+          </button>
+        }
+      >
+        <div className="p-4 space-y-2">
+          {[
+            { value: 'newest', label: 'Newest' },
+            { value: 'price-asc', label: 'Price: Low to High' },
+            { value: 'price-desc', label: 'Price: High to Low' },
+            { value: 'year-desc', label: 'Year: Newest' },
+            { value: 'mileage-asc', label: 'Mileage: Low to High' }
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setSortBy(option.value)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                sortBy === option.value
+                  ? 'bg-[#3AB0FF]/10 border-2 border-[#3AB0FF]'
+                  : 'bg-white border-2 border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                sortBy === option.value
+                  ? 'border-[#3AB0FF] bg-[#3AB0FF]'
+                  : 'border-gray-300'
+              }`}>
+                {sortBy === option.value && (
+                  <div className="w-2 h-2 bg-white rounded-full" />
+                )}
+              </div>
+              <span className={`text-sm font-medium ${
+                sortBy === option.value ? 'text-[#3AB0FF]' : 'text-gray-700'
+              }`}>
+                {option.label}
+              </span>
+            </button>
+          ))}
         </div>
       </BottomSheet>
     </div>
