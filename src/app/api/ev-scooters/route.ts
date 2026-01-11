@@ -14,11 +14,40 @@ export async function GET(request: Request) {
     const search = searchParams.get('search');
     const location = searchParams.get('location');
     const includeSold = searchParams.get('includeSold');
+    const sortBy = searchParams.get('sortBy'); // Add sort parameter
+
+    // Determine sort order based on sortBy parameter
+    let orderColumn = 'created_at';
+    let orderAscending = false;
+    
+    switch (sortBy) {
+      case 'price-asc':
+        orderColumn = 'price';
+        orderAscending = true;
+        break;
+      case 'price-desc':
+        orderColumn = 'price';
+        orderAscending = false;
+        break;
+      case 'year-desc':
+        orderColumn = 'year';
+        orderAscending = false;
+        break;
+      case 'mileage-asc':
+        orderColumn = 'mileage';
+        orderAscending = true;
+        break;
+      case 'newest':
+      default:
+        orderColumn = 'created_at';
+        orderAscending = false;
+        break;
+    }
 
     let query = supabase
       .from('ev_scooters')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order(orderColumn, { ascending: orderAscending });
 
     // Show all scooters by default (including sold ones)
     // Only filter out sold scooters if explicitly requested

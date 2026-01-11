@@ -22,6 +22,7 @@ export async function GET(request: Request) {
     const includeSold = searchParams.get('includeSold');
     const soldParam = searchParams.get('sold');
     const debugLocations = searchParams.get('debugLocations'); // Add debug parameter
+    const sortBy = searchParams.get('sortBy'); // Add sort parameter
 
     // Add caching headers for better performance
     const response = new Response();
@@ -46,10 +47,39 @@ export async function GET(request: Request) {
     // CRITICAL: We DON'T use count: 'exact' here because it can cause limit issues
     // We get the count from a separate query above, so we only need the data here
     // range() must be called AFTER all filters are applied to override default limits
+    
+    // Determine sort order based on sortBy parameter
+    let orderColumn = 'created_at';
+    let orderAscending = false;
+    
+    switch (sortBy) {
+      case 'price-asc':
+        orderColumn = 'price';
+        orderAscending = true;
+        break;
+      case 'price-desc':
+        orderColumn = 'price';
+        orderAscending = false;
+        break;
+      case 'year-desc':
+        orderColumn = 'year';
+        orderAscending = false;
+        break;
+      case 'mileage-asc':
+        orderColumn = 'mileage';
+        orderAscending = true;
+        break;
+      case 'newest':
+      default:
+        orderColumn = 'created_at';
+        orderAscending = false;
+        break;
+    }
+    
     let query = supabase
       .from('vehicles')
       .select('*') // No count: 'exact' to avoid limit issues
-      .order('created_at', { ascending: false });
+      .order(orderColumn, { ascending: orderAscending });
 
     // Sold filter behavior:
     // - Default: show ALL vehicles (both sold and unsold) - no filter applied
