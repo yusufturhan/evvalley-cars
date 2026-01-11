@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useCallback } from "react";
 import { Search, Filter, Car, Zap, Battery, Bike, MapPin, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import FavoriteButton from "@/components/FavoriteButton";
 import BottomSheet from "@/components/BottomSheet";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import Link from "next/link";
+import Image from "next/image";
 import { Vehicle } from "@/lib/database";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
@@ -178,7 +179,7 @@ export function HomeContent() {
     }
   };
 
-  const handleSendMessage = async (vehicleId: string, vehicleTitle: string, sellerEmail: string) => {
+  const handleSendMessage = useCallback(async (vehicleId: string, vehicleTitle: string, sellerEmail: string) => {
     if (!user?.primaryEmailAddress?.emailAddress) {
       alert('Please sign in to send a message');
       return;
@@ -220,7 +221,7 @@ export function HomeContent() {
     } finally {
       setSendingMessage(prev => ({ ...prev, [vehicleId]: false }));
     }
-  };
+  }, [user, messageInputs, messageSent]);
 
   const handleSearch = async () => {
     // Reset to page 1 when searching
@@ -577,11 +578,7 @@ export function HomeContent() {
                   variant="primary"
                   size="sm"
                   onClick={() => {
-                    // Scroll to vehicles grid
-                    const vehiclesSection = document.querySelector('.vehicles-grid');
-                    if (vehiclesSection) {
-                      vehiclesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                    // No auto-scroll to preserve user position
                   }}
                   className="w-full"
                 >
@@ -836,7 +833,7 @@ export function HomeContent() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {vehicles.map((vehicle) => (
+              {vehicles.map((vehicle, index) => (
                 <Link 
                   key={vehicle.id}
                   href={`/vehicles/${vehicle.id}`}
@@ -849,16 +846,19 @@ export function HomeContent() {
                       {vehicle.video_url ? (
                         <video src={vehicle.video_url} playsInline controls className="w-full h-full object-cover transition-transform duration-200 ease-out md:group-hover:scale-105" preload="metadata" />
                       ) : vehicle.images && vehicle.images.length > 0 ? (
-                        <img
+                        <Image
                           src={vehicle.images[0]}
                           alt={vehicle.title}
-                          className="w-full h-full object-cover transition-transform duration-200 ease-out md:group-hover:scale-105"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-200 ease-out md:group-hover:scale-105"
+                          priority={index < 4}
+                          placeholder="blur"
+                          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2YzZjRmNiIvPjwvc3ZnPg=="
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
-                            const fallback = target.nextElementSibling as HTMLElement;
+                            const fallback = target.parentElement?.nextElementSibling as HTMLElement;
                             if (fallback) fallback.style.display = 'flex';
                           }}
                         />
