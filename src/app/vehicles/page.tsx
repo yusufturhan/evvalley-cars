@@ -2,28 +2,50 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { VehiclesClient } from './VehiclesClient';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }): Promise<Metadata> {
+  const params = await searchParams;
+  const category = params.category as string | undefined;
+  const brand = params.brand as string | undefined;
+  
+  // Base values
+  let title = "Electric Vehicles for Sale | EvValley";
+  let description = "Browse electric cars, e-bikes, and scooters for sale. Filter by brand, price, and location. No commissions.";
+  
+  // Custom titles for categories and brands
+  if (category || brand) {
+    const categoryName = category ? category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()) : "Electric Vehicles";
+    const brandName = brand && brand !== 'all' ? brand : "";
+    
+    if (brandName && categoryName) {
+      title = `${brandName} ${categoryName} for Sale | EvValley`;
+      description = `Find the best deals on ${brandName} ${categoryName.toLowerCase()} for sale. Browse private and dealer listings on EvValley.`;
+    } else if (categoryName) {
+      title = `${categoryName} for Sale | EvValley`;
+      description = `Browse the latest ${categoryName.toLowerCase()} for sale. Find electric mobility options that fit your budget and needs.`;
+    }
+  }
+
+  // Check if any filter is active to set noindex
+  const hasFilters = Object.keys(params).some(key => 
+    ['brand', 'year', 'minPrice', 'maxPrice', 'color', 'maxMileage', 'search', 'location', 'sortBy'].includes(key) && 
+    params[key] !== 'all' && 
+    params[key] !== undefined
+  );
+
   return {
-    title: "Electric Vehicles for Sale | EvValley",
-    description: "Browse electric cars, e-bikes, and scooters for sale. Filter by brand, price, and location. No commissions.",
+    title,
+    description,
     metadataBase: new URL('https://www.evvalley.com'),
     alternates: {
       canonical: 'https://www.evvalley.com/vehicles',
     },
     robots: {
-      index: true,
+      index: !hasFilters,
       follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
     },
     openGraph: {
-      title: "Electric Vehicles for Sale | EvValley",
-      description: "Browse electric cars, e-bikes, and scooters for sale. Filter by brand, price, and location. No commissions.",
+      title,
+      description,
       url: "https://www.evvalley.com/vehicles",
       siteName: "Evvalley",
       images: [
@@ -31,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "/opengraph-image",
           width: 1200,
           height: 630,
-          alt: "Electric Vehicles for Sale - EvValley",
+          alt: title,
         },
       ],
       locale: "en_US",
@@ -39,8 +61,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Electric Vehicles for Sale | EvValley",
-      description: "Browse electric cars, e-bikes, and scooters for sale. Filter by brand, price, and location. No commissions.",
+      title,
+      description,
       images: ["/twitter-image"],
       creator: "@evvalley",
     },
