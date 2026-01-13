@@ -55,8 +55,7 @@ export function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.protocol = CANONICAL_PROTOCOL;
       url.host = CANONICAL_HOST;
-      const response = NextResponse.redirect(url, 308);
-      response.headers.set('X-Robots-Tag', 'noindex, follow');
+      const response = NextResponse.redirect(url, 301); // Standard 301 for SEO
       response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
       return response;
     }
