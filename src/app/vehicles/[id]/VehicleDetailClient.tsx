@@ -43,11 +43,21 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
   const router = useRouter();
   const { user, isSignedIn } = useUser();
 
+  const getCategorySlug = (category: string) => {
+    switch (category) {
+      case 'ev-car': return 'ev-cars';
+      case 'hybrid-car': return 'hybrid-cars';
+      case 'ev-scooter': return 'ev-scooters';
+      case 'e-bike': return 'e-bikes';
+      default: return category;
+    }
+  };
+
   const breadcrumbItems = [
     { label: 'Vehicles', href: '/vehicles' },
     { 
       label: vehicle.category.replace('-', ' ').toUpperCase(), 
-      href: `/vehicles/${vehicle.category}` 
+      href: `/vehicles/${getCategorySlug(vehicle.category)}` 
     },
     { 
       label: vehicle.brand, 
