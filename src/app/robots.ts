@@ -12,11 +12,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/api/',
           '/admin/',
-          '/sign-in',
-          '/sign-up',
           '/profile/',
-          '/_next/',
-          '/_next/static/',
         ],
       },
       // Block Chinese search engines and bots
