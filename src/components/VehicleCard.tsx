@@ -51,11 +51,12 @@ const VehicleCard = memo(({ vehicle }: VehicleCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative">
-        <div className="h-64 bg-gray-200 flex items-center justify-center overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex">
+      {/* Left Side - Image */}
+      <div className="relative w-56 h-44 flex-shrink-0">
+        <div className="w-full h-full bg-gray-200 flex items-center justify-center overflow-hidden">
           {vehicle.video_url ? (
-            <video src={vehicle.video_url} playsInline controls className="w-full h-full object-contain bg-black" />
+            <video src={vehicle.video_url} playsInline controls className="w-full h-full object-cover" />
           ) : vehicle.images && vehicle.images.length > 0 ? (
             <img
               src={vehicle.images[0]}
@@ -69,12 +70,12 @@ const VehicleCard = memo(({ vehicle }: VehicleCardProps) => {
               }}
             />
           ) : null}
-          <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex'}`}>
+          <div className={`text-gray-400 text-center ${(vehicle.video_url || (vehicle.images && vehicle.images.length > 0)) ? 'hidden' : 'flex flex-col items-center justify-center'}`}>
             <div className="text-4xl mb-2">🚗</div>
             <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
           </div>
         </div>
-        {/* SOLD Badge - Small and positioned */}
+        {/* SOLD Badge */}
         {vehicle.sold && (
           <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
             SOLD
@@ -86,53 +87,55 @@ const VehicleCard = memo(({ vehicle }: VehicleCardProps) => {
         </div>
       </div>
       
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
-            {getCategoryIcon(vehicle.category)}
-            <span className="text-sm text-gray-600">{getCategoryName(vehicle.category)}</span>
+      {/* Right Side - Details */}
+      <div className="flex-1 p-4 flex flex-col justify-between">
+        <div>
+          {/* Title */}
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            {vehicle.year} {vehicle.brand} {vehicle.model}
+          </h3>
+          
+          {/* Info Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="flex items-center text-gray-600">
+              <span className="text-sm font-medium mr-2">Mileage:</span>
+              <span className="text-sm">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'N/A'}</span>
+            </div>
+            <div className="flex items-center text-gray-600">
+              <MapPin className="h-4 w-4 mr-1" />
+              <span className="text-sm">{vehicle.location}</span>
+            </div>
           </div>
-          <div className="text-sm text-gray-500">
-            {vehicle.year}
-          </div>
-        </div>
-        
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-          {vehicle.brand} {vehicle.model}
-        </h3>
-        
-        <div className="flex items-center text-gray-600 mb-2">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span className="text-sm">{vehicle.location}</span>
-        </div>
-        
-        <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-green-600">
-            {formatPrice(vehicle.price)}
+          
+          {/* Price */}
+          <div className="mb-3">
+            <span className="text-2xl font-bold text-green-600">
+              {formatPrice(vehicle.price)}
+            </span>
             {vehicle.old_price && vehicle.old_price > 0 && vehicle.old_price > vehicle.price && (
               <span className="text-sm text-gray-500 line-through ml-2">
                 {formatPrice(vehicle.old_price)}
               </span>
             )}
           </div>
-          <div className="flex items-center space-x-2">
-            {/* Chat Button - Direct to messaging */}
-            <Link 
-              href={`/vehicles/${vehicle.id}#contact`}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
-              title="Contact Seller"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span>Chat</span>
-            </Link>
-            {/* View Details Button */}
-            <Link 
-              href={`/vehicles/${vehicle.id}`}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-            >
-              View Details
-            </Link>
-          </div>
+        </div>
+        
+        {/* Buttons */}
+        <div className="flex items-center space-x-2">
+          <Link 
+            href={`/vehicles/${vehicle.id}#contact`}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+            title="Contact Seller"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span>Chat</span>
+          </Link>
+          <Link 
+            href={`/vehicles/${vehicle.id}`}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+          >
+            View Details
+          </Link>
         </div>
       </div>
     </div>
