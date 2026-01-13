@@ -9,9 +9,9 @@ const PAGE_PATH = "/sell-your-ev";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 
 export function generateMetadata(): Metadata {
-  const title = "Sell Your EV for Free | EvValley";
+  const title = "Sell Your EV | EvValley";
   const description =
-    "List your electric car in minutes. Free, no commissions, and message buyers directly on EvValley.";
+    "List your electric car in minutes. No commissions, and message buyers directly on EvValley.";
 
   return {
     title,
@@ -48,10 +48,10 @@ export default function SellYourEvPage() {
         <div className="max-w-6xl mx-auto px-4 py-16 space-y-8">
           <div className="space-y-4">
             <p className="text-sm uppercase tracking-widest text-blue-100">
-              Sell faster, keep it free
+              Sell faster, keep more
             </p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-              Sell Your EV for Free on EvValley
+              Sell Your EV on EvValley
             </h1>
             <p className="text-lg sm:text-xl max-w-3xl text-blue-50">
               List your electric vehicle in minutes. No commissions, no hidden
@@ -63,7 +63,7 @@ export default function SellYourEvPage() {
               href={LISTING_CREATE_PATH}
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-[#1C1F4A] font-semibold shadow-lg hover:shadow-xl transition"
             >
-              List your EV for free
+              List your EV now
             </Link>
             <Link
               href="/vehicles"
@@ -96,7 +96,7 @@ export default function SellYourEvPage() {
           <div className="space-y-3">
             <h3 className="text-xl font-bold">Why sellers choose EvValley</h3>
             <ul className="grid sm:grid-cols-2 gap-3 text-sm text-gray-800">
-              <li className="p-3 bg-gray-50 rounded-lg border">Free listing, zero commission</li>
+              <li className="p-3 bg-gray-50 rounded-lg border">Zero commission fees</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Direct messaging with buyers</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Anti-scam checks & reporting</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Photo + video uploads</li>
@@ -127,7 +127,7 @@ export default function SellYourEvPage() {
           <div className="p-6 rounded-lg border bg-gray-50 space-y-3">
             <h4 className="text-lg font-bold">Ready to list?</h4>
             <p className="text-sm text-gray-700">
-              Create your listing for free and start talking to buyers today.
+              Create your listing and start talking to buyers today.
             </p>
             <Link
               href={LISTING_CREATE_PATH}
@@ -152,14 +152,14 @@ export default function SellYourEvPage() {
         <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm uppercase text-gray-600">List now</p>
-            <h3 className="text-2xl font-bold text-gray-900">List your EV for free today</h3>
+            <h3 className="text-2xl font-bold text-gray-900">List your EV today</h3>
             <p className="text-sm text-gray-700">Connect with EV buyers in minutes.</p>
           </div>
           <Link
             href={LISTING_CREATE_PATH}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
           >
-            Start free listing
+            Start Listing
           </Link>
         </div>
       </section>

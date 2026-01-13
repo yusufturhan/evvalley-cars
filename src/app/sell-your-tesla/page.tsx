@@ -9,9 +9,9 @@ const PAGE_PATH = "/sell-your-tesla";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 
 export function generateMetadata(): Metadata {
-  const title = "Sell Your Tesla for Free | EvValley";
+  const title = "Sell Your Tesla | EvValley";
   const description =
-    "Reach EV-focused buyers. List your Tesla fast with free listing and direct messaging.";
+    "Reach EV-focused buyers. List your Tesla fast with direct messaging and no commission fees.";
 
   return {
     title,
@@ -51,7 +51,7 @@ export default function SellYourTeslaPage() {
               Tesla sellers, welcome
             </p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
-              Sell Your Tesla for Free on EvValley
+              Sell Your Tesla on EvValley
             </h1>
             <p className="text-lg sm:text-xl max-w-3xl text-blue-50">
               Hit EV-focused buyers. List in minutes, message directly, and keep your
@@ -63,7 +63,7 @@ export default function SellYourTeslaPage() {
               href={LISTING_CREATE_PATH}
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-[#1C1F4A] font-semibold shadow-lg hover:shadow-xl transition"
             >
-              List your Tesla for free
+              List your Tesla now
             </Link>
             <Link
               href="/vehicles"
@@ -96,7 +96,7 @@ export default function SellYourTeslaPage() {
           <div className="space-y-3">
             <h3 className="text-xl font-bold">Why Tesla owners choose EvValley</h3>
             <ul className="grid sm:grid-cols-2 gap-3 text-sm text-gray-800">
-              <li className="p-3 bg-gray-50 rounded-lg border">Free listing, no commission</li>
+              <li className="p-3 bg-gray-50 rounded-lg border">No commission fees</li>
               <li className="p-3 bg-gray-50 rounded-lg border">EV-focused, Tesla-ready audience</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Direct messaging, no middlemen</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Highlight FSD, hardware, battery status</li>
@@ -127,7 +127,7 @@ export default function SellYourTeslaPage() {
           <div className="p-6 rounded-lg border bg-gray-50 space-y-3">
             <h4 className="text-lg font-bold">Ready to list?</h4>
             <p className="text-sm text-gray-700">
-              List your Tesla for free and talk directly to EV buyers.
+              List your Tesla and talk directly to EV buyers.
             </p>
             <Link
               href={LISTING_CREATE_PATH}
@@ -152,14 +152,14 @@ export default function SellYourTeslaPage() {
         <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm uppercase text-gray-600">List now</p>
-            <h3 className="text-2xl font-bold text-gray-900">List your Tesla for free today</h3>
+            <h3 className="text-2xl font-bold text-gray-900">List your Tesla today</h3>
             <p className="text-sm text-gray-700">Reach EV-focused buyers in minutes.</p>
           </div>
           <Link
             href={LISTING_CREATE_PATH}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
           >
-            Start free listing
+            Start Listing
           </Link>
         </div>
       </section>

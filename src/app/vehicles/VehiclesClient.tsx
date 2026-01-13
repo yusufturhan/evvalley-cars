@@ -313,11 +313,11 @@ export function VehiclesClient({
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 rounded-lg border border-[#E5E7EB] bg-[#F8FAFF] px-5 py-4">
             <div>
               <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Selling your EV?</p>
-              <p className="text-base text-gray-800">List for free in minutes. No commissions.</p>
+              <p className="text-base text-gray-800">List in minutes. No commissions.</p>
             </div>
             <Link href="/sell-your-ev">
               <Button variant="primary" size="lg">
-                Start free listing
+                Start Listing
               </Button>
             </Link>
           </div>

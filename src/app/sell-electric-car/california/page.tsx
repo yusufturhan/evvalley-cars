@@ -11,7 +11,7 @@ const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 export function generateMetadata(): Metadata {
   const title = "Sell Your Electric Car in California | EvValley";
   const description =
-    "List your EV in California for free. Connect with local buyers and message directly.";
+    "List your EV in California. Connect with local buyers and message directly. No commission fees.";
 
   return {
     title,
@@ -54,7 +54,7 @@ export default function SellElectricCarCaliforniaPage() {
               Sell Your Electric Car in California
             </h1>
             <p className="text-lg sm:text-xl max-w-3xl text-blue-50">
-              List for free, reach local EV buyers, and message them directly. No
+              Reach local EV buyers and message them directly. No
               commissions, no hidden fees.
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function SellElectricCarCaliforniaPage() {
               href={LISTING_CREATE_PATH}
               className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-white text-[#1C1F4A] font-semibold shadow-lg hover:shadow-xl transition"
             >
-              List your EV for free
+              List your EV now
             </Link>
             <Link
               href="/vehicles"
@@ -96,7 +96,7 @@ export default function SellElectricCarCaliforniaPage() {
           <div className="space-y-3">
             <h3 className="text-xl font-bold">Why California sellers choose EvValley</h3>
             <ul className="grid sm:grid-cols-2 gap-3 text-sm text-gray-800">
-              <li className="p-3 bg-gray-50 rounded-lg border">Free listing, no commission</li>
+              <li className="p-3 bg-gray-50 rounded-lg border">No commission fees</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Local buyer visibility</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Direct messaging</li>
               <li className="p-3 bg-gray-50 rounded-lg border">Anti-scam checks & reporting</li>
@@ -127,7 +127,7 @@ export default function SellElectricCarCaliforniaPage() {
           <div className="p-6 rounded-lg border bg-gray-50 space-y-3">
             <h4 className="text-lg font-bold">Ready to list?</h4>
             <p className="text-sm text-gray-700">
-              List your EV for free and reach California buyers now.
+              List your EV and reach California buyers now.
             </p>
             <Link
               href={LISTING_CREATE_PATH}
@@ -152,14 +152,14 @@ export default function SellElectricCarCaliforniaPage() {
         <div className="max-w-6xl mx-auto px-4 py-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm uppercase text-gray-600">List now</p>
-            <h3 className="text-2xl font-bold text-gray-900">List your EV for free today</h3>
+            <h3 className="text-2xl font-bold text-gray-900">List your EV today</h3>
             <p className="text-sm text-gray-700">Connect with California EV buyers in minutes.</p>
           </div>
           <Link
             href={LISTING_CREATE_PATH}
             className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#1C1F4A] text-white font-semibold hover:bg-[#2A2F6B] transition"
           >
-            Start free listing
+            Start Listing
           </Link>
         </div>
       </section>

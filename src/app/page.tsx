@@ -4,7 +4,7 @@ import { HomeClient } from './HomeClient';
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Evvalley - US EV & E-Mobility Marketplace | Buy & Sell Electric Vehicles",
-    description: "America's premier electric vehicle marketplace. Buy and sell EVs, hybrid cars, e-bikes, and e-scooters across the United States. Free listings, no commission fees.",
+    description: "America's premier electric vehicle marketplace. Buy and sell EVs, hybrid cars, e-bikes, and e-scooters across the United States. No commission fees.",
     keywords: "electric vehicles, EV marketplace, Tesla, hybrid cars, e-bikes, e-scooters, buy EV, sell EV, electric car marketplace, USA",
     alternates: {
       canonical: 'https://www.evvalley.com/',

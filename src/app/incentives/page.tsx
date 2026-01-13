@@ -49,8 +49,8 @@ export default function IncentivesPage() {
               <div className="text-gray-600">Monthly Visitors</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">100%</div>
-              <div className="text-gray-600">Free Listings</div>
+              <div className="text-3xl font-bold text-[#3AB0FF] mb-2">0%</div>
+              <div className="text-gray-600">Commission</div>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
               <div className="text-3xl font-bold text-[#3AB0FF] mb-2">24/7</div>
@@ -77,8 +77,8 @@ export default function IncentivesPage() {
               <div className="w-16 h-16 bg-[#3AB0FF] rounded-full flex items-center justify-center mx-auto mb-4">
                 <DollarSign className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">100% FREE Listings</h3>
-              <p className="text-gray-600">✅ No listing fees • ✅ No commission • ✅ No hidden costs • ✅ Forever free</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Zero Commission</h3>
+              <p className="text-gray-600">✅ No listing fees • ✅ No commission • ✅ No hidden costs • ✅ Keep 100% profit</p>
               <div className="mt-4 p-3 bg-green-50 rounded-lg">
                 <p className="text-sm text-green-700 font-medium">Currently Active</p>
               </div>
@@ -207,7 +207,7 @@ export default function IncentivesPage() {
               href="/sell" 
               className="bg-[#3AB0FF] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#2A8FE6] transition-colors"
             >
-              🚀 Start Selling Now - FREE
+              🚀 Start Selling Now
             </Link>
             <Link 
               href="/vehicles" 
@@ -218,7 +218,7 @@ export default function IncentivesPage() {
           </div>
           
           <p className="text-sm text-blue-200 mt-6">
-            ✅ No credit card required • ✅ No hidden fees • ✅ Start listing in minutes
+            ✅ No credit card required • ✅ No hidden fees • ✅ No commission • ✅ Start in minutes
           </p>
         </div>
       </section>
