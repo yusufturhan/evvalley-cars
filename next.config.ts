@@ -131,273 +131,283 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/favicon.ico',
-        destination: '/favicon.svg?v=14',
+        destination: 'https://www.evvalley.com/favicon.svg?v=14',
         permanent: true,
       },
       // Legacy car detail slugs → redirect to vehicles with 404 fallback
       {
         source: '/car',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       // Specific car URLs that cause Soft 404 - redirect to vehicles page
       {
         source: '/car/toyota-prius-2014-gray',
-        destination: '/vehicles?search=toyota+prius',
+        destination: 'https://www.evvalley.com/vehicles?search=toyota+prius',
         permanent: true,
       },
       {
         source: '/car/toyota-prius-2014-gray/',
-        destination: '/vehicles?search=toyota+prius',
+        destination: 'https://www.evvalley.com/vehicles?search=toyota+prius',
         permanent: true,
       },
       {
         source: '/car/toyota-prius-plug-in-hybrid-2014',
-        destination: '/vehicles?search=toyota+prius+hybrid',
+        destination: 'https://www.evvalley.com/vehicles?search=toyota+prius+hybrid',
         permanent: true,
       },
       {
         source: '/car/toyota-prius-plug-in-hybrid-2014/',
-        destination: '/vehicles?search=toyota+prius+hybrid',
+        destination: 'https://www.evvalley.com/vehicles?search=toyota+prius+hybrid',
         permanent: true,
       },
-      // Generic car slug redirect - but only if it doesn't match specific patterns
+      // Generic car slug redirect - handle both slash and no-slash in one hop to avoid redirect chains
       {
         source: '/car/:slug((?!toyota-prius-2014-gray|toyota-prius-plug-in-hybrid-2014).*)',
-        destination: '/vehicles?search=:slug',
+        destination: 'https://www.evvalley.com/vehicles?search=:slug',
+        permanent: true,
+      },
+      {
+        source: '/car/:slug((?!toyota-prius-2014-gray|toyota-prius-plug-in-hybrid-2014).*)/',
+        destination: 'https://www.evvalley.com/vehicles?search=:slug',
         permanent: true,
       },
       // Brand pages → filter on vehicles list
       {
         source: '/vehicles/brand/:brand',
-        destination: '/vehicles?brand=:brand',
+        destination: 'https://www.evvalley.com/vehicles?brand=:brand',
         permanent: true,
       },
       {
         source: '/vehicles/brand/:brand/',
-        destination: '/vehicles?brand=:brand',
+        destination: 'https://www.evvalley.com/vehicles?brand=:brand',
         permanent: true,
       },
       // Year pages → filter on vehicles list (fixes 404 errors)
       {
         source: '/vehicles/year/:year',
-        destination: '/vehicles?year=:year',
+        destination: 'https://www.evvalley.com/vehicles?year=:year',
         permanent: true,
       },
       {
         source: '/vehicles/year/:year/',
-        destination: '/vehicles?year=:year',
+        destination: 'https://www.evvalley.com/vehicles?year=:year',
         permanent: true,
       },
       // Old removed pages → redirect to vehicles
       {
         source: '/vehicles/new-arrivals',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/new-arrivals/',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/featured',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/featured/',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/trending',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/trending/',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       // Old removed vehicle IDs → redirect to vehicles
       {
         source: '/vehicles/6ff881f2-0128-44d2-83de-49f05a466c21',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/c287f364-bd34-40d6-8644-125ae21cd2bc',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       {
         source: '/vehicles/72cf4a6d-a6ef-4aa6-a83d-c680cb02c9f6',
-        destination: '/vehicles',
+        destination: 'https://www.evvalley.com/vehicles',
         permanent: true,
       },
       // Old blog slugs → new slugs
       {
         source: '/blog/ev-buying-guide-2024',
-        destination: '/blog/complete-guide-to-buying-electric-vehicles',
+        destination: 'https://www.evvalley.com/blog/complete-guide-to-buying-electric-vehicles',
         permanent: true,
       },
       {
         source: '/blog/ev-buying-guide-2024/',
-        destination: '/blog/complete-guide-to-buying-electric-vehicles',
+        destination: 'https://www.evvalley.com/blog/complete-guide-to-buying-electric-vehicles',
         permanent: true,
       },
       {
         source: '/blog/tesla-home-charging-setup',
-        destination: '/blog/how-to-charge-tesla-at-home',
+        destination: 'https://www.evvalley.com/blog/how-to-charge-tesla-at-home',
         permanent: true,
       },
       {
         source: '/blog/tesla-home-charging-setup/',
-        destination: '/blog/how-to-charge-tesla-at-home',
+        destination: 'https://www.evvalley.com/blog/how-to-charge-tesla-at-home',
         permanent: true,
       },
       // Maintenance guide slug no longer exists → best matching evergreen article
       {
         source: '/blog/battery-technology-advancements-and-the-ev-range-problem',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/battery-technology-advancements-and-the-ev-range-problem/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/ev-maintenance-guide',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/ev-maintenance-guide/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       // Old informational article → relevant evergreen guide
       {
         source: '/blog/what-are-electric-vehicles-and-how-do-they-work',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/what-are-electric-vehicles-and-how-do-they-work/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       // Legacy URL redirects to fix GSC redirection errors
       {
         source: '/ebike',
-        destination: '/vehicles/e-bikes',
+        destination: 'https://www.evvalley.com/vehicles/e-bikes',
         permanent: true,
       },
       {
         source: '/ebike/',
-        destination: '/vehicles/e-bikes',
+        destination: 'https://www.evvalley.com/vehicles/e-bikes',
         permanent: true,
       },
       {
         source: '/bikes',
-        destination: '/vehicles/e-bikes',
+        destination: 'https://www.evvalley.com/vehicles/e-bikes',
         permanent: true,
       },
       {
         source: '/bikes/',
-        destination: '/vehicles/e-bikes',
+        destination: 'https://www.evvalley.com/vehicles/e-bikes',
         permanent: true,
       },
       
       // Fix trailing slash redirects for GSC
       {
         source: '/about/',
-        destination: '/about',
+        destination: 'https://www.evvalley.com/about',
         permanent: true,
       },
       {
         source: '/contact/',
-        destination: '/contact',
+        destination: 'https://www.evvalley.com/contact',
         permanent: true,
       },
       {
         source: '/blog/',
-        destination: '/blog',
+        destination: 'https://www.evvalley.com/blog',
+        permanent: true,
+      },
+      {
+        source: '/community/',
+        destination: 'https://www.evvalley.com/community',
         permanent: true,
       },
       {
         source: '/sell/',
-        destination: '/sell',
+        destination: 'https://www.evvalley.com/sell',
         permanent: true,
       },
       {
         source: '/profile/',
-        destination: '/profile',
+        destination: 'https://www.evvalley.com/profile',
         permanent: true,
       },
       
       // Redirect old bookmarks page
       {
         source: '/bookmarks',
-        destination: '/favorites',
+        destination: 'https://www.evvalley.com/favorites',
         permanent: true,
       },
       {
         source: '/bookmarks/',
-        destination: '/favorites',
+        destination: 'https://www.evvalley.com/favorites',
         permanent: true,
       },
       // Missing blog posts redirects (from 404 errors) - redirect to existing relevant content
       {
         source: '/blog/electric-scooter-buying-guide-2024',
-        destination: '/blog/e-bike-buying-guide-2024',
+        destination: 'https://www.evvalley.com/blog/e-bike-buying-guide-2024',
         permanent: true,
       },
       {
         source: '/blog/electric-scooter-buying-guide-2024/',
-        destination: '/blog/e-bike-buying-guide-2024',
+        destination: 'https://www.evvalley.com/blog/e-bike-buying-guide-2024',
         permanent: true,
       },
       {
         source: '/blog/the-advantages-of-using-electric-vehicles-on-uber-and-lyft',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/the-advantages-of-using-electric-vehicles-on-uber-and-lyft/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/ev-charging-station-guide-2024',
-        destination: '/blog/how-to-charge-tesla-at-home',
+        destination: 'https://www.evvalley.com/blog/how-to-charge-tesla-at-home',
         permanent: true,
       },
       {
         source: '/blog/ev-charging-station-guide-2024/',
-        destination: '/blog/how-to-charge-tesla-at-home',
+        destination: 'https://www.evvalley.com/blog/how-to-charge-tesla-at-home',
         permanent: true,
       },
       {
         source: '/blog/the-future-of-electric-vehicles-where-are-we-headed',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/the-future-of-electric-vehicles-where-are-we-headed/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/advantages-of-electric-vehicles-over-internal-combustion-engine-cars',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
       {
         source: '/blog/advantages-of-electric-vehicles-over-internal-combustion-engine-cars/',
-        destination: '/blog/electric-vehicle-cost-analysis',
+        destination: 'https://www.evvalley.com/blog/electric-vehicle-cost-analysis',
         permanent: true,
       },
     ];
