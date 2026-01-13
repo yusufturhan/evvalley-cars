@@ -866,7 +866,7 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
           <div className="bg-[#F8FAFF] border border-gray-200 rounded-lg px-5 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div>
               <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Have an EV to sell?</p>
-              <p className="text-base text-gray-800">List it for free and reach EV-focused buyers.</p>
+              <p className="text-base text-gray-800">List it and reach EV-focused buyers.</p>
             </div>
             <Link
               href="/sell"
