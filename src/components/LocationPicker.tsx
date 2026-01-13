@@ -17,7 +17,7 @@ export default function LocationPicker({
   value,
   onChange,
   error,
-  placeholder = "Enter ZIP code, city, or address",
+  placeholder = "Enter ZIP code, city, or state (e.g., Mountain View, 94040, CA)",
 }: LocationPickerProps) {
   const [inputValue, setInputValue] = useState(
     value?.formatted_address || ""
@@ -26,75 +26,26 @@ export default function LocationPicker({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
-  const pendingPlaceRef = useRef<LocationData | null>(value);
+  const [geocodeError, setGeocodeError] = useState<string>("");
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<any>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   const geocoderRef = useRef<any>(null);
+  const geocodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize Google Maps API (singleton loader) and Autocomplete
+  // Initialize Google Maps API and Geocoder
   useEffect(() => {
-    let hiddenMapDiv: HTMLDivElement | null = null;
-
     (async () => {
       try {
         const google = await getGoogleMaps();
 
-        // Initialize Places Autocomplete on the input
-        if (inputRef.current && !autocompleteRef.current) {
-          autocompleteRef.current = new google.maps.places.Autocomplete(
-            inputRef.current,
-            {
-              componentRestrictions: { country: "us" },
-              types: ["(cities)", "geocode"], // Cities + addresses/ZIP
-              fields: [
-                "formatted_address",
-                "place_id",
-                "geometry",
-                "address_components",
-              ],
-            }
-          );
-
-          autocompleteRef.current.addListener("place_changed", () => {
-            const place = autocompleteRef.current.getPlace();
-            if (!place || !place.place_id || !place.formatted_address) {
-              return;
-            }
-            const { city, state, postal_code } = parseAddressComponents(
-              place.address_components
-            );
-            const lat = place.geometry?.location?.lat() || 0;
-            const lng = place.geometry?.location?.lng() || 0;
-            const locationData: LocationData = {
-              formatted_address: place.formatted_address,
-              place_id: place.place_id,
-              lat,
-              lng,
-              city,
-              state,
-              postal_code,
-            };
-            setInputValue(place.formatted_address);
-            onChange(locationData);
-          });
-        }
-
-        // Geocoder for fallback (enter/blur without selection)
+        // Initialize Geocoder for manual address search
         if (!geocoderRef.current) {
           geocoderRef.current = new google.maps.Geocoder();
         }
 
-        // Initialize preview map
-        hiddenMapDiv = document.createElement("div");
-        hiddenMapDiv.style.display = "none";
-        document.body.appendChild(hiddenMapDiv);
-
-        const hiddenMap = new google.maps.Map(hiddenMapDiv);
-        // hidden map only to satisfy API; not used directly
         // Initialize visible preview map
-        if (mapRef.current) {
+        if (mapRef.current && !map) {
           const previewMap = new google.maps.Map(mapRef.current, {
             center: { lat: 37.7749, lng: -122.4194 }, // Default: San Francisco
             zoom: 10,
@@ -124,16 +75,11 @@ export default function LocationPicker({
     })();
 
     return () => {
-      if (hiddenMapDiv && document.body.contains(hiddenMapDiv)) {
-        document.body.removeChild(hiddenMapDiv);
-      }
-      if (autocompleteRef.current && (window as any).google?.maps?.event) {
-        (window as any).google.maps.event.clearInstanceListeners(
-          autocompleteRef.current
-        );
+      if (geocodeTimeoutRef.current) {
+        clearTimeout(geocodeTimeoutRef.current);
       }
     };
-  }, [value, onChange]);
+  }, [value, map]);
 
   // Update map when location changes
   useEffect(() => {
@@ -156,21 +102,40 @@ export default function LocationPicker({
     }
   }, [value, map, mapLoaded, marker]);
 
-  // Handle input change (clear selection)
+  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setInputValue(query);
-    onChange(null); // Clear selection when user types
+    setGeocodeError("");
+    
+    // Clear timeout if user is still typing
+    if (geocodeTimeoutRef.current) {
+      clearTimeout(geocodeTimeoutRef.current);
+    }
+    
+    // Clear location when user modifies input
+    if (value) {
+      onChange(null);
+    }
   };
 
-  // Fallback: on Enter or blur, if user typed something but did not select a suggestion, geocode it.
-  const handleGeocodeFallback = async () => {
+  // Geocode the user's input (called on Enter or blur)
+  const handleGeocodeLocation = async () => {
     const query = inputValue.trim();
-    // Skip if empty or already have a valid location
-    if (!query || value || !geocoderRef.current) return;
+    
+    // Skip if empty, already loading, or already have valid location for this query
+    if (!query || isLoading) return;
+    if (value && value.formatted_address === query) return;
+    
+    if (!geocoderRef.current) {
+      setGeocodeError("Maps service not ready. Please try again.");
+      return;
+    }
     
     try {
       setIsLoading(true);
+      setGeocodeError("");
+      
       geocoderRef.current.geocode(
         {
           address: query,
@@ -178,6 +143,7 @@ export default function LocationPicker({
         },
         (results: any, status: any) => {
           setIsLoading(false);
+          
           if (status === "OK" && results && results.length > 0) {
             const place = results[0];
             const { city, state, postal_code } = parseAddressComponents(
@@ -196,18 +162,21 @@ export default function LocationPicker({
             };
             setInputValue(locationData.formatted_address);
             onChange(locationData);
-            pendingPlaceRef.current = locationData;
-            console.log("[LocationPicker] Geocode success:", locationData);
+            setGeocodeError("");
+          } else if (status === "ZERO_RESULTS") {
+            setGeocodeError("Location not found. Please try a different address, city, or ZIP code.");
+            onChange(null);
           } else {
-            console.warn("[LocationPicker] Geocode fallback failed", { query, status });
-            // Clear the value if geocoding failed
+            console.warn("[LocationPicker] Geocode failed", { query, status });
+            setGeocodeError("Unable to verify location. Please check your input and try again.");
             onChange(null);
           }
         }
       );
     } catch (err) {
       setIsLoading(false);
-      console.error("[LocationPicker] Geocode fallback error", err);
+      console.error("[LocationPicker] Geocode error", err);
+      setGeocodeError("An error occurred. Please try again.");
       onChange(null);
     }
   };
@@ -225,22 +194,22 @@ export default function LocationPicker({
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              handleGeocodeFallback();
+              handleGeocodeLocation();
             }
           }}
           onBlur={() => {
-            // Use a timeout to allow click on dropdown; fallback if no selection
-            setTimeout(() => {
-              // Only geocode if we don't already have a valid location
-              if (!value && inputValue.trim()) {
-                handleGeocodeFallback();
+            // Geocode after user finishes typing and leaves field
+            if (geocodeTimeoutRef.current) {
+              clearTimeout(geocodeTimeoutRef.current);
+            }
+            geocodeTimeoutRef.current = setTimeout(() => {
+              if (inputValue.trim() && !value) {
+                handleGeocodeLocation();
               }
-              // reset pending flag after blur attempt
-              pendingPlaceRef.current = null;
-            }, 200);
+            }, 300);
           }}
           className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
-            error ? "border-red-500" : "border-gray-300"
+            error || geocodeError ? "border-red-500" : value ? "border-green-500" : "border-gray-300"
           }`}
           placeholder={placeholder}
           disabled={isLoading}
@@ -250,31 +219,43 @@ export default function LocationPicker({
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#3AB0FF]"></div>
           </div>
         )}
+        {value && !isLoading && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
+            ✓
+          </div>
+        )}
       </div>
 
-      {/* Error Message & Hint */}
+      {/* Success/Error Messages */}
       {error && (
         <p className="text-red-500 text-xs mt-1">{error}</p>
       )}
-      {!error && inputValue && !value && (
-        <p className="text-amber-600 text-xs mt-1 flex items-center gap-1">
+      {geocodeError && !error && (
+        <p className="text-red-500 text-xs mt-1">{geocodeError}</p>
+      )}
+      {!error && !geocodeError && inputValue && !value && !isLoading && (
+        <p className="text-blue-600 text-xs mt-1 flex items-center gap-1">
           <span>💡</span>
-          <span>Press Enter or click outside to confirm your location</span>
+          <span>Press Enter or click outside to confirm location</span>
+        </p>
+      )}
+      {value && !error && !geocodeError && (
+        <p className="text-green-600 text-xs mt-1 flex items-center gap-1">
+          <span>✓</span>
+          <span>Location confirmed</span>
         </p>
       )}
 
       {/* Map Preview */}
-      {mapLoaded && (
+      {mapLoaded && value && (
         <div className="mt-4">
           <div
             ref={mapRef}
             className="w-full h-48 rounded-lg border border-gray-300 overflow-hidden"
           />
-          {value && (
-            <p className="text-xs text-gray-500 mt-1 text-center">
-              {value.formatted_address}
-            </p>
-          )}
+          <p className="text-xs text-gray-500 mt-1 text-center">
+            📍 {value.formatted_address}
+          </p>
         </div>
       )}
     </div>
