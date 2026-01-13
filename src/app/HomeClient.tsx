@@ -844,6 +844,11 @@ export function HomeClient() {
                     <div className="absolute top-3 right-3 z-10" onClick={(e) => e.preventDefault()}>
                       <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                     </div>
+                    {vehicle.sold && (
+                      <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                        SOLD
+                      </div>
+                    )}
                   </div>
                   
                   <div className="p-4 md:flex-1 md:flex md:flex-col md:justify-between">
@@ -892,12 +897,6 @@ export function HomeClient() {
                           ${vehicle.price.toLocaleString()}
                         </span>
                       </div>
-                      
-                      {vehicle.sold && (
-                        <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          SOLD
-                        </div>
-                      )}
                     </div>
 
                     {/* Desktop Layout */}
@@ -923,16 +922,10 @@ export function HomeClient() {
                         </div>
                         <div className="flex items-center">
                           <span className="text-sm font-medium text-gray-700 w-24">Price:</span>
-                          <span className="text-lg font-bold text-green-600">${vehicle.price.toLocaleString()}</span>
-                        </div>
+                        <span className="text-lg font-bold text-green-600">${vehicle.price.toLocaleString()}</span>
                       </div>
-                      
-                      {vehicle.sold && (
-                        <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-3">
-                          SOLD
-                        </div>
-                      )}
                     </div>
+                  </div>
                     
                     {/* CTA: Inline Message Composer (All Screen Sizes) */}
                     <div className="w-full">
