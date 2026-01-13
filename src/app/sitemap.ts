@@ -44,21 +44,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
 
-    // ✅ NEW: Seller SEO landing pages
+    // ✅ Listing page
     {
-      url: `${BASE_URL}/sell-your-ev`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/sell-your-tesla`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/sell-electric-car/california`,
+      url: `${BASE_URL}/sell`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,

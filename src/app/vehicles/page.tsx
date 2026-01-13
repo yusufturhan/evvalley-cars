@@ -111,8 +111,8 @@ export default async function VehiclesPage({ searchParams }: { searchParams: Pro
             </p>
             <p>
               Thinking about selling? You can{' '}
-              <a href="/sell-your-ev" className="text-blue-600 hover:text-blue-800 underline">
-                sell your EV on EvValley
+              <a href="/sell" className="text-blue-600 hover:text-blue-800 underline">
+                list your EV on EvValley
               </a>{' '}
               without commissions, keeping more of your sale price while reaching buyers who already want electric mobility. If you are new to EV ownership, explore our{' '}
               <a href="/blog" className="text-blue-600 hover:text-blue-800 underline">
