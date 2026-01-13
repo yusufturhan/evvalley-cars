@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Vehicle } from "@/lib/database";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import Script from "next/script";
 
 export function VehiclesClient() {
   const searchParams = useSearchParams();
@@ -231,31 +232,54 @@ export function VehiclesClient() {
     }
   }, [user, messageInputs, messageSent]);
 
-  const applyLocationFilter = (loc: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const trimmed = loc.trim();
-    if (trimmed) {
-      params.set('location', trimmed);
-    } else {
-      params.delete('location');
-    }
-    // Preserve pagination reset
-    params.delete('page');
-    router.push(`/vehicles?${params.toString()}`);
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
     setCurrentPage(1);
   };
 
-  // Reset to page 1 when filters change (but not when currentPage changes)
-  useEffect(() => {
-    // Only reset if we're not on page 1 already
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-    }
-  }, [searchParams.get('category'), searchParams.get('brand'), searchParams.get('year'), searchParams.get('minPrice'), searchParams.get('maxPrice'), searchParams.get('color'), searchParams.get('maxMileage'), searchParams.get('search'), searchParams.get('location')]);
+  // Structured Data for vehicles listing
+  const listStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Electric Vehicles for Sale",
+    "description": "Browse electric vehicles, hybrid cars, e-bikes, and e-scooters for sale",
+    "url": "https://www.evvalley.com/vehicles",
+    "itemListElement": vehicles.map((vehicle, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": vehicle.title,
+        "description": vehicle.description || `${vehicle.year} ${vehicle.brand} ${vehicle.model} for sale. Price: $${vehicle.price?.toLocaleString()}. Mileage: ${vehicle.mileage ? vehicle.mileage.toLocaleString() + ' mi' : 'New'}. View more details on Evvalley.`,
+        "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
+        "brand": {
+          "@type": "Brand",
+          "name": vehicle.brand
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": vehicle.price,
+          "priceCurrency": "USD",
+          "availability": vehicle.sold ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/UsedCondition",
+          "url": `https://www.evvalley.com/vehicles/${vehicle.id}`
+        }
+      }
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F9FF] pb-16 md:pb-0">
       <Header />
+
+      {/* Structured Data */}
+      <Script
+        id="list-structured-data-vc"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(listStructuredData)
+        }}
+      />
 
       {/* Sell CTA Banner */}
       <section className="bg-white border-b border-gray-100">

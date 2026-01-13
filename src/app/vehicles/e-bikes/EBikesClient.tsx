@@ -261,7 +261,7 @@ export function EBikesClient() {
       "item": {
         "@type": "Product",
         "name": vehicle.title,
-        "description": `${vehicle.year} ${vehicle.brand} ${vehicle.model}`,
+        "description": vehicle.description || `${vehicle.year} ${vehicle.brand} ${vehicle.model} for sale. Price: $${vehicle.price?.toLocaleString()}. Mileage: ${vehicle.mileage ? vehicle.mileage.toLocaleString() + ' mi' : 'New'}. View more details on Evvalley.`,
         "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : undefined,
         "brand": {
           "@type": "Brand",
@@ -272,7 +272,8 @@ export function EBikesClient() {
           "price": vehicle.price,
           "priceCurrency": "USD",
           "availability": vehicle.sold ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
-          "itemCondition": "https://schema.org/UsedCondition"
+          "itemCondition": "https://schema.org/UsedCondition",
+          "url": `https://www.evvalley.com/vehicles/${vehicle.id}`
         }
       }
     }))

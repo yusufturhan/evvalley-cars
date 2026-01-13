@@ -123,8 +123,35 @@ export default async function VehicleDetailPage({ params }: { params: { id: stri
       }
     }
 
+    // Prepare JSON-LD Product schema
+    const productSchema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": vehicle.title || `${vehicle.year} ${vehicle.brand} ${vehicle.model}`,
+      "description": vehicle.description || `${vehicle.year} ${vehicle.brand} ${vehicle.model} for sale. Price: $${vehicle.price?.toLocaleString()}. Mileage: ${vehicle.mileage ? vehicle.mileage.toLocaleString() + ' mi' : 'New'}. View more details and contact seller on Evvalley.`,
+      "image": vehicle.images && vehicle.images.length > 0 ? vehicle.images : undefined,
+      "brand": {
+        "@type": "Brand",
+        "name": vehicle.brand
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": vehicle.price,
+        "priceCurrency": "USD",
+        "availability": vehicle.sold ? "https://schema.org/OutOfStock" : "https://schema.org/InStock",
+        "itemCondition": "https://schema.org/UsedCondition",
+        "url": `${CANONICAL_ORIGIN}/vehicles/${vehicle.id}`
+      }
+    };
+
     return (
-      <VehicleDetailClient vehicle={vehicle} />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
+        <VehicleDetailClient vehicle={vehicle} />
+      </>
     );
   } catch (error) {
     console.error('Error fetching vehicle:', error);
