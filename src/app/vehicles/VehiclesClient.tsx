@@ -341,7 +341,7 @@ export function VehiclesClient({
             <Button 
               variant="outline"
               size="md"
-              onClick={() => router.push('/vehicles/ev-cars')}
+              onClick={() => router.push('/vehicles?category=ev-car')}
               className="flex items-center gap-2"
             >
               <Car className="w-4 h-4" />
@@ -351,7 +351,7 @@ export function VehiclesClient({
             <Button 
               variant="outline"
               size="md"
-              onClick={() => router.push('/vehicles/hybrid-cars')}
+              onClick={() => router.push('/vehicles?category=hybrid-car')}
               className="flex items-center gap-2"
             >
               <Car className="w-4 h-4" />
@@ -361,7 +361,7 @@ export function VehiclesClient({
             <Button 
               variant="outline"
               size="md"
-              onClick={() => router.push('/vehicles/ev-scooters')}
+              onClick={() => router.push('/vehicles?category=ev-scooter')}
               className="flex items-center gap-2"
             >
               <Bike className="w-4 h-4" />
@@ -371,7 +371,7 @@ export function VehiclesClient({
             <Button 
               variant="outline"
               size="md"
-              onClick={() => router.push('/vehicles/e-bikes')}
+              onClick={() => router.push('/vehicles?category=e-bike')}
               className="flex items-center gap-2"
             >
               <Bike className="w-4 h-4" />
