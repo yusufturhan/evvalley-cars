@@ -37,7 +37,11 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
     description,
     metadataBase: new URL('https://www.evvalley.com'),
     alternates: {
-      canonical: 'https://www.evvalley.com/vehicles',
+      canonical: category === 'ev-car' ? 'https://www.evvalley.com/vehicles/ev-cars' :
+                 category === 'hybrid-car' ? 'https://www.evvalley.com/vehicles/hybrid-cars' :
+                 category === 'ev-scooter' ? 'https://www.evvalley.com/vehicles/ev-scooters' :
+                 category === 'e-bike' ? 'https://www.evvalley.com/vehicles/e-bikes' :
+                 'https://www.evvalley.com/vehicles',
     },
     robots: {
       index: !hasFilters,
