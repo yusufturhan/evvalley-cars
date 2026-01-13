@@ -23,6 +23,7 @@ export default function LocationPicker({
     value?.formatted_address || ""
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [map, setMap] = useState<any>(null);
   const [marker, setMarker] = useState<any>(null);
@@ -37,11 +38,13 @@ export default function LocationPicker({
   useEffect(() => {
     (async () => {
       try {
+        setIsInitializing(true);
         const google = await getGoogleMaps();
 
         // Initialize Geocoder for manual address search
         if (!geocoderRef.current) {
           geocoderRef.current = new google.maps.Geocoder();
+          console.log("[LocationPicker] Geocoder initialized successfully");
         }
 
         // Initialize visible preview map
@@ -69,8 +72,12 @@ export default function LocationPicker({
             setMarker(newMarker);
           }
         }
+        
+        setIsInitializing(false);
       } catch (err) {
-        console.error("Error loading Google Maps API:", err);
+        console.error("[LocationPicker] Error loading Google Maps API:", err);
+        setIsInitializing(false);
+        setGeocodeError("Unable to load maps service. Please refresh the page.");
       }
     })();
 
@@ -120,16 +127,42 @@ export default function LocationPicker({
   };
 
   // Geocode the user's input (called on Enter or blur)
-  const handleGeocodeLocation = async () => {
+  const handleGeocodeLocation = async (retryCount = 0) => {
     const query = inputValue.trim();
+    const MAX_RETRIES = 3;
     
     // Skip if empty, already loading, or already have valid location for this query
     if (!query || isLoading) return;
     if (value && value.formatted_address === query) return;
     
+    // If geocoder not ready, wait and retry
     if (!geocoderRef.current) {
-      setGeocodeError("Maps service not ready. Please try again.");
-      return;
+      if (retryCount < MAX_RETRIES) {
+        console.log(`[LocationPicker] Geocoder not ready, retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+        setIsLoading(true);
+        setGeocodeError("");
+        
+        // Wait 500ms and retry
+        setTimeout(async () => {
+          // Try to initialize geocoder again
+          try {
+            const google = await getGoogleMaps();
+            if (!geocoderRef.current) {
+              geocoderRef.current = new google.maps.Geocoder();
+            }
+          } catch (err) {
+            console.error("[LocationPicker] Failed to load Google Maps:", err);
+          }
+          
+          setIsLoading(false);
+          handleGeocodeLocation(retryCount + 1);
+        }, 500);
+        return;
+      } else {
+        setGeocodeError("Maps service is loading. Please wait a moment and try again.");
+        setIsLoading(false);
+        return;
+      }
     }
     
     try {
@@ -208,18 +241,18 @@ export default function LocationPicker({
               }
             }, 300);
           }}
-          className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
+          className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
             error || geocodeError ? "border-red-500" : value ? "border-green-500" : "border-gray-300"
           }`}
-          placeholder={placeholder}
-          disabled={isLoading}
+          placeholder={isInitializing ? "Loading maps..." : placeholder}
+          disabled={isLoading || isInitializing}
         />
-        {isLoading && (
+        {(isLoading || isInitializing) && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#3AB0FF]"></div>
           </div>
         )}
-        {value && !isLoading && (
+        {value && !isLoading && !isInitializing && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
             ✓
           </div>
@@ -233,13 +266,19 @@ export default function LocationPicker({
       {geocodeError && !error && (
         <p className="text-red-500 text-xs mt-1">{geocodeError}</p>
       )}
-      {!error && !geocodeError && inputValue && !value && !isLoading && (
+      {isInitializing && !error && !geocodeError && (
+        <p className="text-gray-500 text-xs mt-1 flex items-center gap-1">
+          <span>⏳</span>
+          <span>Loading maps service...</span>
+        </p>
+      )}
+      {!error && !geocodeError && !isInitializing && inputValue && !value && !isLoading && (
         <p className="text-blue-600 text-xs mt-1 flex items-center gap-1">
           <span>💡</span>
           <span>Press Enter or click outside to confirm location</span>
         </p>
       )}
-      {value && !error && !geocodeError && (
+      {value && !error && !geocodeError && !isInitializing && (
         <p className="text-green-600 text-xs mt-1 flex items-center gap-1">
           <span>✓</span>
           <span>Location confirmed</span>
