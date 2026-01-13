@@ -2,8 +2,10 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { HybridCarsClient } from './HybridCarsClient';
 import Header from "@/components/Header";
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }): Promise<Metadata> {
+// ... existing generateMetadata ...
   const params = await searchParams;
   const brand = params.brand as string | undefined;
   const location = params.location as string | undefined;
@@ -71,6 +73,11 @@ export default function HybridCarsPage() {
         </div>
       </div>
     }>
+      <div className="bg-[#F5F9FF] pt-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: 'Vehicles', href: '/vehicles' }, { label: 'Hybrid Cars' }]} />
+        </div>
+      </div>
       <HybridCarsClient />
     </Suspense>
   );

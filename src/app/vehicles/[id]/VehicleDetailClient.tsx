@@ -33,6 +33,8 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 
+import Breadcrumbs from "@/components/Breadcrumbs";
+
 interface VehicleDetailClientProps {
   vehicle: Vehicle;
 }
@@ -40,6 +42,20 @@ interface VehicleDetailClientProps {
 export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProps) {
   const router = useRouter();
   const { user, isSignedIn } = useUser();
+
+  const breadcrumbItems = [
+    { label: 'Vehicles', href: '/vehicles' },
+    { 
+      label: vehicle.category.replace('-', ' ').toUpperCase(), 
+      href: `/vehicles/${vehicle.category}` 
+    },
+    { 
+      label: vehicle.brand, 
+      href: `/vehicles/brand/${vehicle.brand.toLowerCase()}` 
+    },
+    { label: vehicle.model }
+  ];
+
   // Build media array: video first (if exists), then images
   const media: string[] = [
     ...(vehicle?.video_url ? [vehicle.video_url] : []),
@@ -354,11 +370,12 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
       <Header />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-        {/* Breadcrumb */}
+        {/* Breadcrumbs */}
         <div className="mb-6">
+          <Breadcrumbs items={breadcrumbItems} />
           <button 
             onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-gray-900"
+            className="flex items-center text-gray-600 hover:text-gray-900 mt-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back

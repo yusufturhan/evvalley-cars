@@ -15,7 +15,19 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import Script from "next/script";
 
-export function VehiclesClient() {
+interface VehiclesClientProps {
+  initialCategory?: string;
+  initialBrand?: string;
+  initialLocation?: string;
+  initialYear?: string;
+}
+
+export function VehiclesClient({ 
+  initialCategory, 
+  initialBrand, 
+  initialLocation,
+  initialYear 
+}: VehiclesClientProps = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useUser();
@@ -24,11 +36,11 @@ export function VehiclesClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [locationQuery, setLocationQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState(initialLocation || '');
   const [filters, setFilters] = useState({
-    category: 'all',
-    brand: 'all',
-    year: 'all',
+    category: initialCategory || 'all',
+    brand: initialBrand || 'all',
+    year: initialYear || 'all',
     minPrice: '',
     maxPrice: '',
     color: 'all',
@@ -77,15 +89,15 @@ export function VehiclesClient() {
 
   // Sync filters state with URL params for UI
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category') || 'all';
-    const brandFromUrl = searchParams.get('brand') || 'all';
-    const yearFromUrl = searchParams.get('year') || 'all';
+    const categoryFromUrl = searchParams.get('category') || initialCategory || 'all';
+    const brandFromUrl = searchParams.get('brand') || initialBrand || 'all';
+    const yearFromUrl = searchParams.get('year') || initialYear || 'all';
     const minPriceFromUrl = searchParams.get('minPrice') || '';
     const maxPriceFromUrl = searchParams.get('maxPrice') || '';
     const colorFromUrl = searchParams.get('color') || 'all';
     const maxMileageFromUrl = searchParams.get('maxMileage') || '';
     const searchFromUrl = searchParams.get('search') || '';
-    const locationFromUrl = searchParams.get('location') || '';
+    const locationFromUrl = searchParams.get('location') || initialLocation || '';
     
     setFilters({
       category: categoryFromUrl,
@@ -99,7 +111,7 @@ export function VehiclesClient() {
     
     setSearchQuery(searchFromUrl);
     setLocationQuery(locationFromUrl);
-  }, [searchParams]);
+  }, [searchParams, initialCategory, initialBrand, initialYear, initialLocation]);
 
   // Fetch vehicles with pagination
   useEffect(() => {
@@ -235,6 +247,20 @@ export function VehiclesClient() {
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
     setCurrentPage(1);
+  };
+
+  const applyLocationFilter = (loc: string) => {
+    setLocationQuery(loc);
+    setCurrentPage(1);
+    
+    // Apply to URL
+    const params = new URLSearchParams(searchParams.toString());
+    if (loc.trim()) {
+      params.set('location', loc.trim());
+    } else {
+      params.delete('location');
+    }
+    router.push(`/vehicles?${params.toString()}`, { scroll: false });
   };
 
   // Structured Data for vehicles listing

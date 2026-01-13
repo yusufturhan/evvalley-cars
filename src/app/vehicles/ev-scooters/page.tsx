@@ -2,8 +2,10 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { EVScootersClient } from './EVScootersClient';
 import { headers } from 'next/headers';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export async function generateMetadata(): Promise<Metadata> {
+// ... existing generateMetadata ...
   const headersList = headers();
   const url = new URL(headersList.get('x-url') || 'https://www.evvalley.com/vehicles/ev-scooters');
   const searchParams = url.searchParams;
@@ -80,6 +82,11 @@ export default function EVScootersPage() {
         </div>
       </div>
     }>
+      <div className="bg-[#F5F9FF] pt-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ label: 'Vehicles', href: '/vehicles' }, { label: 'Electric Scooters' }]} />
+        </div>
+      </div>
       <EVScootersClient />
     </Suspense>
   );
