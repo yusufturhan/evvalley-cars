@@ -329,7 +329,7 @@ export function VehiclesClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3 justify-center">
             <Button 
-              variant="primary"
+              variant={filters.category === 'all' ? "primary" : "outline"}
               size="md"
               onClick={() => router.push('/vehicles')}
               className="flex items-center gap-2"
@@ -339,7 +339,7 @@ export function VehiclesClient({
             </Button>
             
             <Button 
-              variant="outline"
+              variant={filters.category === 'ev-car' ? "primary" : "outline"}
               size="md"
               onClick={() => router.push('/vehicles?category=ev-car')}
               className="flex items-center gap-2"
@@ -349,7 +349,7 @@ export function VehiclesClient({
             </Button>
             
             <Button 
-              variant="outline"
+              variant={filters.category === 'hybrid-car' ? "primary" : "outline"}
               size="md"
               onClick={() => router.push('/vehicles?category=hybrid-car')}
               className="flex items-center gap-2"
@@ -359,7 +359,7 @@ export function VehiclesClient({
             </Button>
             
             <Button 
-              variant="outline"
+              variant={filters.category === 'ev-scooter' ? "primary" : "outline"}
               size="md"
               onClick={() => router.push('/vehicles?category=ev-scooter')}
               className="flex items-center gap-2"
@@ -369,7 +369,7 @@ export function VehiclesClient({
             </Button>
             
             <Button 
-              variant="outline"
+              variant={filters.category === 'e-bike' ? "primary" : "outline"}
               size="md"
               onClick={() => router.push('/vehicles?category=e-bike')}
               className="flex items-center gap-2"
