@@ -284,12 +284,22 @@ export function middleware(request: NextRequest) {
       return response;
     }
     
+    // Redirect specific /blog/ URLs that were removed to relevant content
+    if (pathname === '/blog/a-major-leap-in-ev-charging-infrastructure-in-san-francisco-2024-2025' || pathname === '/blog/a-major-leap-in-ev-charging-infrastructure-in-san-francisco-2024-2025/') {
+      const newUrl = new URL('/blog/ev-charging-station-guide', request.url);
+      newUrl.protocol = 'https:';
+      newUrl.host = 'www.evvalley.com';
+      const response = NextResponse.redirect(newUrl, 301);
+      response.headers.set('X-Robots-Tag', 'index, follow');
+      response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+      return response;
+    }
+
     // Return 410 Gone for known removed/invalid URLs (only for truly deleted content)
     const gonePaths = new Set([
       '/vehicles/88fb4f6a-28a9-4b7c-8ed7-8c7a0c5ae760',
       '/blog/environmental-benefits-of-electric-cars',
       '/blog/the-importance-of-charging-station-availability-for-the-future-of-electric-vehicles',
-      '/blog/a-major-leap-in-ev-charging-infrastructure-in-san-francisco-2024-2025',
       '/blog/battery-technology-advancements-and-the-ev-range-problem',
       '/blog/battery-technology-advancements-and-the-ev-range-problem/',
       '/blog/a-brief-history-of-electric-vehicles-from-the-past-to-today',
