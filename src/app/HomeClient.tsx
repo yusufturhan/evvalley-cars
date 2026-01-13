@@ -849,52 +849,55 @@ export function HomeClient() {
                   <div className="p-4 md:flex-1 md:flex md:flex-col md:justify-between">
                     {/* Mobile/Tablet Layout */}
                     <div className="md:hidden">
-                      {/* Badges */}
-                      <div className="flex items-center mb-2 gap-2 flex-wrap">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
-                          {vehicle.category.replace('-', ' ').toUpperCase()}
-                        </span>
-                        {vehicle.sold && (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            SOLD
-                          </span>
-                        )}
-                      </div>
-                      
                       {/* Title */}
-                      <h3 className="text-lg font-medium text-card-foreground mb-2 line-clamp-2 leading-tight">
-                        {vehicle.title}
+                      <h3 className="text-xl font-bold text-card-foreground mb-4">
+                        {vehicle.year} {vehicle.brand} {vehicle.model}
                       </h3>
                       
-                      {/* Meta Info */}
-                      <div className="flex items-center gap-1.5 mb-3 text-sm text-muted-foreground flex-wrap">
-                        <span>{vehicle.year}</span>
-                        <span>•</span>
-                        <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'New'}</span>
-                        {vehicle.range_miles && (
-                          <>
-                            <span>•</span>
-                            <span>{vehicle.range_miles}mi range</span>
-                          </>
-                        )}
+                      {/* Info List with Icons */}
+                      <div className="space-y-3 mb-4">
+                        <div className="flex items-center gap-3">
+                          <svg className="h-5 w-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                          </svg>
+                          <div>
+                            <div className="text-sm text-gray-600">Mileage</div>
+                            <div className="text-base font-semibold text-gray-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()}` : 'N/A'}</div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <svg className="h-5 w-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          </svg>
+                          <div>
+                            <div className="text-sm text-gray-600">Location</div>
+                            <div className="text-base font-semibold text-gray-900">{vehicle.location}</div>
+                          </div>
+                        </div>
                       </div>
                       
                       {/* Price */}
                       <div className="mb-4">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {(() => {
-                            const rawOld = (vehicle as any).old_price;
-                            const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
-                            const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
-                            return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
-                              <span className="text-muted-foreground line-through text-sm">${oldP.toLocaleString()}</span>
-                            ) : null;
-                          })()}
-                          <span className="text-2xl font-bold text-green-600">
-                            ${vehicle.price.toLocaleString()}
-                          </span>
-                        </div>
+                        {(() => {
+                          const rawOld = (vehicle as any).old_price;
+                          const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                          const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                          return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                            <span className="text-sm text-muted-foreground line-through mr-2">${oldP.toLocaleString()}</span>
+                          ) : null;
+                        })()}
+                        <span className="text-2xl font-bold text-green-600">
+                          ${vehicle.price.toLocaleString()}
+                        </span>
                       </div>
+                      
+                      {vehicle.sold && (
+                        <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          SOLD
+                        </div>
+                      )}
                     </div>
 
                     {/* Desktop Layout */}
