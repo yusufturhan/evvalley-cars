@@ -166,7 +166,9 @@ export default function LocationPicker({
   // Fallback: on Enter or blur, if user typed something but did not select a suggestion, geocode it.
   const handleGeocodeFallback = async () => {
     const query = inputValue.trim();
-    if (!query || !geocoderRef.current) return;
+    // Skip if empty or already have a valid location
+    if (!query || value || !geocoderRef.current) return;
+    
     try {
       setIsLoading(true);
       geocoderRef.current.geocode(
@@ -195,14 +197,18 @@ export default function LocationPicker({
             setInputValue(locationData.formatted_address);
             onChange(locationData);
             pendingPlaceRef.current = locationData;
+            console.log("[LocationPicker] Geocode success:", locationData);
           } else {
             console.warn("[LocationPicker] Geocode fallback failed", { query, status });
+            // Clear the value if geocoding failed
+            onChange(null);
           }
         }
       );
     } catch (err) {
       setIsLoading(false);
       console.error("[LocationPicker] Geocode fallback error", err);
+      onChange(null);
     }
   };
 
@@ -225,12 +231,13 @@ export default function LocationPicker({
           onBlur={() => {
             // Use a timeout to allow click on dropdown; fallback if no selection
             setTimeout(() => {
-              if (!pendingPlaceRef.current) {
+              // Only geocode if we don't already have a valid location
+              if (!value && inputValue.trim()) {
                 handleGeocodeFallback();
               }
               // reset pending flag after blur attempt
               pendingPlaceRef.current = null;
-            }, 150);
+            }, 200);
           }}
           className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#3AB0FF] focus:border-transparent bg-white text-gray-900 placeholder-gray-500 ${
             error ? "border-red-500" : "border-gray-300"
@@ -245,9 +252,15 @@ export default function LocationPicker({
         )}
       </div>
 
-      {/* Error Message */}
+      {/* Error Message & Hint */}
       {error && (
         <p className="text-red-500 text-xs mt-1">{error}</p>
+      )}
+      {!error && inputValue && !value && (
+        <p className="text-amber-600 text-xs mt-1 flex items-center gap-1">
+          <span>💡</span>
+          <span>Press Enter or click outside to confirm your location</span>
+        </p>
       )}
 
       {/* Map Preview */}
