@@ -927,12 +927,12 @@ export function VehiclesClient({
                       <Link 
                         key={vehicle.id}
                         href={`/vehicles/${vehicle.id}`}
-                        className={`group flex bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-all duration-200 ease-out md:hover:-translate-y-1 md:hover:shadow-lg ${
+                        className={`group block md:flex bg-card rounded-xl border border-border shadow-sm overflow-hidden active:opacity-90 transition-all duration-200 ease-out md:hover:-translate-y-1 md:hover:shadow-lg ${
                           vehicle.sold ? 'opacity-75' : ''
                         }`}
                       >
-                        <div className="relative w-56 h-44 flex-shrink-0">
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                        <div className="relative md:w-56 md:h-44 md:flex-shrink-0">
+                          <div className="aspect-[4/3] md:aspect-auto md:w-full md:h-full bg-gray-200 flex items-center justify-center overflow-hidden">
                             {vehicle.video_url ? (
                             <video
                               src={vehicle.video_url}
@@ -964,49 +964,94 @@ export function VehiclesClient({
                               <div className="text-sm">{vehicle.brand} {vehicle.model}</div>
                             </div>
                           </div>
-                          <div className="absolute top-2 left-2 z-10" onClick={(e) => e.preventDefault()}>
+                          <div className="absolute top-3 right-3 z-10" onClick={(e) => e.preventDefault()}>
                             <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                           </div>
-                          {vehicle.sold && (
-                            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-                              SOLD
-                            </div>
-                          )}
                         </div>
                         
-                        <div className="flex-1 p-4 flex flex-col justify-between">
-                          <div>
+                        <div className="p-4 md:flex-1 md:flex md:flex-col md:justify-between">
+                          {/* Mobile/Tablet Layout */}
+                          <div className="md:hidden">
+                            {/* Badges */}
+                            <div className="flex items-center mb-2 gap-2 flex-wrap">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(vehicle.category)}`}>
+                                {vehicle.category.replace('-', ' ').toUpperCase()}
+                              </span>
+                              {vehicle.sold && (
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                  SOLD
+                                </span>
+                              )}
+                            </div>
+                            
                             {/* Title */}
-                            <h3 className="text-lg font-semibold text-card-foreground mb-3 line-clamp-2 leading-tight">
-                              {vehicle.year} {vehicle.brand} {vehicle.model}
+                            <h3 className="text-lg font-medium text-card-foreground mb-2 line-clamp-2 leading-tight">
+                              {vehicle.title}
                             </h3>
                             
-                            {/* Info Grid */}
-                            <div className="grid grid-cols-2 gap-3 mb-3">
-                              <div className="flex items-center text-muted-foreground">
-                                <span className="text-sm font-medium mr-2">Mileage:</span>
-                                <span className="text-sm">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'N/A'}</span>
-                              </div>
-                              <div className="flex items-center text-muted-foreground">
-                                <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span className="text-sm">{vehicle.location}</span>
-                              </div>
+                            {/* Meta Info */}
+                            <div className="flex items-center gap-1.5 mb-3 text-sm text-muted-foreground flex-wrap">
+                              <span>{vehicle.year}</span>
+                              <span>•</span>
+                              <span>{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'New'}</span>
+                              {vehicle.range_miles && (
+                                <>
+                                  <span>•</span>
+                                  <span>{vehicle.range_miles}mi range</span>
+                                </>
+                              )}
                             </div>
                             
                             {/* Price */}
-                            <div className="mb-3">
-                              {(() => {
-                                const rawOld = (vehicle as any).old_price;
-                                const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
-                                const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
-                                return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
-                                  <span className="text-sm text-muted-foreground line-through mr-2">${oldP.toLocaleString()}</span>
-                                ) : null;
-                              })()}
-                              <span className="text-2xl font-bold text-green-600">
-                                ${vehicle.price.toLocaleString()}
-                              </span>
+                            <div className="mb-4">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {(() => {
+                                  const rawOld = (vehicle as any).old_price;
+                                  const oldP = typeof rawOld === 'string' ? parseFloat(rawOld) : Number(rawOld);
+                                  const currP = typeof (vehicle as any).price === 'string' ? parseFloat((vehicle as any).price) : Number((vehicle as any).price);
+                                  return Number.isFinite(oldP) && Number.isFinite(currP) && oldP > 0 && oldP > currP ? (
+                                    <span className="text-muted-foreground line-through text-sm">${oldP.toLocaleString()}</span>
+                                  ) : null;
+                                })()}
+                                <span className="text-2xl font-bold text-green-600">
+                                  ${vehicle.price.toLocaleString()}
+                                </span>
+                              </div>
                             </div>
+                          </div>
+
+                          {/* Desktop Layout */}
+                          <div className="hidden md:block">
+                            {/* Title */}
+                            <h3 className="text-lg font-semibold text-card-foreground mb-4">
+                              {vehicle.year} {vehicle.brand} {vehicle.model}
+                            </h3>
+                            
+                            {/* Info Table */}
+                            <div className="space-y-2 mb-4">
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium text-gray-700 w-24">Year:</span>
+                                <span className="text-sm text-gray-900">{vehicle.year}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium text-gray-700 w-24">Mileage:</span>
+                                <span className="text-sm text-gray-900">{vehicle.mileage ? `${vehicle.mileage.toLocaleString()} mi` : 'N/A'}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium text-gray-700 w-24">Location:</span>
+                                <span className="text-sm text-gray-900">{vehicle.location}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium text-gray-700 w-24">Price:</span>
+                                <span className="text-lg font-bold text-green-600">${vehicle.price.toLocaleString()}</span>
+                              </div>
+                            </div>
+                            
+                            {vehicle.sold && (
+                              <div className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mb-3">
+                                SOLD
+                              </div>
+                            )}
                           </div>
                           
                           {/* CTA: Inline Message Composer (All Screen Sizes) */}
