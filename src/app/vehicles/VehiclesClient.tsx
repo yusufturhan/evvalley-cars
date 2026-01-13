@@ -968,7 +968,7 @@ export function VehiclesClient({
                             <FavoriteButton vehicleId={vehicle.id} vehicleTitle={vehicle.title} size="sm" />
                           </div>
                           {vehicle.sold && (
-                            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-medium z-10">
                               SOLD
                             </div>
                           )}
