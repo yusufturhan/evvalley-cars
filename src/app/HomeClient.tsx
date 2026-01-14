@@ -326,21 +326,11 @@ export function HomeClient() {
       {/* Main Content: Sidebar + Listings */}
       <section className="py-8 bg-gradient-to-r from-[#F5F9FF] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Mobile Filters & Sort Buttons */}
-          <div className="lg:hidden mb-4 flex gap-3">
-            <button
-              onClick={() => setIsFilterOpen(true)}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-[#3AB0FF] text-[#3AB0FF] font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
-            >
-              <Filter className="w-5 h-5" />
-              <span>Filters</span>
-              <span className="ml-1 px-2 py-0.5 bg-[#3AB0FF] text-white text-xs rounded-full">
-                {totalVehicles}
-              </span>
-            </button>
+          {/* Mobile Sort Button Only (Filters moved to bottom nav) */}
+          <div className="lg:hidden mb-4">
             <button
               onClick={() => setIsSortOpen(true)}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm active:scale-95 transition-transform"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
