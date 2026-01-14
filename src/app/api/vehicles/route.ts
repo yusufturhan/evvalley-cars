@@ -23,6 +23,48 @@ export async function GET(request: Request) {
     const soldParam = searchParams.get('sold');
     const debugLocations = searchParams.get('debugLocations'); // Add debug parameter
     const sortBy = searchParams.get('sortBy'); // Add sort parameter
+    const ids = searchParams.get('ids'); // Batch fetch by IDs
+
+    // BATCH FETCH: If ids parameter is provided, fetch multiple vehicles by ID
+    if (ids) {
+      const idArray = ids.split(',').filter(id => id.trim()).slice(0, 100); // Max 100 IDs
+      
+      if (idArray.length === 0) {
+        return NextResponse.json({ vehicles: [], total: 0 });
+      }
+
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .in('id', idArray);
+
+      if (error) {
+        console.error('Error batch fetching vehicles:', error);
+        return NextResponse.json({ 
+          error: 'Failed to fetch vehicles',
+          details: process.env.NODE_ENV === 'development' ? error.message : 'Internal error'
+        }, { status: 500 });
+      }
+
+      // Serialize dates
+      const serializedData = data?.map(vehicle => ({
+        ...vehicle,
+        created_at: vehicle.created_at?.toString(),
+        updated_at: vehicle.updated_at?.toString(),
+        sold_at: vehicle.sold_at?.toString(),
+      })) || [];
+
+      return NextResponse.json({ 
+        vehicles: serializedData,
+        total: serializedData.length,
+        isBatchFetch: true
+      }, {
+        headers: {
+          'Cache-Control': 'public, max-age=300, s-maxage=300',
+          'CDN-Cache-Control': 'public, max-age=300',
+        }
+      });
+    }
 
     // Add caching headers for better performance
     const response = new Response();
