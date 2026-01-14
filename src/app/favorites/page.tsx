@@ -8,6 +8,7 @@ import FavoriteButton from "@/components/FavoriteButton";
 import { Vehicle } from "@/lib/database";
 import Link from "next/link";
 import Head from "next/head";
+import Image from "next/image";
 
 export default function FavoritesPage() {
   const { isSignedIn, user } = useUser();
@@ -52,19 +53,26 @@ export default function FavoritesPage() {
 
   const fetchFavoriteVehicles = async (favoriteIds: string[]) => {
     try {
-      const vehicles: Vehicle[] = [];
-      
-      for (const id of favoriteIds) {
+      // OPTIMIZED: Fetch all vehicles in parallel instead of sequentially
+      const vehiclePromises = favoriteIds.map(async (id) => {
         try {
           const response = await fetch(`/api/vehicles/${id}`);
           if (response.ok) {
             const data = await response.json();
-            vehicles.push(data.vehicle);
+            return data.vehicle;
           }
+          return null;
         } catch (error) {
           console.error(`Error fetching vehicle ${id}:`, error);
+          return null;
         }
-      }
+      });
+      
+      // Wait for all requests to complete in parallel
+      const vehiclesResults = await Promise.all(vehiclePromises);
+      
+      // Filter out nulls (failed requests)
+      const vehicles = vehiclesResults.filter((v): v is Vehicle => v !== null);
       
       setFavoriteVehicles(vehicles);
     } catch (error) {
@@ -159,12 +167,15 @@ export default function FavoritesPage() {
             {favoriteVehicles.map((vehicle) => (
               <div key={vehicle.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative">
-                  <div className="h-48 bg-gray-200">
+                  <div className="h-48 bg-gray-200 relative">
                     {vehicle.images && vehicle.images.length > 0 ? (
-                      <img
+                      <Image
                         src={vehicle.images[0]}
                         alt={`${vehicle.brand} ${vehicle.model}`}
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="h-full flex items-center justify-center">
