@@ -34,9 +34,26 @@ export function middleware(request: NextRequest) {
     const hostname = hostnameHeader.toLowerCase();
     const protocol = request.nextUrl.protocol;
     
-    // Hard-block Clerk subdomain from indexing: return 410 Gone for any path
-    // This ensures Google drops https://clerk.evvalley.com/* permanently.
-    if (hostname === 'clerk.evvalley.com' || hostname.startsWith('clerk.evvalley.com:')) {
+    // Hard-block Clerk subdomains from indexing: return 410 Gone for any path
+    // This ensures Google drops clerk.evvalley.com and accounts.evvalley.com permanently.
+    const isClerkSubdomain = hostname === 'clerk.evvalley.com' || 
+                            hostname.startsWith('clerk.evvalley.com:') ||
+                            hostname === 'accounts.evvalley.com' ||
+                            hostname.startsWith('accounts.evvalley.com:');
+                            
+    if (isClerkSubdomain) {
+      // Allow robots.txt so Google can see the 410 Gone status and noindex tag
+      // This fixes the "Blocked by robots.txt" error in GSC
+      if (pathname === '/robots.txt') {
+        return new NextResponse('User-agent: *\nAllow: /', {
+          status: 200,
+          headers: { 
+            'Content-Type': 'text/plain',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          },
+        });
+      }
+
       return new NextResponse('Gone', {
         status: 410,
         headers: {
