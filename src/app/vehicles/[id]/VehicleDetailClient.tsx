@@ -743,10 +743,6 @@ export default function VehicleDetailClient({ vehicle }: VehicleDetailClientProp
                   <p className="font-semibold text-gray-900 capitalize">{vehicle.transmission || 'N/A'}</p>
                 </div>
                 <div>
-                  <span className="text-gray-800 font-medium">Fuel Economy:</span>
-                  <p className="font-semibold text-gray-900">{vehicle.combined_fuel_economy || 'N/A'}</p>
-                </div>
-                <div>
                   <span className="text-gray-800 font-medium">Drivetrain:</span>
                   <p className="font-semibold text-gray-900 capitalize">{vehicle.drivetrain || 'N/A'}</p>
                 </div>
