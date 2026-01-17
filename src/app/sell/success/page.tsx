@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, ArrowRight, Home } from "lucide-react";
 import Header from "@/components/Header";
 import Link from "next/link";
 
-export default function SellSuccessPage() {
+function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const listingId = searchParams.get('listingId');
@@ -127,5 +127,23 @@ export default function SellSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SellSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+        <Header />
+        <div className="max-w-3xl mx-auto px-4 py-16">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
