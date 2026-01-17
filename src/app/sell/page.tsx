@@ -415,14 +415,22 @@ export default function SellPage() {
       console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
-        const vehicleData = await response.json();
-        const vehicleId = vehicleData?.id;
+        const responseData = await response.json();
+        console.log("📦 API Response:", responseData);
         
-        console.log("✅ Vehicle created successfully:", vehicleId);
+        // API returns { vehicle: { id, ... } }
+        const vehicleId = responseData?.vehicle?.id;
+        
+        console.log("✅ Vehicle created successfully. ID:", vehicleId);
+        console.log("📝 Category:", formData.category);
+        console.log("👤 Seller Type:", formData.seller_type);
         
         // Check if this is a CAR listing (EV Car or Hybrid Car) that requires payment
         const requiresPayment = formData.category === 'ev-car' || formData.category === 'hybrid-car';
         const isPrivateSeller = formData.seller_type === 'private';
+        
+        console.log("💰 Requires Payment:", requiresPayment);
+        console.log("🏠 Is Private Seller:", isPrivateSeller);
         
         if (requiresPayment && isPrivateSeller && vehicleId) {
           console.log("💳 Redirecting to Stripe Checkout for CAR listing...");
@@ -438,12 +446,17 @@ export default function SellPage() {
               }),
             });
             
+            console.log("📥 Stripe Checkout Response Status:", checkoutResponse.status);
+            
             if (checkoutResponse.ok) {
               const { url } = await checkoutResponse.json();
               console.log("✅ Stripe Checkout URL received:", url);
               
               // Don't clear localStorage yet - user might cancel payment
               // It will be cleared on the success page
+              
+              // Show loading message
+              alert("Redirecting to payment page...");
               
               // Redirect to Stripe Checkout
               window.location.href = url;
@@ -459,6 +472,7 @@ export default function SellPage() {
         } else {
           // E-Bike or EV Scooter (no payment required) OR Dealer listing
           console.log("✅ No payment required - listing activated immediately");
+          console.log("🎯 Reason: requiresPayment=" + requiresPayment + ", isPrivateSeller=" + isPrivateSeller + ", vehicleId=" + vehicleId);
           
           // Clear localStorage after successful submission
           localStorage.removeItem('sellFormData');
