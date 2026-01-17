@@ -415,18 +415,64 @@ export default function SellPage() {
       console.log("📥 Response headers:", Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
-        // Clear localStorage after successful submission
-        localStorage.removeItem('sellFormData');
-        localStorage.removeItem('sellFormImages');
-        localStorage.removeItem('sellFormVideo');
-        console.log('🧹 Form data cleared from localStorage');
+        const vehicleData = await response.json();
+        const vehicleId = vehicleData?.id;
         
-        setShowSuccess(true);
-        // Auto-hide success message after 3 seconds
-        setTimeout(() => {
-          setShowSuccess(false);
-          router.push("/vehicles");
-        }, 3000);
+        console.log("✅ Vehicle created successfully:", vehicleId);
+        
+        // Check if this is a CAR listing (EV Car or Hybrid Car) that requires payment
+        const requiresPayment = formData.category === 'ev-car' || formData.category === 'hybrid-car';
+        const isPrivateSeller = formData.seller_type === 'private';
+        
+        if (requiresPayment && isPrivateSeller && vehicleId) {
+          console.log("💳 Redirecting to Stripe Checkout for CAR listing...");
+          
+          try {
+            // Call Stripe Checkout API
+            const checkoutResponse = await fetch("/api/stripe/checkout", {
+              method: "POST",
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                listingId: vehicleId,
+                customerEmail: userEmail,
+              }),
+            });
+            
+            if (checkoutResponse.ok) {
+              const { url } = await checkoutResponse.json();
+              console.log("✅ Stripe Checkout URL received:", url);
+              
+              // Don't clear localStorage yet - user might cancel payment
+              // It will be cleared on the success page
+              
+              // Redirect to Stripe Checkout
+              window.location.href = url;
+            } else {
+              const errorData = await checkoutResponse.json();
+              console.error("❌ Stripe Checkout Error:", errorData);
+              alert(`Payment setup error: ${errorData.error || 'Failed to initialize payment'}`);
+            }
+          } catch (error) {
+            console.error("❌ Stripe Checkout Network Error:", error);
+            alert("Network error: Failed to initialize payment. Please try again.");
+          }
+        } else {
+          // E-Bike or EV Scooter (no payment required) OR Dealer listing
+          console.log("✅ No payment required - listing activated immediately");
+          
+          // Clear localStorage after successful submission
+          localStorage.removeItem('sellFormData');
+          localStorage.removeItem('sellFormImages');
+          localStorage.removeItem('sellFormVideo');
+          console.log('🧹 Form data cleared from localStorage');
+          
+          setShowSuccess(true);
+          // Auto-hide success message after 3 seconds
+          setTimeout(() => {
+            setShowSuccess(false);
+            router.push("/vehicles");
+          }, 3000);
+        }
       } else {
         const errorData = await response.json();
         console.error("❌ API Error:", errorData);
