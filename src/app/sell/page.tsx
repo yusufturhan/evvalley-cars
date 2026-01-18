@@ -449,13 +449,22 @@ export default function SellPage() {
             console.log("📥 Stripe Checkout Response Status:", checkoutResponse.status);
             
             if (checkoutResponse.ok) {
-              const { url } = await checkoutResponse.json();
-              console.log("✅ Stripe Checkout URL received:", url);
+              const responseData = await checkoutResponse.json();
+              console.log("✅ Stripe Checkout Response:", responseData);
+              const { url } = responseData;
+              console.log("✅ Stripe Checkout URL:", url);
+              
+              if (!url) {
+                console.error("❌ No URL in response!");
+                alert("Payment error: No redirect URL received. Check console.");
+                return;
+              }
               
               // Don't clear localStorage yet - user might cancel payment
               // It will be cleared on the success page
               
               // Show loading message
+              console.log("🚀 Redirecting to:", url);
               alert("Redirecting to payment page...");
               
               // Redirect to Stripe Checkout

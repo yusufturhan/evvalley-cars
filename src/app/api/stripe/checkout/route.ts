@@ -13,7 +13,7 @@ function getStripeInstance(): Stripe {
   }
   
   return new Stripe(apiKey, {
-    apiVersion: '2025-01-27.acacia',
+    apiVersion: '2024-11-20.acacia',
   });
 }
 
