@@ -9,10 +9,10 @@ export default function ClerkProvider({
 }) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-  // Get domain from environment or use default
+  // Get domain from environment or use default (remove www. prefix for Clerk subdomain)
   const domain = typeof window !== 'undefined' 
-    ? window.location.hostname 
-    : process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '') || 'evvalley.com';
+    ? window.location.hostname.replace('www.', '')
+    : process.env.NEXT_PUBLIC_APP_URL?.replace('https://', '').replace('http://', '').replace('www.', '') || 'evvalley.com';
 
   return (
     <ClerkProviderBase
