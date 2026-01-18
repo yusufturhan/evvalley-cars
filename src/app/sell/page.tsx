@@ -273,9 +273,11 @@ export default function SellPage() {
       newErrors.images = 'Maximum 15 images allowed';
     }
 
-    // Location validation - must select from suggestions
-    if (!locationData) {
-      newErrors.location = 'Please select a location from the suggestions.';
+    // Location validation - simplified (now accepts manual text input)
+    if (!formData.location || !formData.location.trim()) {
+      newErrors.location = 'Location is required (e.g., "Mountain View, CA" or "94303")';
+    } else if (formData.location.trim().length < 3) {
+      newErrors.location = 'Location must be at least 3 characters';
     }
 
     setErrors(newErrors);
@@ -378,15 +380,15 @@ export default function SellPage() {
         category: formData.category,
         range_miles: formData.range_miles || '',
         max_speed: formData.max_speed || '',
-        // Location data from LocationPicker
-        location: locationData?.formatted_address || '',
-        location_text: locationData?.formatted_address || '',
-        place_id: locationData?.place_id || '',
+        // Location data from LocationPicker (simplified - manual text input)
+        location: formData.location.trim(),
+        location_text: formData.location.trim(),
+        place_id: locationData?.place_id || null,
         lat: locationData?.lat || null,
         lng: locationData?.lng || null,
         city: locationData?.city || '',
         state: locationData?.state || '',
-        postal_code: locationData?.postal_code || '',
+        postal_code: locationData?.postal_code || null,
         seller_id: sellerIdToUse,
         seller_email: userEmail, // Use the email from Clerk directly
         seller_type: formData.seller_type, // propagate selection to API
