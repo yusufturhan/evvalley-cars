@@ -282,6 +282,13 @@ export default function SellPage() {
 
     setErrors(newErrors);
     
+    // Log validation results
+    console.log('🔍 Validation Results:', {
+      hasErrors: Object.keys(newErrors).length > 0,
+      errorCount: Object.keys(newErrors).length,
+      errors: newErrors
+    });
+    
     // If there are general errors, show them
     if (newErrors.general) {
       alert(newErrors.general);
@@ -353,10 +360,12 @@ export default function SellPage() {
 
     // Validate form
     if (!validateForm()) {
-      console.error("❌ Form validation failed:", errors);
+      console.error("❌ Form validation failed. Check the validation results above for details.");
       alert("Please fix the errors in the form. Check the console for details.");
       return;
     }
+    
+    console.log("✅ Form validation passed. Proceeding with submission...");
 
     setLoading(true);
     try {
